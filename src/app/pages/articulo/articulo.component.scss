@@ -1,0 +1,61 @@
+
+@use '../../../assets/styles/variables.scss';
+#fotoProducto {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  z-index: -1;
+}
+.margenChico{
+  margin-top: 230px;
+}
+.margenChico > *{
+  margin-bottom: 10px;
+}
+
+ul li {
+  display: inline;
+
+  &:not(:last-of-type)::after {
+    content: ", ";
+  }
+}
+
+.apto-container{
+  display: flex;
+  height: 30px;
+  align-items: center;
+  gap: 10px;
+  img{
+    height: 30px;
+  }
+}
+textarea{
+  resize: vertical;
+  display: block;
+  max-height: 150px;
+  border-radius: variables.$border-radius-grande;
+  border: unset;
+  background-color:variables.$color-principal-claro;
+  margin-top: 10px;
+  width: calc(100% - 30px);
+  padding: 15px;
+  &:focus{
+    outline: none;
+  }
+}
+#cantidad-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+button{
+  width: 100%;
+  border-radius: 20px;
+  border: unset;
+  background-color:variables.$color-principal-claro;
+  font-size: larger;
+  padding: 10px;
+}

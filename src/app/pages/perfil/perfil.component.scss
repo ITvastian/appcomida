@@ -1,0 +1,62 @@
+@use'../../../assets/styles/variables.scss';
+
+* {
+  font-size: large;
+}
+
+form {
+  margin-top: 45px;
+  display: flex;
+  flex-direction: column;
+
+  div {
+    display: flex;
+    flex-direction: column;
+
+    input {
+      font-size: medium;
+      border: none;
+      border-radius: 5px;
+      background-color: #e8e2e2;
+      padding: 5px;
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+}
+
+form {
+  gap: 20px;
+}
+
+form div {
+  gap: 5px;
+}
+
+button {
+  font-size: 17px;
+  height: 35px;
+  background-color: variables.$color-principal-claro;
+  border: unset;
+  border-radius: 15px;
+  cursor: pointer;
+  padding: 3px 0px 3px 0px;
+  letter-spacing: 1px;
+  margin-top: 20px;
+  &:disabled {
+    pointer-events: none;
+    background-color: rgb(217, 217, 217);
+    color: rgb(163, 163, 163);
+  }
+}
+
+button:hover {
+  background-color: rgba(228, 137, 137, 0.434);
+}
+
+.error {
+  color: red;
+  letter-spacing: 1px;
+}

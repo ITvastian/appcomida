@@ -1,0 +1,53 @@
+@use'../../../assets/styles/variables.scss';
+
+#barra-busqueda {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  background-color: variables.$color-principal-claro;
+  border-radius: 25px;
+  margin: 20px 10%;
+  padding: 5px 10px;
+
+  input {
+    width: 100%;
+    background-color: unset;
+    border: unset;
+    font-size: large;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+#apto-container {
+  display: flex;
+  align-items: center;
+  height: 25px;
+}
+
+img {
+  height: 100%;
+}
+
+#filtros {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#container {
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+h2 {
+  margin-top: 40px;
+  font-size: x-large;
+  text-align: center;
+  background-color: rgb(217, 217, 217);
+  color: rgb(163, 163, 163);
+  padding: 5px 5px;
+}

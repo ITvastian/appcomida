@@ -1,0 +1,22 @@
+@use '../../../../assets/styles/variables.scss';
+$width : 80px;
+
+
+#container {
+  display: flex;
+  justify-content: space-between;
+  width: $width;
+  align-items: center;
+  background-color: variables.$color-principal-claro;
+  border-radius: variables.$border-radius-mediano;
+  overflow: hidden;
+  border: 1px solid black;
+}
+
+button {
+  border: unset;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: variables.$color-principal;
+  padding: 2px 10px;
+}

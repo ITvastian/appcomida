@@ -1,0 +1,63 @@
+<section>
+  <form
+    #formulario="ngForm"
+    class="margenChico"
+    (ngSubmit)="guardarDatosPerfil()"
+  >
+    <div>
+      <label for="nombre" id="nombre">Nombre</label>
+      <input
+        type="text"
+        id="nombre"
+        name="nombre"
+        [(ngModel)]="perfil.nombre"
+        #nombre="ngModel"
+        minlength="3"
+        required
+      />
+      <p class="error" *ngIf="nombre.invalid && nombre.touched">
+        Ingrese nombre valido
+      </p>
+    </div>
+    <div>
+      <label for="direccion">Direccion</label>
+      <input
+        type="text"
+        id="direccion"
+        name="direccion"
+        [(ngModel)]="perfil.direccion"
+        #direccion="ngModel"
+        minlength="5"
+        required
+      />
+      <p class="error" *ngIf="direccion.invalid && direccion.touched">
+        Ingrese direccion valida
+      </p>
+    </div>
+    <div>
+      <label for="notas">Notas</label>
+      <input
+        type="text"
+        id="notas"
+        name="notas"
+        [(ngModel)]="perfil.detalleEntrega"
+      />
+    </div>
+    <div>
+      <label for="telefono">Teléfono</label>
+      <input
+        type="text"
+        id="telefono"
+        name="telefono"
+        [(ngModel)]="perfil.telefono"
+        #telefono="ngModel"
+        minlength="5"
+        required
+      />
+      <p class="error" *ngIf="direccion.invalid && direccion.touched">
+        Ingrese telefono valido
+      </p>
+    </div>
+    <button [disabled]="formulario.invalid">Enviar</button>
+  </form>
+</section>

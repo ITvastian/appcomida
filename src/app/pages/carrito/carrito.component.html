@@ -1,0 +1,103 @@
+<ng-container *ngIf="CartService.carrito.length !== 0; else sinCarrito">
+  <div id="container">
+    <div
+      *ngFor="let producto of CartService.carrito; index as i"
+      class="tarjetaProdContainer margenChico"
+    >
+      <ng-container *ngIf="productosCarrito()[i]">
+        <div
+          class="izq"
+          [ngStyle]="{
+            'background-image': 'url(' + productosCarrito()[i].fotoUrl + ')'
+          }"
+        >
+          <div>
+            <img
+              *ngIf="productosCarrito()[i].esCeliaco"
+              src="../../../assets/icons/celiaco.png"
+              alt="celiaco"
+            />
+            <img
+              *ngIf="productosCarrito()[i].esVegano"
+              src="../../../assets/icons/vegano.svg"
+              alt="vegano"
+            />
+          </div>
+        </div>
+        <div class="centro">
+          <p class="negrita">{{ productosCarrito()[i].nombre }}</p>
+          <p *ngIf="producto.notas !== ''">{{ producto.notas }}</p>
+          <app-contador-cantidad
+            [cantidadInicial]="producto.cantidad"
+            (cantidadNueva)="CartService.cambiarProd(producto.idProd, $event)"
+          ></app-contador-cantidad>
+        </div>
+        <div class="der">
+          <button (click)="eliminarProd(producto.idProd)" class="borrar">
+            <img src="../../../assets/icons/borrar.png" alt="" />
+          </button>
+          <p class="negrita">${{ productosCarrito()[i].precio }}</p>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div class="flex-mas">
+    <a id="mas" [routerLink]="['/home']" routerLinkActive="router-link-active"
+      >+</a
+    >
+  </div>
+  <section class="margenChico" id="informacion">
+    <h3>Direccion de Envío</h3>
+    <div class="flexApart" id="envioContainer">
+      <div>
+        <ng-container *ngIf="perfilService.perfil(); else sinDatosEnvio">
+          <h4>{{ perfilService.perfil()!.nombre }}</h4>
+          <p>
+            {{ perfilService.perfil()!.direccion }} -
+            {{ perfilService.perfil()?.telefono }}
+          </p>
+          <p>{{ perfilService.perfil()!.detalleEntrega }}</p>
+        </ng-container>
+        <ng-template #sinDatosEnvio>
+          <p>Ingresa tus datos de envio</p>
+        </ng-template>
+      </div>
+      <div>
+        <a
+          href=""
+          [routerLink]="['/perfil']"
+          routerLinkActive="router-link-active"
+        >
+          <img src="../../../assets/icons/lapiz.png" alt="editar" />
+        </a>
+      </div>
+    </div>
+    <div id="totales" class="flexApart">
+      <div>
+        <p class="negrita">Subtotal</p>
+        <p>Delivery</p>
+        <p class="negrita">Total</p>
+      </div>
+      <div id="montos">
+        <p class="negrita">${{ subtotal }}</p>
+        <p class="">${{ delivery }}</p>
+        <p class="negrita">${{ total }}</p>
+      </div>
+    </div>
+    <div class="">
+      <button id="enviar" [disabled]="!perfilService.perfil()" (click)="enviarMensaje()">Realizar pedido</button>
+    </div>
+  </section>
+</ng-container>
+
+<ng-template #sinCarrito>
+  <h2>Carrito Vacio</h2>
+</ng-template>
+
+<dialog method="modal" #dialog>
+  <p>Pudiste realizar el pedido?</p>
+  <div>
+    <button (click)="finalizarPedido()">Si<span>Reiniciar pedido</span></button>
+    <button (click)="editarPedido()">No <span>Editar pedido</span></button>
+  </div>
+</dialog>
