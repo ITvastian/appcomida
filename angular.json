@@ -20,7 +20,6 @@
             "outputPath": "dist/curso-angular",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "baseHref": "/home/",
             "polyfills": [
               "zone.js"
             ],
