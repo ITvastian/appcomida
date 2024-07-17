@@ -21,7 +21,7 @@ export class BuscarComponent {
   productos: Producto[] = [];
 
   ngOnInit(): void {
-    this.headerService.titulo.set('Buscar');
+    this.headerService.titulo.set('Search');
     this.productosService.getallProducts().then(res => this.productos = res)
   }
 

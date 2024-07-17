@@ -37,7 +37,7 @@ export class CarritoComponent {
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
 
   ngOnInit(): void {
-    this.headerService.titulo.set('Carrito');
+    this.headerService.titulo.set('Cart');
     this.buscarInfo().then(() => {
     this.calcularinfo();
     });
