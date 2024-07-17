@@ -21,11 +21,13 @@ time, mark, audio, video {
 	padding: 0;
 	border: 0;
 	font-size: 100%;
-	font: inherit;
+	// font: inherit;
+  font-family: 'Roboto';
 	vertical-align: baseline;
 }
 h1,h2,h3,h4,h5,h6{
 font-weight: bold;
+font-family: 'Roboto';
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
@@ -36,7 +38,7 @@ body {
 	line-height: 1;
   width: 100vw;
   overflow-x: hidden;
-  text-transform: capitalize;
+  // text-transform: capitalize;
 }
 ol, ul {
 	list-style: none;
