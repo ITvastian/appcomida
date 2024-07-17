@@ -26,6 +26,7 @@ export class ArticuloComponent {
 
   ngOnInit(): void {
     this.headerService.titulo.set('articulo');
+
   }
   constructor(private ac: ActivatedRoute, private router:Router) {
     ac.params.subscribe((param) => {

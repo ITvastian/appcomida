@@ -54,7 +54,7 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": ["Carne de ternera","Pan Brioche","Queso", "Tomate", "Lechuga"],
-        "fotoUrl": "https://elsheriffburger.com/uploads/lh90_elsheriffbuger/products/54/es/img-H.-Especial-5-WEB-de-taman%CC%83o-mediano.jpg"
+        "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQL03lAYjhfBAZmm9PpBPoziv3XGvGIMFhwNQ&s"
       },
       {
         "id": "3",
@@ -97,7 +97,7 @@
   {
     "id": 3,
     "nombre": "Postres",
-    "fotoUrl": "https://www.recetasnestle.com.ar/sites/default/files/2023-03/postre-en-vaso-dulce-leche.jpg.jpg",
+    "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBm61qBO3DX_aUw8mJrh775LPkSu1zmofKXQ&s",
     "productos": [
       {
         "id": "10",
@@ -115,7 +115,7 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": [],
-        "fotoUrl": "https://www.cronica.com.ar/__export/1653520801548/sites/cronica/img/2021/06/17/chocotorta_2_crop1623944104124.jpg_792575817.jpg"
+        "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtU4VQTGsATrY0rZOKwTWNLZ3AsdLLMzA1xg&s"
       },
       {
         "id": "12",
@@ -131,7 +131,7 @@
   {
     "id": 4,
     "nombre": "Bebidas",
-    "fotoUrl": "https://img.band.uol.com.br/image/2023/02/09/bebidas-alcoolicas-181014_800x450.webp",
+    "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSybAauVkfSwZpKDRIkgnKYj1lZ9gY408yP6g&s",
     "productos": [
       {
         "id": "13",
@@ -165,7 +165,7 @@
   {
     "id": 5,
     "nombre": "Combos",
-    "fotoUrl": "https://i-ticketing.iwos.com/1000x1000-th/products/220/products_220_2.png",
+    "fotoUrl": "https://s.libertaddigital.com/2016/05/24/combomc.jpg",
     "productos": [
       {
         "id": "16",
@@ -208,7 +208,7 @@
         "esVegano":true,
         "esCeliaco":true,
         "ingredientes": ["Lechuga","Tomate","Zanahoria"],
-        "fotoUrl": "https://www.plantheoshops.com.ar/mitienda/galeria/files/5/61b36abcb06eb_1639148220-7227.jpeg"
+        "fotoUrl": "https://i.blogs.es/9f5353/ensalada-pollo1/450_1000.jpg"
       }
     ]
   }
