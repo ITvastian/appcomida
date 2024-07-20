@@ -20,14 +20,14 @@
       </p>
     </div>
     <div>
-      <label for="direccion">Direccion</label>
+      <label for="direccion">Número de mesa</label>
       <input
         type="text"
         id="direccion"
         name="direccion"
         [(ngModel)]="perfil.direccion"
         #direccion="ngModel"
-        minlength="5"
+        minlength="1"
         required
       />
       <p class="error" *ngIf="direccion.invalid && direccion.touched">
