@@ -16,7 +16,7 @@
         required
       />
       <p class="error" *ngIf="nombre.invalid && nombre.touched">
-        Ingrese nombre valido
+        Ingrese un nombre
       </p>
     </div>
     <div>
@@ -31,7 +31,7 @@
         required
       />
       <p class="error" *ngIf="direccion.invalid && direccion.touched">
-        Ingrese direccion valida
+        Ingrese número de mesa
       </p>
     </div>
     <div>
@@ -55,7 +55,7 @@
         required
       />
       <p class="error" *ngIf="direccion.invalid && direccion.touched">
-        Ingrese telefono valido
+        Ingrese un teléfono
       </p>
     </div>
     <button [disabled]="formulario.invalid">Enviar</button>
