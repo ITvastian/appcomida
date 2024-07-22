@@ -28,9 +28,9 @@
           <p class="negrita">{{ productosCarrito()[i].nombre }}</p>
           <p *ngIf="producto.notas !== ''">{{ producto.notas }}</p>
           <app-contador-cantidad
-            [cantidadInicial]="producto.cantidad"
-            (cantidadNueva)="CartService.cambiarProd(producto.idProd, $event)"
-          ></app-contador-cantidad>
+          [cantidadInicial]="producto.cantidad"
+          (cantidadNueva)="cambiarProductoCantidad(producto.idProd, $event)"
+        ></app-contador-cantidad>
         </div>
         <div class="der">
           <button (click)="eliminarProd(producto.idProd)" class="borrar">

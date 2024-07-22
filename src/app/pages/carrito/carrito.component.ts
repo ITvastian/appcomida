@@ -39,32 +39,42 @@ export class CarritoComponent {
   ngOnInit(): void {
     this.headerService.titulo.set('Cart');
     this.buscarInfo().then(() => {
-    this.calcularinfo();
+      this.calcularinfo();
     });
   }
 
   async buscarInfo() {
+    const productos = [];
     for (let i = 0; i < this.CartService.carrito.length; i++) {
       const itemCarrito = this.CartService.carrito[i];
       const res = await this.ProductosService.getById(itemCarrito.idProd);
-      if (res) this.productosCarrito.set([...this.productosCarrito(), res]);
+      if (res) productos.push(res);
     }
+    this.productosCarrito.set(productos);
+    this.calcularinfo(); // Asegurar que se recalcula el total después de buscar la información
   }
 
   eliminarProd(idProd: number) {
     this.CartService.deleteProd(idProd);
+    this.actualizarCarrito();
   }
+
   calcularinfo() {
-    this.subtotal = 0;
-    for (let i = 0; i < this.CartService.carrito.length; i++) {
-      this.subtotal +=
-        this.productosCarrito()[i].precio *
-        this.CartService.carrito[i].cantidad;
-    }
+    this.subtotal = this.CartService.carrito.reduce((acc, item, index) => {
+      const producto = this.productosCarrito()[index];
+      return acc + (producto.precio * item.cantidad);
+    }, 0);
     this.total = this.subtotal + this.delivery;
   }
+
   cambiarProductoCantidad(id: number, cantidad: number) {
     this.CartService.cambiarProd(id, cantidad);
+    this.actualizarCarrito();
+    this.calcularinfo();
+  }
+
+  async actualizarCarrito() {
+    await this.buscarInfo();
     this.calcularinfo();
   }
 
@@ -92,6 +102,7 @@ export class CarritoComponent {
     window.open(link, '_blank');
     this.dialog.nativeElement.showModal();
   }
+
   finalizarPedido() {
     this.CartService.vaciar();
     this.dialog.nativeElement.close();
