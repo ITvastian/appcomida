@@ -4,12 +4,12 @@
   id="fotoProducto"
 />
 <section class="margenChico">
-  <ul>
-    <span>Ingredientes: </span>
-    <li *ngFor="let ingrediente of producto?.ingredientes">
-      {{ ingrediente }}
-    </li>
-  </ul>
+    <ul>
+      <span>Ingredientes: </span>
+      <li *ngFor="let ingrediente of producto?.ingredientes">
+        {{ ingrediente }}
+      </li>
+    </ul>
   <div >
     <div *ngIf="producto?.esCeliaco" class="apto-container">
       <img class="apto" src="../../../assets/icons/celiaco.png" alt="celiaco" />
@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <label for="notas">Notas: </label>
+  <label for="notas" >Notas: </label>
   <textarea name="notas" id="notas" cols="30" rows="30" [(ngModel)]="notas"></textarea>
   <div id="cantidad-container">
     <label for="cantidad">Cantidad: </label>
