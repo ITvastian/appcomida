@@ -1,34 +1,39 @@
 <section>
-<form #buscarForm="ngForm" (change)="buscar()">
-  <div id="barra-busqueda">
-    <img src="../../../assets/icons/lupa.svg" alt="" />
-    <input type="text" name="texto" [(ngModel)]="parametrosBusqueda.texto" />
-  </div>
-  <div id="filtros">
-    <div id="apto-container">
-      <img src="../../../assets/icons/celiaco.png" alt="Apto Celiaco" />
-      <input type="checkbox" name="celiaco" [(ngModel)]="parametrosBusqueda.aptoCeliaco" />
-      <span>Apto Celiaco</span>
+  <form #buscarForm="ngForm" (change)="buscar()">
+    <div id="barra-busqueda">
+      <img src="../../../assets/icons/lupa.svg" alt="" />
+      <input type="text" name="texto" [(ngModel)]="parametrosBusqueda.texto" />
     </div>
-    <div id="apto-container">
-      <img src="../../../assets/icons/vegano.svg" alt="Apto Vegano" />
-      <input type="checkbox" name="vegano" [(ngModel)]="parametrosBusqueda.aptoVegano" />
-      <span>Apto Vegano</span>
+    <div id="filtros">
+      <div id="apto-container">
+        <img src="../../../assets/icons/celiaco.png" alt="Apto Celiaco" />
+        <input
+          type="checkbox"
+          name="celiaco"
+          [(ngModel)]="parametrosBusqueda.aptoCeliaco"
+        />
+        <span>Apto Celiaco</span>
+      </div>
+      <div id="apto-container">
+        <img src="../../../assets/icons/vegano.svg" alt="Apto Vegano" />
+        <input
+          type="checkbox"
+          name="vegano"
+          [(ngModel)]="parametrosBusqueda.aptoVegano"
+        />
+        <span>Apto Vegano</span>
+      </div>
     </div>
+  </form>
+  <div id="container" *ngIf="productos.length !== 0; else sinResultado">
+    <app-tarjeta-producto
+      *ngFor="let producto of productos"
+      [producto]="producto"
+      [routerLink]="['/articulo', producto.id]"
+    ></app-tarjeta-producto>
   </div>
-</form>
-<div id="container" *ngIf="productos.length !== 0; else sinResultado">
 
-  <app-tarjeta-producto
-  *ngFor="let producto of productos"
-  [producto]="producto"
-  [routerLink]="['/articulo',producto.id]"
-  ></app-tarjeta-producto>
-</div>
-
-<ng-template #sinResultado id="sinResultado">
-  <h2>Sin resultados</h2>
-</ng-template>
+  <ng-template #sinResultado id="sinResultado">
+    <h2>Sin resultados</h2>
+  </ng-template>
 </section>
-
-

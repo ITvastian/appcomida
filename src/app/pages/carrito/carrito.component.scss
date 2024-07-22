@@ -119,25 +119,35 @@ h2{
 }
 
 dialog {
-  background-color: hsl(0 63% 84% / 1);
+  background-color: white;
   border-radius: 10px;
   border: unset;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.164);
+
   div{
     margin-top: 50px;
     display: flex;
     justify-content: space-around;
   }
-  button {
+  #modal-btn {
+    font-weight: bold;
+    border-radius: 8px;
+    border: unset;
+    height: 4rem;
+    max-height: 4rem;
+    align-items: center;
+    justify-content: center;
+    font-size: larger;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    width: 130px;
+    width: 40%;
+    color: black;
     &:first-of-type{
-      background-color: rgb(127, 198, 131);
+      background-color: rgb(9 167 17 / 79%);
     }
     &:last-of-type{
-      background-color: rgb(239, 152, 152);
+      background-color: rgb(215 19 19 / 73%);
     }
     span {
       font-size: x-large;
@@ -149,3 +159,4 @@ dialog {
     text-align: center;
   }
 }
+

@@ -87,16 +87,18 @@ export class CarritoComponent {
       pedido += `*${this.CartService.carrito[i].cantidad} X ${producto?.nombre}
       `;
     }
-    const mensaje = `Hola! Soy ${
-      this.perfilService.perfil()?.nombre
-    }, y te quiero hacer el siguiente pedido ${pedido}
-    Si te queres comunicar conmigo hacelo al N° del que te hablo o al ${
-      this.perfilService.perfil()?.telefono
-    }
-    La direccion del envio es : ${this.perfilService.perfil()?.direccion} - ${
-      this.perfilService.perfil()?.detalleEntrega
-    }
-    Muchas Gracias`;
+    const mensaje = `
+      Hola! Soy ${this.perfilService.perfil()?.nombre}
+      Orden:
+
+      Pedido: ${pedido}
+      Teléfono: ${this.perfilService.perfil()?.telefono}
+
+      Mesa N°: ${this.perfilService.perfil()?.direccion}
+
+      Notas :${this.perfilService.perfil()?.detalleEntrega}
+
+      Muchas Gracias!!!`;
 
     const link = `https://wa.me/${Numero_Whats}?text=${encodeURI(mensaje)}`;
     window.open(link, '_blank');

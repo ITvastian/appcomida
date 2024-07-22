@@ -68,7 +68,7 @@
           [routerLink]="['/perfil']"
           routerLinkActive="router-link-active"
         >
-          <img src="../../../assets/icons/lapiz.png" alt="editar" />
+          <img src="../../../assets/icons/lapizz.png" alt="editar" />
         </a>
       </div>
     </div>
@@ -95,9 +95,9 @@
 </ng-template>
 
 <dialog method="modal" #dialog>
-  <p>Pudiste realizar el pedido?</p>
+  <p>¿Pudiste realizar el pedido?</p>
   <div>
-    <button (click)="finalizarPedido()">Si<span>Reiniciar pedido</span></button>
-    <button (click)="editarPedido()">No <span>Editar pedido</span></button>
+    <button id="modal-btn" (click)="finalizarPedido()">Si</button>
+    <button id="modal-btn" (click)="editarPedido()">No</button>
   </div>
 </dialog>
