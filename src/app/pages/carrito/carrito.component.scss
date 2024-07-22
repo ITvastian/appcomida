@@ -160,3 +160,27 @@ dialog {
   }
 }
 
+#cart {
+  position: relative; /* Asegura que el contenedor es el contexto de la posición absoluta de la imagen */
+  overflow: hidden;
+  width: 100%; /* Asegura que el contenedor ocupa todo el ancho de la pantalla */
+  height: 100vh; /* Ajusta la altura según sea necesario */
+}
+
+@keyframes moveX {
+  0% {
+    transform: translateX(-100px); /* Empieza fuera del borde derecho de la ventana */
+  }
+  100% {
+    transform: translateX(100vw); /* Mueve fuera del borde izquierdo de la ventana */
+  }
+}
+
+.animated-image {
+  position: absolute;
+  left: 0;
+  width: 80px; /* Ajusta el tamaño según sea necesario */
+  height: auto; /* Mantiene la proporción de la imagen */
+  animation: moveX 5s linear infinite;
+  transform: translateY(-50%);
+}
