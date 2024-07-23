@@ -32,7 +32,7 @@ export class CarritoComponent {
 
   productosCarrito: WritableSignal<Producto[]> = signal([]);
   subtotal = 0;
-  delivery = 100;
+  delivery = 0;
   total = 0;
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
 
