@@ -16,6 +16,7 @@ export class ContadorCantidadComponent implements OnInit{
   @Output() cantidadNueva = new EventEmitter<number>();
   @Input () cantidadInicial = 1;
 
+
   actualizarNum(dif: number) {
     this.numero.set(Math.max(this.numero() + dif, 1));
     this.cantidadNueva.emit(this.numero());

@@ -11,7 +11,11 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": ["Muzarella","Aceitunas","Orégano"],
-        "fotoUrl": "https://caserissimo.com/wp-content/uploads/2015/08/pizabuaur1-1024x768.jpg"
+        "fotoUrl": "https://caserissimo.com/wp-content/uploads/2015/08/pizabuaur1-1024x768.jpg",
+        "extras": [
+        {"nombre": "Extra de queso", "precio": 100},
+        {"nombre": "Extra de jamón", "precio": 150}
+      ]
       },
       {
         "id": "8",
@@ -20,7 +24,11 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": ["Muzarella","Aceitunas","Morrones","Tomate","Huevo"],
-        "fotoUrl": "https://images-gmi-pmc.edge-generalmills.com/fce31bdd-1931-4f30-adef-a5bac0864676.jpg"
+        "fotoUrl": "https://images-gmi-pmc.edge-generalmills.com/fce31bdd-1931-4f30-adef-a5bac0864676.jpg",
+        "extras": [
+        {"nombre": "Extra de queso", "precio": 100},
+        {"nombre": "Extra de jamón", "precio": 150}
+      ]
       },
       {
         "id": "9",
@@ -29,7 +37,11 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": ["Muzarella","Roquefort","Provolone","Parmesano"],
-        "fotoUrl": "https://www.gourmet.cl/wp-content/uploads/2017/04/pizza-570x458.jpg"
+        "fotoUrl": "https://www.gourmet.cl/wp-content/uploads/2017/04/pizza-570x458.jpg",
+        "extras": [
+          {"nombre": "Extra de queso", "precio": 100},
+          {"nombre": "Extra de jamón", "precio": 150}
+        ]
       }
     ]
   },
@@ -45,7 +57,11 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": ["Carne de ternera","Pan Brioche","Queso"],
-        "fotoUrl": "https://quem.com.ar/tienda/wp-content/uploads/2020/12/Grandwich_17-10_-061.jpg"
+        "fotoUrl": "https://quem.com.ar/tienda/wp-content/uploads/2020/12/Grandwich_17-10_-061.jpg",
+        "extras": [
+          {"nombre": "Extra de queso", "precio": 100},
+          {"nombre": "Extra de jamón", "precio": 150}
+        ]
       },
       {
         "id": "2",
@@ -54,7 +70,11 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": ["Carne de ternera","Pan Brioche","Queso", "Tomate", "Lechuga"],
-        "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQL03lAYjhfBAZmm9PpBPoziv3XGvGIMFhwNQ&s"
+        "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQL03lAYjhfBAZmm9PpBPoziv3XGvGIMFhwNQ&s",
+        "extras": [
+          {"nombre": "Extra de queso", "precio": 100},
+          {"nombre": "Extra de jamón", "precio": 150}
+        ]
       },
       {
         "id": "3",
@@ -63,7 +83,10 @@
         "esVegano":true,
         "esCeliaco":false,
         "ingredientes": ["Medallón a base de lentejas","Pan Brioche","Tomate"],
-        "fotoUrl": "https://www.pequerecetas.com/wp-content/uploads/2009/04/hamburguesa-de-garbanzos-casera-receta.jpg"
+        "fotoUrl": "https://www.pequerecetas.com/wp-content/uploads/2009/04/hamburguesa-de-garbanzos-casera-receta.jpg",
+        "extras": [
+          {"nombre": "Extra de Tomate", "precio": 100}
+        ]
       },
       {
         "id": "4",
@@ -72,7 +95,11 @@
         "esVegano":false,
         "esCeliaco":true,
         "ingredientes": ["Carne de ternera","Pan libre de tacc","Queso"],
-        "fotoUrl": "https://www.perez-h.com/newsite/wp-content/uploads/2016/06/queso-2.jpg"
+        "fotoUrl": "https://www.perez-h.com/newsite/wp-content/uploads/2016/06/queso-2.jpg",
+        "extras": [
+          {"nombre": "Extra de queso", "precio": 100},
+          {"nombre": "Extra de jamón", "precio": 150}
+        ]
       },
       {
         "id": "5",
@@ -81,7 +108,11 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": ["Carne de ternera","Pan Brioche","Queso","Salsa secreta BBQ", "Panceta"],
-        "fotoUrl": "https://www.clarin.com/img/2022/05/27/0HXb0UR0v_2000x1500__1.jpg"
+        "fotoUrl": "https://www.clarin.com/img/2022/05/27/0HXb0UR0v_2000x1500__1.jpg",
+        "extras": [
+          {"nombre": "Extra de queso", "precio": 100},
+          {"nombre": "Extra de jamón", "precio": 150}
+        ]
       },
       {
         "id": "6",
@@ -90,7 +121,11 @@
         "esVegano":true,
         "esCeliaco":true,
         "ingredientes": ["Medallón a base de lentejas","Tomate","Lechuga"],
-        "fotoUrl": "https://canalcocina.es/medias/images/1010_Coc_RecetasDeAnnie_HamburguesaQueso.jpg"
+        "fotoUrl": "https://canalcocina.es/medias/images/1010_Coc_RecetasDeAnnie_HamburguesaQueso.jpg",
+        "extras": [
+          {"nombre": "Extra de queso", "precio": 100},
+          {"nombre": "Extra de jamón", "precio": 150}
+        ]
       }
     ]
   },
@@ -174,7 +209,11 @@
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": [],
-        "fotoUrl": "https://thepostsportsbar.com/wp-content/uploads/2019/07/ALL-Pizzas-0045-top-down.jpg"
+        "fotoUrl": "https://thepostsportsbar.com/wp-content/uploads/2019/07/ALL-Pizzas-0045-top-down.jpg",
+        "extras": [
+          {"nombre": "Extra de queso", "precio": 100},
+          {"nombre": "Extra de jamón", "precio": 150}
+        ]
       }
     ]
   },
@@ -195,11 +234,14 @@
       {
         "id": "18",
         "nombre":"Ensalada César",
-        "precio": 100,
+        "precio": 1000,
         "esVegano":false,
         "esCeliaco":false,
         "ingredientes": ["Lechuga","Salsa César","Pollo","Croutones"],
-        "fotoUrl": "https://www.cocinacaserayfacil.net/wp-content/uploads/2018/06/Ensalada-cesar.jpg"
+        "fotoUrl": "https://www.cocinacaserayfacil.net/wp-content/uploads/2018/06/Ensalada-cesar.jpg",
+        "extras": [
+          {"nombre": "Extra de Pollo", "precio": 100}
+        ]
       },
       {
         "id": "19",

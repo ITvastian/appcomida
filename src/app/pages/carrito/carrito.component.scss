@@ -1,6 +1,6 @@
 @use '../../../assets/styles/variables.scss';
 
-h2{
+h2 {
   font-size: xx-large;
   text-align: center;
   margin-top: 50px;
@@ -9,13 +9,14 @@ h2{
 #container {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 5px;
 }
 
 .tarjetaProdContainer {
   position: relative;
   display: flex;
-  height: 100px;
+  min-height: 100px;
+  max-height: 120px;
   border-radius: variables.$border-radius-mediano;
   overflow: hidden;
   background-color: variables.$color-principal-claro;
@@ -24,7 +25,7 @@ h2{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 10px;
+    padding: 5px;
   }
 }
 
@@ -49,12 +50,21 @@ h2{
 
 .centro {
   width: 65%;
+  gap: 3px;
 }
 
 .der {
   width: 10%;
   background-color: unset;
-  align-items: flex-end;
+  align-items: center;
+  .extras-li {
+    padding-bottom: 7px;
+    .li-extras {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+    }
+  }
 }
 
 .borrar {
@@ -124,11 +134,12 @@ dialog {
   border: unset;
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.164);
 
-  div{
+  div {
     margin-top: 50px;
     display: flex;
     justify-content: space-around;
   }
+
   #modal-btn {
     font-weight: bold;
     border-radius: 8px;
@@ -143,12 +154,15 @@ dialog {
     align-items: center;
     width: 40%;
     color: black;
-    &:first-of-type{
+
+    &:first-of-type {
       background-color: rgb(9 167 17 / 79%);
     }
-    &:last-of-type{
+
+    &:last-of-type {
       background-color: rgb(215 19 19 / 73%);
     }
+
     span {
       font-size: x-large;
     }
@@ -161,26 +175,28 @@ dialog {
 }
 
 #cart {
-  position: relative; /* Asegura que el contenedor es el contexto de la posición absoluta de la imagen */
+  position: relative;
   overflow: hidden;
-  width: 100%; /* Asegura que el contenedor ocupa todo el ancho de la pantalla */
-  height: 100vh; /* Ajusta la altura según sea necesario */
+  width: 100%;
+  height: 100vh;
 }
 
 @keyframes moveX {
   0% {
-    transform: translateX(-100px); /* Empieza fuera del borde derecho de la ventana */
+    transform: translateX(-100px);
   }
+
   100% {
-    transform: translateX(100vw); /* Mueve fuera del borde izquierdo de la ventana */
+    transform: translateX(100vw);
   }
 }
 
 .animated-image {
   position: absolute;
   left: 0;
-  width: 80px; /* Ajusta el tamaño según sea necesario */
-  height: auto; /* Mantiene la proporción de la imagen */
+  width: 80px;
+  height: auto;
   animation: moveX 5s linear infinite;
   transform: translateY(-50%);
 }
+

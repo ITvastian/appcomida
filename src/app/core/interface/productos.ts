@@ -6,4 +6,10 @@ export interface Producto{
   esCeliaco: boolean
   ingredientes: string
   fotoUrl: string
+  extras: Extra[]
+}
+export interface Extra {
+  nombre: string;
+  precio: number;
+  seleccionado?: boolean; // Asegúrate de que esta propiedad exista
 }

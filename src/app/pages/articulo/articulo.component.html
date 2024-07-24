@@ -10,7 +10,18 @@
         {{ ingrediente }}
       </li>
     </ul>
-  <div >
+    <!-- ------------------------ -->
+     <div class="extras-container">
+         <!-- <span>Extras:</span> -->
+         <li *ngFor="let extra of producto?.extras">
+           <input type="checkbox"
+           (change)="actualizarExtrasSeleccionados(extra)"
+           [checked]="extra.seleccionado">
+           {{ extra.nombre }} - ${{ extra.precio }}
+          </li>
+      </div>
+    <!-- ------------------------ -->
+  <div>
     <div *ngIf="producto?.esCeliaco" class="apto-container">
       <img class="apto" src="../../../assets/icons/celiaco.png" alt="celiaco" />
       <p>Apto celiaco</p>

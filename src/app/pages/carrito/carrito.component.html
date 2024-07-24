@@ -1,44 +1,52 @@
 <ng-container *ngIf="CartService.carrito.length !== 0; else sinCarrito">
   <div id="container">
     <div
-      *ngFor="let producto of CartService.carrito; index as i"
+      *ngFor="let item of productosCarrito(); index as i"
       class="tarjetaProdContainer margenChico"
     >
-      <ng-container *ngIf="productosCarrito()[i]">
-        <div
-          class="izq"
-          [ngStyle]="{
-            'background-image': 'url(' + productosCarrito()[i].fotoUrl + ')'
-          }"
-        >
-          <div>
-            <img
-              *ngIf="productosCarrito()[i].esCeliaco"
-              src="../../../assets/icons/celiaco.png"
-              alt="celiaco"
-            />
-            <img
-              *ngIf="productosCarrito()[i].esVegano"
-              src="../../../assets/icons/vegano.svg"
-              alt="vegano"
-            />
-          </div>
+      <div
+        class="izq"
+        [ngStyle]="{ 'background-image': 'url(' + item.fotoUrl + ')' }"
+      >
+        <div>
+          <img
+            *ngIf="item.esCeliaco"
+            src="../../../assets/icons/celiaco.png"
+            alt="celiaco"
+          />
+          <img
+            *ngIf="item.esVegano"
+            src="../../../assets/icons/vegano.svg"
+            alt="vegano"
+          />
         </div>
-        <div class="centro">
-          <p class="negrita">{{ productosCarrito()[i].nombre }}</p>
-          <p *ngIf="producto.notas !== ''">{{ producto.notas }}</p>
-          <app-contador-cantidad
-          [cantidadInicial]="producto.cantidad"
-          (cantidadNueva)="cambiarProductoCantidad(producto.idProd, $event)"
+      </div>
+      <div class="centro">
+        <p class="negrita">{{ item.nombre }}</p>
+        <p *ngIf="item.notas !== ''" id="notas-carrito">{{ item.notas }}</p>
+        <ul>
+          <li *ngFor="let extra of item.extras">
+            <p id="extra-nombre">{{ extra.nombre }}</p>
+          </li>
+        </ul>
+        <app-contador-cantidad
+          [cantidadInicial]="item.cantidad"
+          (cantidadNueva)="cambiarProductoCantidad(item.id, $event)"
         ></app-contador-cantidad>
+      </div>
+      <div class="der">
+        <button (click)="eliminarProd(item.id)" class="borrar">
+          <img src="../../../assets/icons/borrarr.png" alt="" width="20px" />
+        </button>
+        <div class="precios">
+          <div class="extras-li">
+            <li *ngFor="let extra of item.extras" class="li-extras">
+              <h4 id="precio-extra">${{ extra.precio }}</h4>
+            </li>
+          </div>
+            <p class="negrita">${{ item.precio }}</p>
         </div>
-        <div class="der">
-          <button (click)="eliminarProd(producto.idProd)" class="borrar">
-            <img src="../../../assets/icons/borrarr.png" alt="" width="25px"/>
-          </button>
-          <p class="negrita">${{ productosCarrito()[i].precio }}</p>
-        </div>
-      </ng-container>
+      </div>
     </div>
   </div>
   <div class="flex-mas">
@@ -75,24 +83,30 @@
     <div id="totales" class="flexApart">
       <div>
         <p class="negrita">Subtotal</p>
-        <!-- <p>Delivery</p> -->
+        <p class="negrita">Extras</p>
         <p class="negrita">Total</p>
       </div>
       <div id="montos">
-        <p class="negrita">${{ subtotal }}</p>
-        <!-- <p class="">${{ delivery }}</p> -->
+        <p class="negrita">${{ subtotal - extraTotal}}</p>
+        <p class="negrita">${{ extraTotal }}</p>
         <p class="negrita">${{ total }}</p>
       </div>
     </div>
-    <div class="">
-      <button id="enviar" [disabled]="!perfilService.perfil()" (click)="enviarMensaje()">Realizar pedido</button>
+    <div>
+      <button
+        id="enviar"
+        [disabled]="!perfilService.perfil()"
+        (click)="enviarMensaje()"
+      >
+        Realizar pedido
+      </button>
     </div>
   </section>
 </ng-container>
 
 <ng-template #sinCarrito id="cart">
   <h2>Carrito Vacío</h2>
-  <img src="../../../assets/icons/cart.png" alt="" class="animated-image"/>
+  <img src="../../../assets/icons/cart.png" alt="" class="animated-image" />
 </ng-template>
 
 <dialog method="modal" #dialog>

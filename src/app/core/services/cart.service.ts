@@ -4,55 +4,6 @@ import { Cart } from '../interface/carrito';
 @Injectable({
   providedIn: 'root',
 })
-// export class CartService {
-
-//   constructor() {
-//     const cart = localStorage.getItem('cart');
-//     if (cart) {
-//       this.carrito = JSON.parse(cart);
-//     }
-//   }
-
-//   carrito: Cart[] = [];
-
-//   addProd(idProd: number, cantidad: number, notas: string) {
-//     const i = this.carrito.findIndex((producto) => producto.idProd === idProd);
-//     if (i === -1) {
-//       const nuevoProd: Cart = {
-//         idProd: idProd,
-//         cantidad: cantidad,
-//         notas: notas,
-//       };
-//       this.carrito.push(nuevoProd);
-//     } else {
-//       this.carrito[i].cantidad += cantidad;
-//     }
-//     this.actualizarAlmacenamiento();
-//   }
-//   deleteProd(idProd: number) {
-//     this.carrito = this.carrito.filter(
-//       (producto) => producto.idProd !== idProd
-//     );
-//     if (this.carrito.length === 0) return localStorage.clear();
-//     this.actualizarAlmacenamiento();
-//   }
-//   cambiarProd(idProd: number, cantidad: number) {
-//     this.carrito = this.carrito.map((producto) => {
-//       const productoActual = producto;
-//       if (productoActual.idProd === idProd) productoActual.cantidad = cantidad;
-//       return productoActual;
-//     });
-//     this.actualizarAlmacenamiento();
-//   }
-//   actualizarAlmacenamiento() {
-//     localStorage.setItem('cart', JSON.stringify(this.carrito));
-//   }
-
-//   vaciar(){
-//     this.carrito = [];
-//     localStorage.clear()
-//   }
-// }
 export class CartService {
   carrito: Cart[] = [];
 
@@ -76,17 +27,19 @@ export class CartService {
     }
   }
 
-  addProd(idProd: number, cantidad: number, notas: string) {
+  addProd(idProd: number, cantidad: number, notas: string, extras: any[]) {
     const i = this.carrito.findIndex((producto) => producto.idProd === idProd);
     if (i === -1) {
       const nuevoProd: Cart = {
         idProd: idProd,
         cantidad: cantidad,
         notas: notas,
+        extras: extras
       };
       this.carrito.push(nuevoProd);
     } else {
       this.carrito[i].cantidad += cantidad;
+      this.carrito[i].extras = extras;
     }
     this.actualizarAlmacenamiento();
   }
