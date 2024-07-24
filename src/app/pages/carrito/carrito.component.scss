@@ -199,4 +199,8 @@ dialog {
   animation: moveX 5s linear infinite;
   transform: translateY(-50%);
 }
+.subtitle-negrita, .extras-negrita, .precio-negrita{
+    font-weight: 500;
+    font-size: medium;
+}
 

@@ -1,1 +1,1 @@
-export const Numero_Whats = '(541133449577)';
+export const Numero_Whats = '541133449577';

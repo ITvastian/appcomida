@@ -124,7 +124,8 @@ export class CarritoComponent {
 
       Muchas Gracias!!!`;
 
-    const link = `https://wa.me/${Numero_Whats}?text=${encodeURI(mensaje)}`;
+    // const link = `https://wa.me/${Numero_Whats}?text=${encodeURI(mensaje)}`;
+    const link = `https://wa.me/${Numero_Whats}?text=${encodeURIComponent(mensaje)}`;
     window.open(link, '_blank');
     this.dialog.nativeElement.showModal();
   }
