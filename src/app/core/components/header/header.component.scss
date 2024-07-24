@@ -10,6 +10,9 @@ header{
   justify-content: center;
   transition: 500ms ease-in-out;
 }
+header {
+  z-index: 99;
+}
 header::before{
   content: "";
   top: 0;
