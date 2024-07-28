@@ -143,15 +143,24 @@ export class CarritoComponent {
   editarPedido() {
     this.dialog.nativeElement.close();
   }
+
   stars: any[] = new Array(5);
   rating: number = 0;
   hoverIndex: number = 0;
+  clickSound: HTMLAudioElement;
 
+  constructor() {
+    this.clickSound = new Audio('assets/sounds/click.wav');
+  }
   rate(index: number): void {
     this.rating = index;
+    this.playSound();
   }
 
   hover(index: number): void {
     this.hoverIndex = index;
+  }
+  playSound(): void {
+    this.clickSound.play();
   }
 }
