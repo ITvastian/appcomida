@@ -16,6 +16,6 @@ export class TarjetaProductoComponent implements OnChanges {
 
 
   ngOnChanges(): void {
-    console.log('Extras en TarjetaProductoComponent:', this.extrasSeleccionados); // Debugging line
+    // console.log('Extras en TarjetaProductoComponent:', this.extrasSeleccionados); // Debugging line
   }
 }

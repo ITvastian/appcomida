@@ -55,7 +55,7 @@
     >
   </div>
   <section class="margenChico" id="informacion">
-    <h3>Direccion de Envío</h3>
+    <h3>Informacion: </h3>
     <div class="flexApart" id="envioContainer">
       <div>
         <ng-container *ngIf="perfilService.perfil(); else sinDatosEnvio">
@@ -67,7 +67,7 @@
           <p>{{ perfilService.perfil()!.detalleEntrega }}</p>
         </ng-container>
         <ng-template #sinDatosEnvio>
-          <p>Ingresa tus datos de envio</p>
+          <p>Ingresa tus datos</p>
         </ng-template>
       </div>
       <div>

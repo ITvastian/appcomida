@@ -111,16 +111,20 @@ export class CarritoComponent {
         }
       }
     }
+    const entrega = this.perfilService.perfil()?.paraLlevar? 'Si' : 'No';
     const mensaje = `
       Hola! Soy ${this.perfilService.perfil()?.nombre}
       Orden:
 
-      Pedido: ${pedido}
+      Pedido:
+      ${pedido}
       Teléfono: ${this.perfilService.perfil()?.telefono}
 
       Mesa N°: ${this.perfilService.perfil()?.direccion}
 
       Notas: ${this.perfilService.perfil()?.detalleEntrega}
+
+      Para llevar: ${entrega}
 
       Muchas Gracias!!!`;
 

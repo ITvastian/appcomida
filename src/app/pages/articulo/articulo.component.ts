@@ -38,7 +38,7 @@ export class ArticuloComponent {
         this.ProductosService.getById(param['id']).then((producto) => {
           this.producto = producto;
           if (this.producto && this.producto.extras) {
-            console.log('Producto con extras:', this.producto); // Verifica el estado del producto
+            // console.log('Producto con extras:', this.producto); // Verifica el estado del producto
             this.producto.extras.forEach(extra => extra.seleccionado = false);
           }
           this.headerService.titulo.set(producto!.nombre);
@@ -56,12 +56,12 @@ export class ArticuloComponent {
     } else {
       this.extrasSeleccionados = this.extrasSeleccionados.filter(e => e.nombre !== extra.nombre || e.precio !== extra.precio);
     }
-    console.log('Extras seleccionados después de actualizar:', this.extrasSeleccionados); // Debugging line
+    // console.log('Extras seleccionados después de actualizar:', this.extrasSeleccionados); // Debugging line
   }
 
   agregarAlCarrito(): void {
     if (!this.producto) return;
-    console.log('Extras seleccionados al agregar al carrito:', this.extrasSeleccionados); // Debugging line
+    // console.log('Extras seleccionados al agregar al carrito:', this.extrasSeleccionados); // Debugging line
     this.CartService.addProd(
       this.producto.id,
       this.cantidad(),

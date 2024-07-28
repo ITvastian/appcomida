@@ -3,4 +3,5 @@ export interface Perfil{
   direccion: string
   detalleEntrega: string,
   telefono?: string,
+  paraLlevar?: boolean;
 }

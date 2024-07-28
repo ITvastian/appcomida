@@ -58,6 +58,13 @@
         Ingrese un teléfono
       </p>
     </div>
+    <div class="checkboxes__item">
+      <label class="checkbox style-h" for="paraLlevar">
+        <input type="checkbox" id="paraLlevar" name="paraLlevar" [(ngModel)]="perfil.paraLlevar" />
+        <div class="checkbox__checkmark"></div>
+        <div class="checkbox__body">Para llevar?</div>
+      </label>
+    </div>
     <button [disabled]="formulario.invalid">Enviar</button>
   </form>
 </section>
