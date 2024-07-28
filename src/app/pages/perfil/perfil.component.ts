@@ -36,4 +36,5 @@ export class PerfilComponent {
     this.router.navigate(["/carrito"])
   }
 
+
 }

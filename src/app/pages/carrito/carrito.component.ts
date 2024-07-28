@@ -143,4 +143,15 @@ export class CarritoComponent {
   editarPedido() {
     this.dialog.nativeElement.close();
   }
+  stars: any[] = new Array(5);
+  rating: number = 0;
+  hoverIndex: number = 0;
+
+  rate(index: number): void {
+    this.rating = index;
+  }
+
+  hover(index: number): void {
+    this.hoverIndex = index;
+  }
 }

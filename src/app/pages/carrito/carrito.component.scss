@@ -135,7 +135,7 @@ dialog {
   box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.164);
 
   div {
-    margin-top: 50px;
+    margin-top: 20px;
     display: flex;
     justify-content: space-around;
   }
@@ -203,4 +203,22 @@ dialog {
     font-weight: 500;
     font-size: medium;
 }
+
+
+
+.rating {
+  text-align: center;
+  align-items: flex-end;
+}
+
+.rating .stars .star {
+  cursor: pointer;
+  font-size: 24px;
+  color: gray;
+}
+
+.rating .stars .star.filled {
+  color: gold;
+}
+
 

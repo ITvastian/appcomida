@@ -115,4 +115,17 @@
     <button id="modal-btn" (click)="finalizarPedido()">Si</button>
     <button id="modal-btn" (click)="editarPedido()">No</button>
   </div>
+  <div class="rating">
+    <p>Califica la app:</p>
+    <div class="stars">
+      <span
+        class="star"
+        *ngFor="let star of stars; let i = index"
+        [class.filled]="i < rating || i < hoverIndex"
+        (click)="rate(i + 1)"
+        (mouseover)="hover(i + 1)"
+        (mouseleave)="hover(0)"
+      >☆</span>
+    </div>
+  </div>
 </dialog>

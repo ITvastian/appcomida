@@ -12,14 +12,13 @@ form {
   div {
     display: flex;
     flex-direction: column;
-
     input {
       font-size: medium;
       border: none;
       border-radius: 5px;
       background-color: #e8e2e2;
       padding: 5px;
-
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
       &:focus {
         outline: none;
       }
@@ -60,6 +59,8 @@ button:hover {
   color: red;
   letter-spacing: 1px;
 }
+
+
 .checkbox.style-h {
   display: block;
   position: relative;
@@ -138,3 +139,6 @@ button:hover {
   box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
   transition: box-shadow 0.25s ease, background 1s ease, color 0.25s ease;
 }
+
+
+
