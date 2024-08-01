@@ -37,6 +37,7 @@ export class CarritoComponent {
   delivery = 0;
   total = 0;
   extraTotal = 0;
+  entrega = `${this.perfilService.perfil()?.paraLlevar? 'Si' : 'No'}`;
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
 
   ngOnInit(): void {

@@ -36,5 +36,9 @@ export class PerfilComponent {
     this.router.navigate(["/carrito"])
   }
 
+  navigateToAdmin() {
+    this.router.navigate(['/admin']);
+  }
+
 
 }

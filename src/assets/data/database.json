@@ -179,7 +179,7 @@
       },
       {
         "id": "14",
-        "nombre":"Agua Saborizada Naranja",
+        "nombre":"Agua Saborizada",
         "precio": 100,
         "esVegano":true,
         "esCeliaco":true,

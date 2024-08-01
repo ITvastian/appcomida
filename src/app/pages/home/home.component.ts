@@ -11,7 +11,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   standalone:true,
-  imports:[TarjetaCategoryComponent, CommonModule, RouterModule]
+  imports: [TarjetaCategoryComponent, CommonModule, RouterModule]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   headerService = inject(HeaderService);

@@ -215,10 +215,14 @@ dialog {
   cursor: pointer;
   font-size: 24px;
   color: gray;
+  span{
+    user-select: none;
+  }
 }
 
 .rating .stars .star.filled {
   color: gold;
 }
+
 
 

@@ -6,8 +6,10 @@ import { BuscarComponent } from './pages/buscar/buscar.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { RubroComponent } from './pages/rubro/rubro.component';
 import { HomeComponent } from './pages/home/home.component';
+import { AdminComponent } from './pages/admin/admin.component';
 
 const routes: Routes = [
+  { path: 'admin', component: AdminComponent },
   {path: 'carrito', component: CarritoComponent},
   {path: 'articulo/:id', component: ArticuloComponent},
   {path: 'buscar', component: BuscarComponent},

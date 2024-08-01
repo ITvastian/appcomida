@@ -44,7 +44,7 @@
               <h4 id="precio-extra">${{ extra.precio }}</h4>
             </li>
           </div>
-            <p class="negrita">${{ item.precio }}</p>
+          <p class="negrita">${{ item.precio }}</p>
         </div>
       </div>
     </div>
@@ -55,14 +55,15 @@
     >
   </div>
   <section class="margenChico" id="informacion">
-    <h3>Información: </h3>
+    <h3>Información:</h3>
     <div class="flexApart" id="envioContainer">
       <div>
         <ng-container *ngIf="perfilService.perfil(); else sinDatosEnvio">
           <h4>{{ perfilService.perfil()!.nombre }}</h4>
           <p>
             {{ perfilService.perfil()!.direccion }} -
-            {{ perfilService.perfil()?.telefono }}
+            {{ perfilService.perfil()?.telefono }} -
+            {{ entrega }}
           </p>
           <p>{{ perfilService.perfil()!.detalleEntrega }}</p>
         </ng-container>
@@ -87,7 +88,7 @@
         <p class="negrita">Total</p>
       </div>
       <div id="montos">
-        <p class="precio-negrita">${{ subtotal - extraTotal}}</p>
+        <p class="precio-negrita">${{ subtotal - extraTotal }}</p>
         <p class="precio-negrita">${{ extraTotal }}</p>
         <p class="negrita">${{ total }}</p>
       </div>
@@ -125,7 +126,8 @@
         (click)="rate(i + 1)"
         (mouseover)="hover(i + 1)"
         (mouseleave)="hover(0)"
-      >☆</span>
+        >☆</span
+      >
     </div>
   </div>
 </dialog>
