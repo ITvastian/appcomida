@@ -5,13 +5,14 @@ import { TarjetaCategoryComponent } from 'src/app/core/components/tarjeta-catego
 import { Categoria } from 'src/app/core/interface/categorias';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { RouterModule } from '@angular/router';
+import { CarruselComponent } from "../../core/components/carousel/carousel.component";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   standalone:true,
-  imports: [TarjetaCategoryComponent, CommonModule, RouterModule]
+  imports: [TarjetaCategoryComponent, CommonModule, RouterModule, CarruselComponent]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   headerService = inject(HeaderService);
