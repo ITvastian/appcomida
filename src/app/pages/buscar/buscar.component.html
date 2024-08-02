@@ -2,7 +2,7 @@
   <form #buscarForm="ngForm" (change)="buscar()">
     <div id="barra-busqueda">
       <img src="../../../assets/icons/lupa.svg" alt="" />
-      <input type="text" name="texto" [(ngModel)]="parametrosBusqueda.texto" />
+      <input type="text" name="texto" [(ngModel)]="parametrosBusqueda.texto" autocomplete="off" (input)="onInputChange()" />
       <button class="btn-clear" *ngIf="parametrosBusqueda.texto" (click)="clear()">x</button>
     </div>
     <div id="filtros">

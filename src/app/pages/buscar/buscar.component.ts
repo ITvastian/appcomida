@@ -22,9 +22,7 @@ export class BuscarComponent {
 
   ngOnInit(): void {
     this.headerService.titulo.set('Search');
-    this.productosService
-      .getallProducts()
-      .then((res) => (this.productos = res));
+    this.cargarTodosLosProductos();
   }
 
   parametrosBusqueda: Busqueda = {
@@ -32,16 +30,21 @@ export class BuscarComponent {
     aptoCeliaco: false,
     aptoVegano: false,
   };
+
   async buscar() {
-    this.productos = await this.productosService.buscar(
-      this.parametrosBusqueda
-    );
+    this.productos = await this.productosService.buscar(this.parametrosBusqueda);
   }
+
   async cargarTodosLosProductos() {
     this.productos = await this.productosService.getallProducts();
   }
-  clear() {
-    this.parametrosBusqueda.texto = '';
-    this.cargarTodosLosProductos();
+
+  async clear() {
+    this.parametrosBusqueda.texto = ''; // Clear the search text
+    await this.cargarTodosLosProductos(); // Load all products
+  }
+
+  onInputChange() {
+    this.buscar(); // Perform the search as the user types
   }
 }
