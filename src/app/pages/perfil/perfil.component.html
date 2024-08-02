@@ -28,9 +28,10 @@
         [(ngModel)]="perfil.direccion"
         #direccion="ngModel"
         minlength="1"
+        [required]="!perfil.paraLlevar"
         required
       />
-      <p class="error" *ngIf="direccion.invalid && direccion.touched">
+      <p class="error" *ngIf="!perfil.paraLlevar && direccion.invalid && direccion.touched">
         Ingrese número de mesa
       </p>
     </div>
@@ -54,7 +55,7 @@
         minlength="5"
         required
       />
-      <p class="error" *ngIf="direccion.invalid && direccion.touched">
+      <p class="error" *ngIf="telefono.invalid && telefono.touched">
         Ingrese un teléfono
       </p>
     </div>
