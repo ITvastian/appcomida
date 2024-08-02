@@ -1,27 +1,26 @@
 <section>
-  <form #buscarForm="ngForm" (change)="buscar()">
+  <form #buscarForm="ngForm" (submit)="onSubmit($event)">
     <div id="barra-busqueda">
       <img src="../../../assets/icons/lupa.svg" alt="" />
-      <input type="text" name="texto" [(ngModel)]="parametrosBusqueda.texto" autocomplete="off" (input)="onInputChange()" />
+      <input
+        type="text"
+        name="texto"
+        [(ngModel)]="parametrosBusqueda.texto"
+        autocomplete="off"
+        (input)="onInputChange()"
+        (keydown)="onKeydown($event)"
+      />
       <button class="btn-clear" *ngIf="parametrosBusqueda.texto" (click)="clear()">x</button>
     </div>
     <div id="filtros">
       <div id="apto-container">
         <img src="../../../assets/icons/celiaco.png" alt="Apto Celiaco" />
-        <input
-          type="checkbox"
-          name="celiaco"
-          [(ngModel)]="parametrosBusqueda.aptoCeliaco"
-        />
+        <input type="checkbox" name="celiaco" [(ngModel)]="parametrosBusqueda.aptoCeliaco" />
         <span>Apto Celiaco</span>
       </div>
       <div id="apto-container">
         <img src="../../../assets/icons/vegano.svg" alt="Apto Vegano" />
-        <input
-          type="checkbox"
-          name="vegano"
-          [(ngModel)]="parametrosBusqueda.aptoVegano"
-        />
+        <input type="checkbox" name="vegano" [(ngModel)]="parametrosBusqueda.aptoVegano" />
         <span>Apto Vegano</span>
       </div>
     </div>

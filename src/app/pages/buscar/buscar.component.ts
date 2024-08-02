@@ -40,11 +40,23 @@ export class BuscarComponent {
   }
 
   async clear() {
-    this.parametrosBusqueda.texto = ''; // Clear the search text
-    await this.cargarTodosLosProductos(); // Load all products
+    this.parametrosBusqueda.texto = '';
+    await this.cargarTodosLosProductos();
   }
 
   onInputChange() {
     this.buscar(); // Perform the search as the user types
+  }
+
+  onSubmit(event: Event) {
+    event.preventDefault(); // Prevent the form from submitting and reloading the page
+    this.buscar();
+  }
+
+  onKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent form submission on Enter key press
+      this.buscar(); // Perform the search on Enter key press
+    }
   }
 }
