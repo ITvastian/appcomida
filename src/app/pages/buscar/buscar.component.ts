@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-buscar',
   templateUrl: './buscar.component.html',
   styleUrls: ['./buscar.component.scss'],
-  imports: [CommonModule, FormsModule,TarjetaProductoComponent, RouterModule],
+  imports: [CommonModule, FormsModule, TarjetaProductoComponent, RouterModule],
   standalone: true,
 })
 export class BuscarComponent {
@@ -22,15 +22,26 @@ export class BuscarComponent {
 
   ngOnInit(): void {
     this.headerService.titulo.set('Search');
-    this.productosService.getallProducts().then(res => this.productos = res)
+    this.productosService
+      .getallProducts()
+      .then((res) => (this.productos = res));
   }
 
-  parametrosBusqueda:Busqueda = {
+  parametrosBusqueda: Busqueda = {
     texto: '',
     aptoCeliaco: false,
     aptoVegano: false,
   };
   async buscar() {
-    this.productos = await this.productosService.buscar(this.parametrosBusqueda);
+    this.productos = await this.productosService.buscar(
+      this.parametrosBusqueda
+    );
+  }
+  async cargarTodosLosProductos() {
+    this.productos = await this.productosService.getallProducts();
+  }
+  clear() {
+    this.parametrosBusqueda.texto = '';
+    this.cargarTodosLosProductos();
   }
 }

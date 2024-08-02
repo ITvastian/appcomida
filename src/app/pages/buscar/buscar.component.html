@@ -3,6 +3,7 @@
     <div id="barra-busqueda">
       <img src="../../../assets/icons/lupa.svg" alt="" />
       <input type="text" name="texto" [(ngModel)]="parametrosBusqueda.texto" />
+      <button class="btn-clear" *ngIf="parametrosBusqueda.texto" (click)="clear()">x</button>
     </div>
     <div id="filtros">
       <div id="apto-container">
