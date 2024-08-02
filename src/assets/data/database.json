@@ -2,7 +2,7 @@
   {
     "id": 1,
     "nombre": "Pizzas",
-    "fotoUrl": "https://www.laespanolaaceites.com/wp-content/uploads/2019/06/pizza-con-chorizo-jamon-y-queso-1080x671.jpg",
+    "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6__yM9PKkSq9_SCOPXfRYKSlNEK11kiEG3w&s",
     "productos": [
       {
         "id": "7",
@@ -48,7 +48,7 @@
   {
     "id": 2,
     "nombre": "Hamburguesas",
-    "fotoUrl": "https://img.freepik.com/vector-gratis/hamburguesa-realista-sobre-fondo-pizarra_79603-1042.jpg?w=2000",
+    "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ36PkR760tkwXPBoH59y3Oo-Nw-jpZRZGPlw&s",
     "productos": [
       {
         "id": "1",
@@ -83,7 +83,7 @@
         "esVegano":true,
         "esCeliaco":false,
         "ingredientes": ["Medallón a base de lentejas","Pan Brioche","Tomate"],
-        "fotoUrl": "https://www.pequerecetas.com/wp-content/uploads/2009/04/hamburguesa-de-garbanzos-casera-receta.jpg",
+        "fotoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYWITfIb-IiSS176Bkh2QV9CMY_FbLp9fTeg&s",
         "extras": [
           {"nombre": "Extra de Tomate", "precio": 100}
         ]
