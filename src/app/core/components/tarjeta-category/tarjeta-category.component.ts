@@ -11,4 +11,8 @@ import { CommonModule } from '@angular/common';
 })
 export class TarjetaCategoryComponent {
   @Input({ required: true }) categoria!: Categoria;
+
+  // ngOnInit() {
+  //   console.log('Categoria:', this.categoria);
+  // }
 }

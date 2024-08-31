@@ -1,22 +1,27 @@
 import { Injectable } from '@angular/core';
 import { Categoria } from '../interface/categorias';
+import { Producto } from '../interface/productos';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoriasService {
-  constructor() {}
+  // private apiUrl = 'http://localhost:3001/api/categorias';
+  private apiUrl = 'https://mvp-admin.onrender.com/api/categorias';
 
-  async getAll(): Promise<Categoria[]> {
-    const res = await fetch('./../../../assets/data/database.json');
-    const resJson = await res.json();
-    return resJson;
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<Categoria[]> {
+    return this.http.get<Categoria[]>(this.apiUrl);
   }
-  async getById(id: number): Promise<Categoria | undefined> {
-    const res = await fetch('./../../../assets/data/database.json');
-    const resJson: Categoria[] = await res.json();
-    const categoria = resJson.find((categoria) => categoria.id === id);
-    if (categoria) return categoria;
-    return;
+
+  getById(id: number): Observable<Categoria> {
+    return this.http.get<Categoria>(`${this.apiUrl}/${id}`);
+  }
+
+  create(categoria: Categoria): Observable<Categoria> {
+    return this.http.post<Categoria>(this.apiUrl, categoria);
   }
 }

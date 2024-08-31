@@ -4,8 +4,9 @@ export interface Producto{
   precio: number
   esVegano: boolean
   esCeliaco: boolean
-  ingredientes: string
-  fotoUrl: string
+  ingredientes: string[]
+  // fotoUrl: string
+  productoFotoUrl:string
   extras: Extra[]
 }
 export interface Extra {

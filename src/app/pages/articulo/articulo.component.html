@@ -1,26 +1,31 @@
-<img
-  src="{{ producto?.fotoUrl }}"
-  alt="{{ producto?.nombre }}"
-  id="fotoProducto"
-/>
+<div *ngIf="producto?.productoFotoUrl; else noFoto">
+  <img [src]="producto?.productoFotoUrl" [alt]="producto?.nombre" id="fotoProducto" />
+</div>
+<ng-template #noFoto>
+  <p>No hay imagen disponible.</p>
+</ng-template>
 <section class="margenChico">
-    <ul>
-      <span>Ingredientes: </span>
-      <li *ngFor="let ingrediente of producto?.ingredientes">
-        {{ ingrediente }}
-      </li>
-    </ul>
-    <!-- ------------------------ -->
-     <div class="extras-container">
-         <!-- <span>Extras:</span> -->
-         <li *ngFor="let extra of producto?.extras">
-           <input type="checkbox"
-           (change)="actualizarExtrasSeleccionados(extra)"
-           [checked]="extra.seleccionado">
-           {{ extra.nombre }} - ${{ extra.precio }}
-          </li>
+  <ul>
+    <span>Ingredientes: </span>
+    <li *ngFor="let ingrediente of producto?.ingredientes">
+      {{ ingrediente }}
+    </li>
+  </ul>
+  <!-- ------------------------ -->
+  <div class="extras-container">
+    <ng-container *ngIf="producto?.extras as extras">
+      <div *ngIf="extras.length > 0">
+        <div *ngFor="let extra of extras">
+          <input
+            type="checkbox"
+            (change)="actualizarExtrasSeleccionados(extra)"
+          />
+          {{ extra.nombre }} - {{ extra.precio | currency }}
+        </div>
       </div>
-    <!-- ------------------------ -->
+    </ng-container>
+  </div>
+  <!-- ------------------------ -->
   <div>
     <div *ngIf="producto?.esCeliaco" class="apto-container">
       <img class="apto" src="../../../assets/icons/celiaco.png" alt="celiaco" />
@@ -32,11 +37,19 @@
     </div>
   </div>
 
-  <label for="notas" >Notas: </label>
-  <textarea name="notas" id="notas" cols="30" rows="30" [(ngModel)]="notas"></textarea>
+  <label for="notas">Notas: </label>
+  <textarea
+    name="notas"
+    id="notas"
+    cols="30"
+    rows="30"
+    [(ngModel)]="notas"
+  ></textarea>
   <div id="cantidad-container">
     <label for="cantidad">Cantidad: </label>
-    <app-contador-cantidad (cantidadNueva)="cantidad.set($event)"></app-contador-cantidad>
+    <app-contador-cantidad
+      (cantidadNueva)="cantidad = $event"
+    ></app-contador-cantidad>
   </div>
   <button (click)="agregarAlCarrito()">Agregar al carrito</button>
 </section>

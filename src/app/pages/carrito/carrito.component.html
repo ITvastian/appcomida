@@ -1,4 +1,4 @@
-<ng-container *ngIf="CartService.carrito.length !== 0; else sinCarrito">
+<ng-container *ngIf="productosCarrito().length > 0; else sinCarrito">
   <div id="container">
     <div
       *ngFor="let item of productosCarrito(); index as i"
@@ -6,7 +6,7 @@
     >
       <div
         class="izq"
-        [ngStyle]="{ 'background-image': 'url(' + item.fotoUrl + ')' }"
+        [ngStyle]="{ 'background-image': 'url(' + item.productoFotoUrl + ')' }"
       >
         <div>
           <img
@@ -23,7 +23,7 @@
       </div>
       <div class="centro">
         <p class="negrita">{{ item.nombre }}</p>
-        <p *ngIf="item.notas !== ''" id="notas-carrito">{{ item.notas }}</p>
+        <p *ngIf="item.notas" id="notas-carrito">{{ item.notas }}</p>
         <ul>
           <li *ngFor="let extra of item.extras">
             <p id="extra-nombre">{{ extra.nombre }}</p>
@@ -88,9 +88,9 @@
         <p class="negrita">Total</p>
       </div>
       <div id="montos">
-        <p class="precio-negrita">${{ subtotal - extraTotal }}</p>
-        <p class="precio-negrita">${{ extraTotal }}</p>
-        <p class="negrita">${{ total }}</p>
+        <p>${{ subtotal }}</p>
+        <p>${{ extraTotal }}</p>
+        <p>${{ total }}</p>
       </div>
     </div>
     <div>

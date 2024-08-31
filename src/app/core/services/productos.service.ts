@@ -1,51 +1,40 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 import { Producto } from '../interface/productos';
-import { Categoria } from '../interface/categorias';
 import { Busqueda } from '../interface/busqueda';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ProductosService {
-  constructor() {}
+export class ProductosService  {
+  // private apiUrl = 'http://localhost:3001/api'; // URL de tu API
+  private apiUrl = 'https://mvp-admin.onrender.com/api';
 
-  async getByCategory(id: number): Promise<Producto[]> {
-    const res = await fetch('./../../../assets/data/database.json');
-    const resJson: Categoria[] = await res.json();
-    const productos = resJson.find((item) => item.id === id)?.productos;
-    if (productos) return productos;
-    return [];
+  constructor(private http: HttpClient) {}
+
+  getByCategory(id: number): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.apiUrl}/categorias/${id}/productos`);
   }
 
-  async getallProducts(): Promise<Producto[]> {
-    const res = await fetch('./../../../assets/data/database.json');
-    const resJson: Categoria[] = await res.json();
-    let productos: Producto[] = [];
-    resJson.forEach((categoria) => {
-      productos = [...productos, ...categoria.productos];
-    });
-    return productos;
-  }
-  async getById(id: number): Promise<Producto | undefined> {
-    const productos = await this.getallProducts();
-    const productoElegido = productos.find((productos) => productos.id === id);
-    return productoElegido ? productoElegido : undefined;
+  getAllProducts(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.apiUrl}/productos`);
   }
 
-  async buscar(parametros: Busqueda) {
-    const productos = await this.getallProducts();
-    const productosFiltrados = productos.filter(producto => {
-      if (parametros.aptoCeliaco && !producto.esCeliaco) return false;
-      if (parametros.aptoVegano && !producto.esVegano) return false;
-      const busquedaTitulo = producto.nombre.toLowerCase().includes(parametros.texto.toLowerCase());
-      if (busquedaTitulo) return true;
-      for (let i = 0; i < producto.ingredientes.length; i++) {
-        const ingrediente = producto.ingredientes[i];
-        if(ingrediente.toLowerCase().includes(parametros.texto.toLowerCase()))
-          return true;
+  getById(id: number): Observable<Producto> {
+    return this.http.get<Producto>(`${this.apiUrl}/productos/${id}`).pipe(
+      tap(producto => console.log('Producto recibido:', producto)) // Depuración
+    );
+  }
+
+
+  buscar(parametros: Busqueda): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.apiUrl}/productos`, {
+      params: {
+        texto: parametros.texto,
+        aptoCeliaco: parametros.aptoCeliaco.toString(),
+        aptoVegano: parametros.aptoVegano.toString()
       }
-      return false;
     });
-    return productosFiltrados;
   }
 }

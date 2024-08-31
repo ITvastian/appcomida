@@ -10,11 +10,11 @@ import { AdminComponent } from './pages/admin/admin.component';
 
 const routes: Routes = [
   { path: 'admin', component: AdminComponent },
-  {path: 'carrito', component: CarritoComponent},
-  {path: 'articulo/:id', component: ArticuloComponent},
-  {path: 'buscar', component: BuscarComponent},
-  {path: 'perfil', component: PerfilComponent},
-  {path: 'categoria/:id', component: RubroComponent},
+  { path: 'carrito', component: CarritoComponent },
+  { path: 'articulo/:id', component: ArticuloComponent },
+  { path: 'buscar', component: BuscarComponent },
+  { path: 'perfil', component: PerfilComponent },
+  { path: 'categoria/:nombre', component: RubroComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
 ];

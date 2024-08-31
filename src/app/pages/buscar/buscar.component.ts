@@ -20,43 +20,49 @@ export class BuscarComponent {
   productosService = inject(ProductosService);
   productos: Producto[] = [];
 
-  ngOnInit(): void {
-    this.headerService.titulo.set('Search');
-    this.cargarTodosLosProductos();
-  }
-
   parametrosBusqueda: Busqueda = {
     texto: '',
     aptoCeliaco: false,
     aptoVegano: false,
   };
 
-  async buscar() {
-    this.productos = await this.productosService.buscar(this.parametrosBusqueda);
+  ngOnInit(): void {
+    this.headerService.titulo.set('Search');
+    this.cargarTodosLosProductos();
   }
 
-  async cargarTodosLosProductos() {
-    this.productos = await this.productosService.getallProducts();
+  buscar() {
+    this.productosService.buscar(this.parametrosBusqueda).subscribe({
+      next: (productos) => this.productos = productos,
+      error: (err) => console.error('Error fetching products:', err)
+    });
   }
 
-  async clear() {
+  cargarTodosLosProductos() {
+    this.productosService.getAllProducts().subscribe({
+      next: (productos) => this.productos = productos,
+      error: (err) => console.error('Error fetching all products:', err)
+    });
+  }
+
+  clear() {
     this.parametrosBusqueda.texto = '';
-    await this.cargarTodosLosProductos();
+    this.cargarTodosLosProductos();
   }
 
   onInputChange() {
-    this.buscar(); // Perform the search as the user types
+    this.buscar(); // Realiza la búsqueda a medida que el usuario escribe
   }
 
   onSubmit(event: Event) {
-    event.preventDefault(); // Prevent the form from submitting and reloading the page
+    event.preventDefault(); // Evita que el formulario se envíe y recargue la página
     this.buscar();
   }
 
   onKeydown(event: KeyboardEvent) {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Prevent form submission on Enter key press
-      this.buscar(); // Perform the search on Enter key press
+      event.preventDefault(); // Evita el envío del formulario al presionar Enter
+      this.buscar(); // Realiza la búsqueda al presionar Enter
     }
   }
 }

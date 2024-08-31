@@ -102,6 +102,9 @@ h2 {
 
 
 #montos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   text-align: end;
 }
 

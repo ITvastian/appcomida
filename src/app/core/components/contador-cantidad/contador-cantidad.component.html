@@ -1,5 +1,5 @@
 <div id="container">
   <button (click)="actualizarNum(1)">+</button>
   <span>{{ numero() }}</span>
-  <button (click)="actualizarNum(-1)" [disabled]="numero() == 1">-</button>
+  <button (click)="actualizarNum(-1)" [disabled]="numero() === 1">-</button>
 </div>
