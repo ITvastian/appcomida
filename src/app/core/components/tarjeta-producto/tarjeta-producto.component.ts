@@ -16,7 +16,7 @@ export class TarjetaProductoComponent implements OnChanges {
 
 
   ngOnChanges(): void {
-    console.log('Producto en TarjetaProductoComponent:', this.producto); // Verifica el objeto recibido
+    // console.log('Producto en TarjetaProductoComponent:', this.producto); // Verifica el objeto recibido
   }
 
 }

@@ -23,7 +23,7 @@ export class ProductosService  {
 
   getById(id: number): Observable<Producto> {
     return this.http.get<Producto>(`${this.apiUrl}/productos/${id}`).pipe(
-      tap(producto => console.log('Producto recibido:', producto)) // Depuración
+      // tap(producto => console.log('Producto recibido:', producto)) // Depuración
     );
   }
 

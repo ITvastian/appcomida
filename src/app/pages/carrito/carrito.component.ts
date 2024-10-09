@@ -34,6 +34,7 @@ export class CarritoComponent {
   productosCarrito: WritableSignal<
     (Producto & { cantidad: number; extras: any[]; notas?: string })[]
   > = signal([]);
+
   subtotal = 0;
   delivery = 0;
   total = 0;
@@ -41,12 +42,14 @@ export class CarritoComponent {
   entrega = `${this.perfilService.perfil()?.paraLlevar ? 'Si' : 'No'}`;
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
 
+  // Cache de productos para evitar llamadas duplicadas
+  productosCache: { [id: string]: Producto } = {};
+
   ngOnInit(): void {
     this.headerService.titulo.set('Cart');
     this.buscarInfo().then(() => {
       this.calcularinfo();
     });
-
   }
 
   async buscarInfo() {
@@ -54,43 +57,60 @@ export class CarritoComponent {
 
     for (let i = 0; i < this.CartService.carrito.length; i++) {
       const itemCarrito = this.CartService.carrito[i];
-      const productoObservable = this.ProductosService.getById(itemCarrito.idProd);
 
-      try {
-        const producto = await firstValueFrom(productoObservable);
+      console.log(`Solicitando producto con id: ${itemCarrito.idProd}`);
 
-        if (producto) {
-          const productoValido: Producto & {
-            cantidad: number;
-            extras: Extra[];
-            notas?: string;
-          } = {
-            id: producto.id,
-            nombre: producto.nombre,
-            precio: producto.precio,
-            esVegano: producto.esVegano,
-            esCeliaco: producto.esCeliaco,
-            // fotoUrl: producto.fotoUrl,
-            productoFotoUrl: producto.productoFotoUrl,
-            ingredientes: producto.ingredientes,
-            cantidad: itemCarrito.cantidad,
-            extras: itemCarrito.extras || [], // Asegúrate de que extras está aquí
-            notas: itemCarrito.notas || '',
-          };
+      // Revisa si el producto ya está en cache
+      let producto = this.productosCache[itemCarrito.idProd];
+      if (!producto) {
+        try {
+          // Si no está en caché, hace la solicitud
+          const productoObservable = this.ProductosService.getById(itemCarrito.idProd);
+          producto = await firstValueFrom(productoObservable);
 
-          productos.push(productoValido);
+          if (producto) {
+            this.productosCache[itemCarrito.idProd] = producto; // Almacena en cache
+            console.log(`Producto ${itemCarrito.idProd} cacheado`);
+          } else {
+            console.warn(`Producto con id ${itemCarrito.idProd} no encontrado.`);
+          }
+        } catch (error) {
+          console.error(`Error al obtener el producto con id ${itemCarrito.idProd}:`, error);
+          continue; // Si hay un error con este producto, pasa al siguiente
         }
-      } catch (error) {
-        console.error(`Error al obtener el producto con id ${itemCarrito.idProd}:`, error);
+      }
+
+      // Si el producto fue encontrado o cacheado, se añade al carrito
+      if (producto) {
+        const productoValido: Producto & {
+          cantidad: number;
+          extras: Extra[];
+          notas?: string;
+        } = {
+          id: producto.id,
+          nombre: producto.nombre,
+          precio: producto.precio,
+          esVegano: producto.esVegano,
+          esCeliaco: producto.esCeliaco,
+          productoFotoUrl: producto.productoFotoUrl,
+          ingredientes: producto.ingredientes,
+          cantidad: itemCarrito.cantidad,
+          extras: itemCarrito.extras || [],
+          notas: itemCarrito.notas || '',
+        };
+
+        productos.push(productoValido);
       }
     }
     this.productosCarrito.set(productos);
     this.calcularinfo();
   }
+
   eliminarProd(idProd: number) {
     this.CartService.deleteProd(idProd);
     this.actualizarCarrito();
   }
+
   cambiarProductoCantidad(id: number, nuevaCantidad: number) {
     const itemActual = this.CartService.carrito.find(item => item.idProd === id);
     if (!itemActual) return;
@@ -101,6 +121,7 @@ export class CarritoComponent {
     // Recalcula la información
     this.calcularinfo();
   }
+
   calcularinfo() {
     this.subtotal = 0;
     this.extraTotal = 0;
@@ -116,8 +137,6 @@ export class CarritoComponent {
 
     this.total = this.subtotal + this.extraTotal + this.delivery;
   }
-
-
 
   async actualizarCarrito() {
     await this.buscarInfo();

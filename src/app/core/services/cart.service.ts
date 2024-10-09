@@ -29,11 +29,11 @@ export class CartService {
     } else {
       this.carrito = [];
     }
-    console.log('Carrito cargado:', this.carrito);
+    // console.log('Carrito cargado:', this.carrito);
   }
 
   addProd(idProd: number, cantidad: number, notas: string, extras: Extra[]) {
-    console.log('Extras recibidos:', extras);
+    // console.log('Extras recibidos:', extras);
     const i = this.carrito.findIndex((producto) => producto.idProd === idProd);
     if (i === -1) {
       const nuevoProd: Cart = {
@@ -72,7 +72,7 @@ export class CartService {
   }
 
   actualizarAlmacenamiento() {
-    console.log('Actualizando almacenamiento con carrito:', this.carrito);
+    // console.log('Actualizando almacenamiento con carrito:', this.carrito);
     localStorage.setItem('cart', JSON.stringify(this.carrito));
   }
 

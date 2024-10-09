@@ -5,6 +5,6 @@ import { Injectable, signal } from '@angular/core';
 })
 export class HeaderService {
   constructor() {}
-  titulo = signal('');
+  titulo = signal('Pedime');
   extendido=signal(false)
 }

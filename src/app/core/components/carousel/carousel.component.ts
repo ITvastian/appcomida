@@ -41,12 +41,12 @@ export class CarruselComponent implements AfterViewInit {
     this.intervalId = setInterval(changeSlide, 3000);
 
     // If you want to add buttons, keep this code
-    const nextButton = this.elementRef.nativeElement.querySelector('.next');
-    nextButton.addEventListener('click', () => {
-      clearInterval(this.intervalId); // Stop automatic sliding
-      changeSlide(); // Manually change slide
-      this.intervalId = setInterval(changeSlide, 3000); // Restart automatic sliding
-    });
+    // const nextButton = this.elementRef.nativeElement.querySelector('.next');
+    // nextButton.addEventListener('click', () => {
+    //   clearInterval(this.intervalId); // Stop automatic sliding
+    //   changeSlide(); // Manually change slide
+    //   this.intervalId = setInterval(changeSlide, 3000); // Restart automatic sliding
+    // });
   }
 
   ngOnDestroy() {

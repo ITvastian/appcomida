@@ -5,8 +5,11 @@
   <p>No hay imagen disponible.</p>
 </ng-template>
 <section class="margenChico">
+  <h1 class="name-product">
+    {{producto?.nombre}}
+  </h1>
   <ul>
-    <span>Ingredientes: </span>
+    <span id="label">Ingredientes: </span>
     <li *ngFor="let ingrediente of producto?.ingredientes">
       {{ ingrediente }}
     </li>
@@ -15,12 +18,15 @@
   <div class="extras-container">
     <ng-container *ngIf="producto?.extras as extras">
       <div *ngIf="extras.length > 0">
-        <div *ngFor="let extra of extras">
-          <input
-            type="checkbox"
-            (change)="actualizarExtrasSeleccionados(extra)"
-          />
-          {{ extra.nombre }} - {{ extra.precio | currency }}
+        <div *ngFor="let extra of extras" class="extra-item">
+          <label class="extra-label">
+            <input
+              type="checkbox"
+              class="extra-checkbox"
+              (change)="actualizarExtrasSeleccionados(extra)"
+            />
+            <span>{{ extra.nombre }} - {{ extra.precio | currency }}</span>
+          </label>
         </div>
       </div>
     </ng-container>
@@ -37,7 +43,7 @@
     </div>
   </div>
 
-  <label for="notas">Notas: </label>
+  <label for="notas" id="label">Notas: </label>
   <textarea
     name="notas"
     id="notas"
@@ -46,7 +52,7 @@
     [(ngModel)]="notas"
   ></textarea>
   <div id="cantidad-container">
-    <label for="cantidad">Cantidad: </label>
+    <label for="cantidad" id="label">Cantidad: </label>
     <app-contador-cantidad
       (cantidadNueva)="cantidad = $event"
     ></app-contador-cantidad>
