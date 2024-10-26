@@ -1,16 +1,16 @@
-<div *ngIf="producto?.productoFotoUrl; else noFoto">
-  <img [src]="producto?.productoFotoUrl" [alt]="producto?.nombre" id="fotoProducto" />
+<div *ngIf="producto?.photoUrl; else noFoto">
+  <img [src]="producto?.photoUrl" [alt]="producto?.name" id="fotoProducto" />
 </div>
 <ng-template #noFoto>
   <p>No hay imagen disponible.</p>
 </ng-template>
 <section class="margenChico">
   <h1 class="name-product">
-    {{producto?.nombre}}
+    {{producto?.name}}
   </h1>
   <ul>
     <span id="label">Ingredientes: </span>
-    <li *ngFor="let ingrediente of producto?.ingredientes">
+    <li *ngFor="let ingrediente of producto?.ingredients">
       {{ ingrediente }}
     </li>
   </ul>
@@ -25,7 +25,7 @@
               class="extra-checkbox"
               (change)="actualizarExtrasSeleccionados(extra)"
             />
-            <span>{{ extra.nombre }} - {{ extra.precio | currency }}</span>
+            <span>{{ extra.name }} - {{ extra.price | currency }}</span>
           </label>
         </div>
       </div>

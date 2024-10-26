@@ -1,3 +1,9 @@
-  <div [ngStyle]="{'background-image':'url('+categoria.fotoUrl+')'}">
-    <h3>{{ categoria.categoria }}</h3>
-  </div>
+<div
+  [ngStyle]="{
+    'background-image': categoria.photoUrl
+      ? 'url(' + categoria.photoUrl + ')'
+      : 'none'
+  }"
+>
+  <h3>{{ categoria.name }}</h3>
+</div>

@@ -6,7 +6,7 @@
     >
       <div
         class="izq"
-        [ngStyle]="{ 'background-image': 'url(' + item.productoFotoUrl + ')' }"
+        [ngStyle]="{ 'background-image': 'url(' + item.photoUrl + ')' }"
       >
         <div>
           <img
@@ -22,37 +22,36 @@
         </div>
       </div>
       <div class="centro">
-        <p class="negrita">{{ item.nombre }}</p>
+        <p class="negrita">{{ item.name }}</p>
         <p *ngIf="item.notas" id="notas-carrito">{{ item.notas }}</p>
         <ul>
           <li *ngFor="let extra of item.extras">
-            <p id="extra-nombre">{{ extra.nombre }}</p>
+            <p id="extra-nombre">{{ extra.name }}</p>
           </li>
         </ul>
         <app-contador-cantidad
           [cantidadInicial]="item.cantidad"
-          (cantidadNueva)="cambiarProductoCantidad(item.id, $event)"
+          (cantidadNueva)="cambiarProductoCantidad(item._id, $event)"
         ></app-contador-cantidad>
       </div>
       <div class="der">
-        <button (click)="eliminarProd(item.id)" class="borrar">
+        <button (click)="eliminarProd(item._id)" class="borrar">
           <img src="../../../assets/icons/borrarr.png" alt="" width="20px" />
         </button>
         <div class="precios">
           <div class="extras-li">
             <li *ngFor="let extra of item.extras" class="li-extras">
-              <h4 id="precio-extra">${{ extra.precio }}</h4>
+              <h4 id="precio-extra">${{ extra.price }}</h4>
             </li>
           </div>
-          <p class="negrita">${{ item.precio }}</p>
+          <p class="negrita">${{ item.price }}</p>
         </div>
       </div>
     </div>
   </div>
   <div class="flex-mas">
     <a id="mas" [routerLink]="['/home']" routerLinkActive="router-link-active"
-      >+</a
-    >
+      ><img src="../../../assets/img/mano.png" alt=""></a>
   </div>
   <section class="margenChico" id="informacion">
     <h3>Información:</h3>

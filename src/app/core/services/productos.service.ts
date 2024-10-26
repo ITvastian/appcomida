@@ -7,14 +7,16 @@ import { Busqueda } from '../interface/busqueda';
 @Injectable({
   providedIn: 'root',
 })
-export class ProductosService  {
-  // private apiUrl = 'http://localhost:3001/api'; // URL de tu API
+export class ProductosService {
+  // private apiUrl = 'http://localhost:3001/api';
   private apiUrl = 'https://mvp-admin.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 
   getByCategory(id: number): Observable<Producto[]> {
-    return this.http.get<Producto[]>(`${this.apiUrl}/categorias/${id}/productos`);
+    return this.http.get<Producto[]>(
+      `${this.apiUrl}/categorias/${id}/productos`
+    );
   }
 
   getAllProducts(): Observable<Producto[]> {
@@ -22,19 +24,20 @@ export class ProductosService  {
   }
 
   getById(id: number): Observable<Producto> {
-    return this.http.get<Producto>(`${this.apiUrl}/productos/${id}`).pipe(
+    return this.http
+      .get<Producto>(`${this.apiUrl}/productos/${id}`)
+      .pipe
       // tap(producto => console.log('Producto recibido:', producto)) // Depuración
-    );
+      ();
   }
-
 
   buscar(parametros: Busqueda): Observable<Producto[]> {
     return this.http.get<Producto[]>(`${this.apiUrl}/productos`, {
       params: {
         texto: parametros.texto,
         aptoCeliaco: parametros.aptoCeliaco.toString(),
-        aptoVegano: parametros.aptoVegano.toString()
-      }
+        aptoVegano: parametros.aptoVegano.toString(),
+      },
     });
   }
 }

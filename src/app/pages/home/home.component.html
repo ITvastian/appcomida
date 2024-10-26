@@ -4,7 +4,7 @@
     <app-tarjeta-category
       *ngFor="let categoria of categorias()"
       [categoria]="categoria"
-      [routerLink]="['/categoria', categoria.categoria]"
+      [routerLink]="['/categoria', categoria.name]"
       routerLinkActive="router-link-active"
     ></app-tarjeta-category>
   } @placeholder {

@@ -16,6 +16,7 @@ import { CartService } from 'src/app/core/services/cart.service';
 import { Numero_Whats } from 'src/app/core/services/constantes/telefono';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { firstValueFrom } from 'rxjs';
+import { VentasService } from 'src/app/core/services/ventas.service';
 
 @Component({
   selector: 'app-carrito',
@@ -30,6 +31,7 @@ export class CarritoComponent {
   ProductosService = inject(ProductosService);
   perfilService = inject(PerfilService);
   router = inject(Router);
+  ventasService = inject(VentasService);
 
   productosCarrito: WritableSignal<
     (Producto & { cantidad: number; extras: any[]; notas?: string })[]
@@ -46,7 +48,7 @@ export class CarritoComponent {
   productosCache: { [id: string]: Producto } = {};
 
   ngOnInit(): void {
-    this.headerService.titulo.set('Cart');
+    this.headerService.titulo.set('Carrito');
     this.buscarInfo().then(() => {
       this.calcularinfo();
     });
@@ -58,7 +60,7 @@ export class CarritoComponent {
     for (let i = 0; i < this.CartService.carrito.length; i++) {
       const itemCarrito = this.CartService.carrito[i];
 
-      console.log(`Solicitando producto con id: ${itemCarrito.idProd}`);
+      // console.log(`Solicitando producto con id: ${itemCarrito.idProd}`);
 
       // Revisa si el producto ya está en cache
       let producto = this.productosCache[itemCarrito.idProd];
@@ -70,7 +72,7 @@ export class CarritoComponent {
 
           if (producto) {
             this.productosCache[itemCarrito.idProd] = producto; // Almacena en cache
-            console.log(`Producto ${itemCarrito.idProd} cacheado`);
+            // console.log(`Producto ${itemCarrito.idProd} cacheado`);
           } else {
             console.warn(`Producto con id ${itemCarrito.idProd} no encontrado.`);
           }
@@ -87,13 +89,13 @@ export class CarritoComponent {
           extras: Extra[];
           notas?: string;
         } = {
-          id: producto.id,
-          nombre: producto.nombre,
-          precio: producto.precio,
+          _id: producto._id,
+          name: producto.name,
+          price: producto.price,
           esVegano: producto.esVegano,
           esCeliaco: producto.esCeliaco,
-          productoFotoUrl: producto.productoFotoUrl,
-          ingredientes: producto.ingredientes,
+          photoUrl: producto.photoUrl,
+          ingredients: producto.ingredients,
           cantidad: itemCarrito.cantidad,
           extras: itemCarrito.extras || [],
           notas: itemCarrito.notas || '',
@@ -127,10 +129,10 @@ export class CarritoComponent {
     this.extraTotal = 0;
 
     this.CartService.carrito.forEach((item) => {
-      const producto = this.productosCarrito().find(p => p.id === item.idProd);
+      const producto = this.productosCarrito().find(p => p._id === item.idProd);
       if (producto) {
-        const totalExtras = item.extras?.reduce((extraAcc, extra) => extraAcc + extra.precio, 0) || 0;
-        this.subtotal += producto.precio * item.cantidad;
+        const totalExtras = item.extras?.reduce((extraAcc, extra) => extraAcc + extra.price, 0) || 0;
+        this.subtotal += producto.price * item.cantidad;
         this.extraTotal += totalExtras;
       }
     });
@@ -150,9 +152,9 @@ export class CarritoComponent {
       try {
         const producto = await firstValueFrom(this.ProductosService.getById(itemCarrito.idProd));
         if (producto) {
-          pedido += `*${itemCarrito.cantidad} X ${producto.nombre}\n`;
+          pedido += `*${itemCarrito.cantidad} X ${producto.name}\n`;
           if (itemCarrito.extras && itemCarrito.extras.length > 0) {
-            pedido += `${itemCarrito.extras.map(extra => extra.nombre).join(', ')}\n`;
+            pedido += `${itemCarrito.extras.map(extra => extra.name).join(', ')}\n`;
           }
           if (itemCarrito.notas) {
             pedido += `  Notas: ${itemCarrito.notas}\n`;
@@ -189,6 +191,33 @@ export class CarritoComponent {
     this.dialog.nativeElement.close();
     this.router.navigate(['/home']);
   }
+  // finalizarPedido() {
+  //   const perfil = this.perfilService.perfil(); // Obtener los datos del perfil
+  //   const venta = {
+  //     productos: this.CartService.carrito, // Los productos que están en el carrito
+  //     total: this.total, // Total de la venta
+  //     cliente: {
+  //       nombre: perfil?.nombre,
+  //       telefono: perfil?.telefono,
+  //       mesa: perfil?.direccion,
+  //       paraLlevar: perfil?.paraLlevar,
+  //       notas: perfil?.detalleEntrega,
+  //     },
+  //   };
+
+  //   // Llama al servicio para enviar los datos de la venta
+  //   this.ventasService.agregarVenta(venta).subscribe({
+  //     next: (respuesta) => {
+  //       console.log('Venta guardada exitosamente:', respuesta);
+  //       this.CartService.vaciar(); // Vaciar el carrito después de la venta
+  //       this.dialog.nativeElement.close();
+  //       this.router.navigate(['/home']);
+  //     },
+  //     error: (error) => {
+  //       console.error('Error al guardar la venta:', error);
+  //     },
+  //   });
+  // }
 
   editarPedido() {
     this.dialog.nativeElement.close();

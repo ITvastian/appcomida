@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class CategoriasService {
-  // private apiUrl = 'http://localhost:3001/api/categorias';
+  // private apiUrl = 'http://localhost:3001';
   private apiUrl = 'https://mvp-admin.onrender.com/api/categorias';
 
   constructor(private http: HttpClient) {}

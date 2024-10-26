@@ -36,10 +36,11 @@ export class ArticuloComponent implements OnInit {
     }
     this.route.params.subscribe((params) => {
       const id = params['id'];
+      // console.log('ID from route:', id);
       this.productosService.getById(id).subscribe({
         next: (producto) => {
           this.producto = producto;
-          // console.log('Producto:', this.producto); // Verifica los datos del producto
+          console.log('Producto:', this.producto); // Verifica los datos del producto
         },
         error: (err) => console.error('Error fetching producto:', err),
       });
@@ -51,14 +52,14 @@ export class ArticuloComponent implements OnInit {
     if (extra.seleccionado) {
       if (
         !this.extrasSeleccionados.some(
-          (e) => e.nombre === extra.nombre && e.precio === extra.precio
+          (e) => e.name === extra.name && e.price === extra.price
         )
       ) {
         this.extrasSeleccionados.push(extra);
       }
     } else {
       this.extrasSeleccionados = this.extrasSeleccionados.filter(
-        (e) => e.nombre !== extra.nombre || e.precio !== extra.precio
+        (e) => e.name !== extra.name || e.price !== extra.price
       );
     }
   }
@@ -66,7 +67,7 @@ export class ArticuloComponent implements OnInit {
   agregarAlCarrito(): void {
     if (!this.producto) return;
     this.cartService.addProd(
-      this.producto.id,
+      this.producto._id,
       this.cantidad,
       this.notas,
       this.extrasSeleccionados

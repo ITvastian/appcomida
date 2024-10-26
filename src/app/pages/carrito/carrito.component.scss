@@ -47,18 +47,25 @@ h2 {
     }
   }
 }
+.flex-mas{
+  #mas{
+    img{
+      width: 35px;
+    }
+  }
+}
 
 .centro {
-  width: 65%;
+  width: 55%;
   gap: 3px;
 }
 
 .der {
-  width: 10%;
+  width: 15%;
   background-color: unset;
   align-items: center;
   .extras-li {
-    padding-bottom: 7px;
+    padding-bottom: 11px;
     .li-extras {
       margin: 0;
       padding: 0;
@@ -79,7 +86,7 @@ h2 {
   text-decoration: none;
   color: black;
   background-color: variables.$color-principal-claro;
-  padding: 05px 20px;
+  padding: 5px 15px;
   border-radius: variables.$border-radius-mediano;
 }
 

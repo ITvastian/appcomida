@@ -27,7 +27,7 @@ export class BuscarComponent {
   };
 
   ngOnInit(): void {
-    this.headerService.titulo.set('Search');
+    this.headerService.titulo.set('Buscar');
     this.cargarTodosLosProductos();
   }
 

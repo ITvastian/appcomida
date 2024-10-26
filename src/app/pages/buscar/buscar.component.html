@@ -12,7 +12,7 @@
       />
       <button class="btn-clear" *ngIf="parametrosBusqueda.texto" (click)="clear()">x</button>
     </div>
-    <div id="filtros">
+    <!-- <div id="filtros">
       <div id="apto-container">
         <img src="../../../assets/icons/celiaco.png" alt="Apto Celiaco" />
         <input type="checkbox" name="celiaco" [(ngModel)]="parametrosBusqueda.aptoCeliaco" class="custom-checkbox"/>
@@ -23,13 +23,13 @@
         <input type="checkbox" name="vegano" [(ngModel)]="parametrosBusqueda.aptoVegano" />
         <span>Apto Vegano</span>
       </div>
-    </div>
+    </div> -->
   </form>
   <div id="container" *ngIf="productos.length !== 0; else sinResultado">
     <app-tarjeta-producto
       *ngFor="let producto of productos"
       [producto]="producto"
-      [routerLink]="['/articulo', producto.id]"
+      [routerLink]="['/articulo', producto._id]"
     ></app-tarjeta-producto>
   </div>
 

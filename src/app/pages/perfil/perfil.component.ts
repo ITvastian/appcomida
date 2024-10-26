@@ -19,7 +19,7 @@ export class PerfilComponent {
   router = inject(Router)
 
   ngOnInit(): void {
-    this.headerService.titulo.set('Profile');
+    this.headerService.titulo.set('Perfil');
     if(this.perfilService.perfil()){
       this.perfil = {...this.perfilService.perfil()!}
     }

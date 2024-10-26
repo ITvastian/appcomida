@@ -26,10 +26,10 @@ export class RubroComponent implements OnInit {
       if (categoriaNombre) {
         this.categoriasService.getAll().subscribe({
           next: (categorias) => {
-            const categoria = categorias.find(cat => cat.categoria === categoriaNombre);
+            const categoria = categorias.find(cat => cat.name === categoriaNombre);
             if (categoria) {
               this.productos.set(categoria.productos);
-              this.headerService.titulo.set(categoria.categoria);
+              this.headerService.titulo.set(categoria.name);
             }
           },
           error: (err) => console.error('Error fetching category:', err)
