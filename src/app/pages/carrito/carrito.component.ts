@@ -17,6 +17,7 @@ import { Numero_Whats } from 'src/app/core/services/constantes/telefono';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { firstValueFrom } from 'rxjs';
 import { VentasService } from 'src/app/core/services/ventas.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-carrito',
@@ -42,6 +43,7 @@ export class CarritoComponent {
   total = 0;
   extraTotal = 0;
   entrega = `${this.perfilService.perfil()?.paraLlevar ? 'Si' : 'No'}`;
+
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
 
   // Cache de productos para evitar llamadas duplicadas
@@ -186,62 +188,58 @@ export class CarritoComponent {
     this.dialog.nativeElement.showModal();
   }
 
-  finalizarPedido() {
-    this.CartService.vaciar();
-    this.dialog.nativeElement.close();
-    this.router.navigate(['/home']);
-  }
   // finalizarPedido() {
-  //   const perfil = this.perfilService.perfil(); // Obtener los datos del perfil
-  //   const venta = {
-  //     productos: this.CartService.carrito, // Los productos que están en el carrito
-  //     total: this.total, // Total de la venta
-  //     cliente: {
-  //       nombre: perfil?.nombre,
-  //       telefono: perfil?.telefono,
-  //       mesa: perfil?.direccion,
-  //       paraLlevar: perfil?.paraLlevar,
-  //       notas: perfil?.detalleEntrega,
-  //     },
-  //   };
-
-  //   // Llama al servicio para enviar los datos de la venta
-  //   this.ventasService.agregarVenta(venta).subscribe({
-  //     next: (respuesta) => {
-  //       console.log('Venta guardada exitosamente:', respuesta);
-  //       this.CartService.vaciar(); // Vaciar el carrito después de la venta
-  //       this.dialog.nativeElement.close();
-  //       this.router.navigate(['/home']);
-  //     },
-  //     error: (error) => {
-  //       console.error('Error al guardar la venta:', error);
-  //     },
-  //   });
+  //   this.CartService.vaciar();
+  //   this.dialog.nativeElement.close();
+  //   this.router.navigate(['/home']);
   // }
 
-  editarPedido() {
-    this.dialog.nativeElement.close();
-  }
 
   stars: any[] = new Array(5);
-  rating: number = 0;
-  hoverIndex: number = 0;
+  rating: number = 0;         // Definimos la variable rating
+  hoverIndex: number = 0;     // Definimos la variable hoverIndex
+  private apiUrl: string = 'http://localhost:3001/api/rating';
   clickSound: HTMLAudioElement;
 
-  constructor() {
-    this.clickSound = new Audio('assets/sounds/click.wav');
-  }
+constructor(private http: HttpClient) {
+  // Inicializar el sonido de clic
+  this.clickSound = new Audio('assets/sounds/click.wav');
+}
 
-  rate(index: number): void {
-    this.rating = index;
-    this.playSound();
-  }
+// Llamar a esta función cuando el usuario seleccione la calificación
+async enviarCalificacion() {
+  this.http.post(this.apiUrl, { rating: this.rating })
+    .subscribe({
+      next: (response) => {
+        console.log('Rating enviado exitosamente:', response);
+      },
+      error: (error) => {
+        console.error('Error al enviar el rating:', error);
+      }
+    });
+}
 
-  hover(index: number): void {
-    this.hoverIndex = index;
-  }
+rate(index: number): void {
+  this.rating = index;    // Asignamos la calificación
+  this.playSound();
+}
 
-  playSound(): void {
-    this.clickSound.play();
-  }
+hover(index: number): void {
+  this.hoverIndex = index;
+}
+
+playSound(): void {
+  this.clickSound.play();
+}
+
+finalizarPedido() {
+  this.CartService.vaciar();
+  this.dialog.nativeElement.close();
+  this.router.navigate(['/home']);
+  this.enviarCalificacion();
+}
+
+editarPedido() {
+  this.dialog.nativeElement.close();
+}
 }

@@ -7,6 +7,7 @@ import { HeaderComponent } from './core/components/header/header.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 
+
 @NgModule({ declarations: [
         AppComponent,
         TabsComponent,
