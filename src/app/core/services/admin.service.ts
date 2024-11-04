@@ -13,8 +13,9 @@ interface Product {
 })
 export class ProductService {
   // private apiUrl = 'http://localhost:3001/api/categorias/';
-//
+
   private apiUrl = 'https://mvp-admin.onrender.com/api/categorias';
+
 
   constructor(private http: HttpClient) {}
 

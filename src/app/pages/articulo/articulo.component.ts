@@ -40,7 +40,7 @@ export class ArticuloComponent implements OnInit {
       this.productosService.getById(id).subscribe({
         next: (producto) => {
           this.producto = producto;
-          console.log('Producto:', this.producto); // Verifica los datos del producto
+          // console.log('Producto:', this.producto);
         },
         error: (err) => console.error('Error fetching producto:', err),
       });

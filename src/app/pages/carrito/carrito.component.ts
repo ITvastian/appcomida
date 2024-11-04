@@ -18,12 +18,13 @@ import { HeaderService } from 'src/app/core/services/header.service';
 import { firstValueFrom } from 'rxjs';
 import { VentasService } from 'src/app/core/services/ventas.service';
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-carrito',
   templateUrl: './carrito.component.html',
   styleUrls: ['./carrito.component.scss'],
-  imports: [CommonModule, ContadorCantidadComponent, RouterModule],
+  imports: [CommonModule, ContadorCantidadComponent, RouterModule,FormsModule],
   standalone: true,
 })
 export class CarritoComponent {
@@ -80,11 +81,10 @@ export class CarritoComponent {
           }
         } catch (error) {
           console.error(`Error al obtener el producto con id ${itemCarrito.idProd}:`, error);
-          continue; // Si hay un error con este producto, pasa al siguiente
+          continue;
         }
       }
 
-      // Si el producto fue encontrado o cacheado, se añade al carrito
       if (producto) {
         const productoValido: Producto & {
           cantidad: number;
@@ -118,11 +118,7 @@ export class CarritoComponent {
   cambiarProductoCantidad(id: number, nuevaCantidad: number) {
     const itemActual = this.CartService.carrito.find(item => item.idProd === id);
     if (!itemActual) return;
-
-    // Actualiza la cantidad en el carrito
     this.CartService.cambiarProd(id, nuevaCantidad);
-
-    // Recalcula la información
     this.calcularinfo();
   }
 
@@ -188,30 +184,28 @@ export class CarritoComponent {
     this.dialog.nativeElement.showModal();
   }
 
-  // finalizarPedido() {
-  //   this.CartService.vaciar();
-  //   this.dialog.nativeElement.close();
-  //   this.router.navigate(['/home']);
-  // }
-
-
   stars: any[] = new Array(5);
-  rating: number = 0;         // Definimos la variable rating
-  hoverIndex: number = 0;     // Definimos la variable hoverIndex
-  private apiUrl: string = 'http://localhost:3001/api/rating';
+  rating: number = 0;
+  hoverIndex: number = 0;
+  // private apiUrl: string = 'http://localhost:3001/api/rating';
+  private apiUrl: string = 'https://mvp-admin.onrender.com/api/rating';
   clickSound: HTMLAudioElement;
+  suggestionText = '';
 
 constructor(private http: HttpClient) {
-  // Inicializar el sonido de clic
   this.clickSound = new Audio('assets/sounds/click.wav');
 }
 
-// Llamar a esta función cuando el usuario seleccione la calificación
 async enviarCalificacion() {
-  this.http.post(this.apiUrl, { rating: this.rating })
+  const feedback = {
+    rating: this.rating,
+    suggestion: this.suggestionText
+  };
+
+  this.http.post(this.apiUrl, feedback)
     .subscribe({
       next: (response) => {
-        console.log('Rating enviado exitosamente:', response);
+        // console.log('Rating enviado exitosamente:', response);
       },
       error: (error) => {
         console.error('Error al enviar el rating:', error);
@@ -220,7 +214,7 @@ async enviarCalificacion() {
 }
 
 rate(index: number): void {
-  this.rating = index;    // Asignamos la calificación
+  this.rating = index;
   this.playSound();
 }
 
@@ -237,6 +231,8 @@ finalizarPedido() {
   this.dialog.nativeElement.close();
   this.router.navigate(['/home']);
   this.enviarCalificacion();
+  this.suggestionText = '';
+  this.rating = 0;
 }
 
 editarPedido() {
