@@ -31,12 +31,12 @@ export class BuscarComponent {
     this.cargarTodosLosProductos();
   }
 
-  buscar() {
-    this.productosService.buscar(this.parametrosBusqueda).subscribe({
-      next: (productos) => this.productos = productos,
-      error: (err) => console.error('Error fetching products:', err)
-    });
-  }
+  // buscar() {
+  //   this.productosService.buscar(this.parametrosBusqueda).subscribe({
+  //     next: (productos) => this.productos = productos,
+  //     error: (err) => console.error('Error fetching products:', err)
+  //   });
+  // }
 
   cargarTodosLosProductos() {
     this.productosService.getAllProducts().subscribe({
@@ -50,19 +50,19 @@ export class BuscarComponent {
     this.cargarTodosLosProductos();
   }
 
-  onInputChange() {
-    this.buscar(); // Realiza la búsqueda a medida que el usuario escribe
-  }
+  // onInputChange() {
+  //   this.buscar(); // Realiza la búsqueda a medida que el usuario escribe
+  // }
 
-  onSubmit(event: Event) {
-    event.preventDefault(); // Evita que el formulario se envíe y recargue la página
-    this.buscar();
-  }
+  // onSubmit(event: Event) {
+  //   event.preventDefault(); // Evita que el formulario se envíe y recargue la página
+  //   this.buscar();
+  // }
 
-  onKeydown(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
-      event.preventDefault(); // Evita el envío del formulario al presionar Enter
-      this.buscar(); // Realiza la búsqueda al presionar Enter
-    }
-  }
+  // onKeydown(event: KeyboardEvent) {
+  //   if (event.key === 'Enter') {
+  //     event.preventDefault(); // Evita el envío del formulario al presionar Enter
+  //     this.buscar(); // Realiza la búsqueda al presionar Enter
+  //   }
+  // }
 }
