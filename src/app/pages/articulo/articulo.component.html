@@ -1,61 +1,65 @@
+
 <div *ngIf="producto?.photoUrl; else noFoto">
   <img [src]="producto?.photoUrl" [alt]="producto?.name" id="fotoProducto" />
 </div>
 <ng-template #noFoto>
   <p>No hay imagen disponible.</p>
 </ng-template>
+
 <section class="margenChico">
   <h1 class="name-product">
-    {{producto?.name}}
+    {{ producto?.name }}
   </h1>
-  <ul>
+
+  <!-- Ingredientes -->
+  <div>
     <span id="label">Ingredientes: </span>
-    <li *ngFor="let ingrediente of producto?.ingredients">
-      {{ ingrediente }}
-    </li>
-  </ul>
-  <!-- ------------------------ -->
+    <ul *ngIf="isArray(producto?.ingredients); else textIngredients">
+      <li *ngFor="let ingrediente of producto?.ingredients">
+        {{ ingrediente }}
+      </li>
+    </ul>
+    <ng-template #textIngredients>
+      <p>{{ producto?.ingredients }}</p>
+    </ng-template>
+  </div>
+
+  <!-- Extras -->
+  <!-- <div class="extras-container">
+    <ng-container *ngIf="producto?.extras as extras">
+      <div *ngIf="extras.length > 0">
+        <div *ngFor="let extra of extras" class="extra-item">
+          <label class="extra-label">
+            <input type="checkbox" class="extra-checkbox" (change)="actualizarExtrasSeleccionados(extra)" />
+            <span>{{ extra }}</span>
+          </label>
+        </div>
+      </div>
+    </ng-container>
+  </div> -->
   <div class="extras-container">
     <ng-container *ngIf="producto?.extras as extras">
       <div *ngIf="extras.length > 0">
         <div *ngFor="let extra of extras" class="extra-item">
           <label class="extra-label">
-            <input
-              type="checkbox"
-              class="extra-checkbox"
-              (change)="actualizarExtrasSeleccionados(extra)"
-            />
-            <span>{{ extra.name }} - {{ extra.price | currency }}</span>
+            <input type="checkbox" class="extra-checkbox" (change)="actualizarExtrasSeleccionados(extra)" />
+            <span>{{ extra.name }}</span>
           </label>
         </div>
       </div>
     </ng-container>
   </div>
-  <!-- ------------------------ -->
-  <div>
-    <div *ngIf="producto?.esCeliaco" class="apto-container">
-      <img class="apto" src="../../../assets/icons/celiaco.png" alt="celiaco" />
-      <p>Apto celiaco</p>
-    </div>
-    <div *ngIf="producto?.esVegano" class="apto-container">
-      <img class="apto" src="../../../assets/icons/vegano.svg" alt="vegano" />
-      <p>Apto Vegano</p>
-    </div>
-  </div>
 
+  <!-- Notas -->
   <label for="notas" id="label">Notas: </label>
-  <textarea
-    name="notas"
-    id="notas"
-    cols="30"
-    rows="30"
-    [(ngModel)]="notas"
-  ></textarea>
+  <textarea name="notas" id="notas" cols="30" rows="30" [(ngModel)]="notas"></textarea>
+
+  <!-- Cantidad -->
   <div id="cantidad-container">
     <label for="cantidad" id="label">Cantidad: </label>
-    <app-contador-cantidad
-      (cantidadNueva)="cantidad = $event"
-    ></app-contador-cantidad>
+    <app-contador-cantidad (cantidadNueva)="cantidad = $event"></app-contador-cantidad>
   </div>
+
+  <!-- Botón Agregar -->
   <button (click)="agregarAlCarrito()">Agregar al carrito</button>
 </section>

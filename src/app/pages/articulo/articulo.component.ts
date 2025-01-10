@@ -1,3 +1,4 @@
+
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from 'src/app/core/services/header.service';
@@ -20,58 +21,100 @@ export class ArticuloComponent implements OnInit {
   headerService = inject(HeaderService);
   productosService = inject(ProductosService);
   cartService = inject(CartService);
-  categoriasService = inject(CategoriasService);
-
   router = inject(Router);
   route = inject(ActivatedRoute);
 
   producto?: Producto;
   cantidad: number = 1;
-  notas = '';
-  extrasSeleccionados: Extra[] = [];
+  notas: string = '';
+  extrasSeleccionados: any[] = [];
 
   ngOnInit(): void {
-    if (this.producto?.extras) {
-      this.producto.extras.forEach((extra) => (extra.seleccionado = false));
-    }
-    this.route.params.subscribe((params) => {
-      const id = params['id'];
-      // console.log('ID from route:', id);
-      this.productosService.getById(id).subscribe({
-        next: (producto) => {
-          this.producto = producto;
-          // console.log('Producto:', this.producto);
-        },
-        error: (err) => console.error('Error fetching producto:', err),
-      });
+    this.route.paramMap.subscribe((params) => {
+      const categoryId = params.get('category');
+      console.log('Categoría recibida de la URL:', categoryId);
+      if (!categoryId) {
+        console.error('No se recibió categoría desde la URL.');
+      }
+      if (categoryId) {
+        this.productosService.getByCategory(categoryId).subscribe((productos) => {
+          if (productos.length > 0) {
+            this.producto = productos[0];
+            console.log('Producto encontrado:', this.producto);
+
+            if (this.producto?.extras && Array.isArray(this.producto.extras)) {
+              // Aseguramos que cada extra tenga las propiedades necesarias
+              this.producto.extras = this.producto.extras.map((extra) => ({
+                name: typeof extra === 'string' ? extra : extra.name,
+                price: extra.price || 0, // Usamos un precio predeterminado si no está definido
+                seleccionado: false, // Por defecto no seleccionado
+              })) as Extra[];
+              console.log('Extras procesados:', this.producto.extras);
+            }
+          } else {
+            console.log('No se encontraron productos para la categoría:', categoryId);
+          }
+        });
+      } else {
+        console.log('No se recibió una categoría válida.');
+      }
     });
   }
 
   actualizarExtrasSeleccionados(extra: Extra): void {
-    extra.seleccionado = !extra.seleccionado;
-    if (extra.seleccionado) {
-      if (
-        !this.extrasSeleccionados.some(
-          (e) => e.name === extra.name && e.price === extra.price
-        )
-      ) {
-        this.extrasSeleccionados.push(extra);
-      }
+    const index = this.extrasSeleccionados.findIndex((e) => e.name === extra.name);
+    if (index === -1) {
+      this.extrasSeleccionados.push(extra);
     } else {
-      this.extrasSeleccionados = this.extrasSeleccionados.filter(
-        (e) => e.name !== extra.name || e.price !== extra.price
-      );
+      this.extrasSeleccionados.splice(index, 1);
     }
+    console.log('Extras seleccionados:', this.extrasSeleccionados);
   }
 
+  // agregarAlCarrito(): void {
+  //   if (!this.producto) {
+  //     console.error('Producto no está definido.');
+  //     return;
+  //   }
+
+  //   const productoId = String(this.producto._id);
+  //   if (!productoId) {
+  //     console.error('El producto no tiene un ID válido:', this.producto);
+  //     return;
+  //   }
+
+  //   this.cartService.addProd(
+  //     productoId,
+  //     this.cantidad,
+  //     this.notas,
+  //     this.extrasSeleccionados // Pasamos los extras seleccionados como un arreglo de `Extra[]`
+  //   );
+
+  //   this.router.navigate(['/carrito']);
+  // }
   agregarAlCarrito(): void {
-    if (!this.producto) return;
+    if (!this.producto) {
+      console.error('Producto no está definido.');
+      return;
+    }
+  
+    const productoId = this.producto.category;
+    if (!productoId) {
+      console.error('El producto no tiene un ID válido:', this.producto);
+      return;
+    }
+  
     this.cartService.addProd(
-      this.producto._id,
+      String(productoId),
       this.cantidad,
       this.notas,
       this.extrasSeleccionados
     );
+  
     this.router.navigate(['/carrito']);
+  }
+
+  isArray(value: any): boolean {
+    return Array.isArray(value);
   }
 }

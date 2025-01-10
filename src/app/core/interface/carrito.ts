@@ -1,6 +1,6 @@
 import { Extra } from "./productos";
 export interface Cart {
-  idProd: number;
+  idProd: string;
   cantidad: number;
   precio: number;
   notas: string;

@@ -32,11 +32,11 @@ export class CartService {
     // console.log('Carrito cargado:', this.carrito);
   }
 
-  addProd(idProd: number, cantidad: number, notas: string, extras: Extra[]) {
-    // console.log('Extras recibidos:', extras);
+  addProd(idProd:  string, cantidad: number, notas: string, extras: Extra[]) {
+    console.log('idProd:', idProd);
     const i = this.carrito.findIndex((producto) => producto.idProd === idProd);
     if (i === -1) {
-      const nuevoProd: Cart = {
+      const nuevoProd: Cart = { 
         idProd: idProd,
         cantidad: cantidad,
         notas: notas,
@@ -52,7 +52,7 @@ export class CartService {
     this.actualizarAlmacenamiento();
   }
 
-  deleteProd(idProd: number) {
+  deleteProd(idProd: string) {
     this.carrito = this.carrito.filter((producto) => producto.idProd !== idProd);
     if (this.carrito.length === 0) {
       localStorage.clear();
@@ -61,14 +61,22 @@ export class CartService {
     }
   }
 
-  cambiarProd(idProd: number, cantidad: number) {
-    this.carrito = this.carrito.map((producto) => {
-      if (producto.idProd === idProd) {
-        producto.cantidad = cantidad;
-      }
-      return producto;
-    });
+  // cambiarProd(idProd: string, cantidad: number) {
+  //   this.carrito = this.carrito.map((producto) => {
+  //     if (producto.idProd === idProd) {
+  //       producto.cantidad = cantidad;
+  //     }
+  //     return producto;
+  //   });
+  //   this.actualizarAlmacenamiento();
+  // }
+  cambiarProd(idProd: string, nuevaCantidad: number) {
+    const item = this.carrito.find(p => p.idProd === idProd);
+    if (item) {
+      item.cantidad = nuevaCantidad;
+    }
     this.actualizarAlmacenamiento();
+
   }
 
   actualizarAlmacenamiento() {

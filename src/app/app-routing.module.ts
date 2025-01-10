@@ -9,10 +9,10 @@ import { HomeComponent } from './pages/home/home.component';
 
 const routes: Routes = [
   { path: 'carrito', component: CarritoComponent },
-  { path: 'articulo/:id', component: ArticuloComponent },
+  { path: 'articulo/:category', component: ArticuloComponent },
   { path: 'buscar', component: BuscarComponent },
   { path: 'perfil', component: PerfilComponent },
-  { path: 'categoria/:nombre', component: RubroComponent },
+  { path: 'categoria/:id', component: RubroComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
 ];

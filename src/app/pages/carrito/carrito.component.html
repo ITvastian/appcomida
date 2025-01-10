@@ -8,7 +8,8 @@
         class="izq"
         [ngStyle]="{ 'background-image': 'url(' + item.photoUrl + ')' }"
       >
-        <div>
+      
+        <!-- <div>
           <img
             *ngIf="item.esCeliaco"
             src="../../../assets/icons/celiaco.png"
@@ -19,29 +20,32 @@
             src="../../../assets/icons/vegano.svg"
             alt="vegano"
           />
-        </div>
+        </div> -->
       </div>
       <div class="centro">
         <p class="negrita">{{ item.name }}</p>
         <p *ngIf="item.notas" id="notas-carrito">{{ item.notas }}</p>
         <ul>
-          <li *ngFor="let extra of item.extras">
+          <!-- <li *ngFor="let extra of item.extras">
             <p id="extra-nombre">{{ extra.name }}</p>
+          </li> -->
+          <li *ngFor="let extra of getStringsFromExtras(item.extras)">
+            <p id="extra-nombre">{{ extra }}</p>
           </li>
         </ul>
         <app-contador-cantidad
           [cantidadInicial]="item.cantidad"
-          (cantidadNueva)="cambiarProductoCantidad(item._id, $event)"
+          (cantidadNueva)="cambiarProductoCantidad(item.category,$event)"
         ></app-contador-cantidad>
       </div>
       <div class="der">
-        <button (click)="eliminarProd(item._id)" class="borrar">
+        <button (click)="eliminarProd(item.category)" class="borrar">
           <img src="../../../assets/icons/borrarr.png" alt="" width="20px" />
         </button>
         <div class="precios">
           <div class="extras-li">
-            <li *ngFor="let extra of item.extras" class="li-extras">
-              <h4 id="precio-extra">${{ extra.price }}</h4>
+            <li *ngFor="let extra of getNumbersFromExtras(item.extras)" class="li-extras">
+              <h4 id="precio-extra">${{ extra }}</h4>
             </li>
           </div>
           <p class="negrita">${{ item.price }}</p>
@@ -86,11 +90,12 @@
         <p class="extras-negrita">Extras</p>
         <p class="negrita">Total</p>
       </div>
-      <div id="montos">
+      <div id="montos" *ngFor="let item of productosCarrito(); index as i">
         <p>${{ subtotal }}</p>
-        <p>${{ extraTotal }}</p>
+        <p *ngFor="let extra of getNumbersFromExtras(item.extras)">${{ extra }}</p>
         <p>${{ total }}</p>
-      </div>
+      </div> 
+    
     </div>
     <div>
       <button

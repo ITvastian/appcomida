@@ -21,12 +21,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   categorias: WritableSignal<Categoria[]> = signal([]);
 
   ngOnInit(): void {
-    this.headerService.titulo.set('Pedime');
+    this.headerService.titulo.set('Dyno');
     this.headerService.extendido.set(true);
 
     this.categoriasService.getAll().subscribe({
-      next: (res) => this.categorias.set(res),
-      error: (err) => console.error('Error fetching categories:', err)
+      next: (res: Categoria[]) => this.categorias.set(res),  // Tipo explícito para res
+      error: (err: any) => console.error('Error fetching categories:', err)  // Tipo explícito para err
     });
   }
   ngOnDestroy(): void {

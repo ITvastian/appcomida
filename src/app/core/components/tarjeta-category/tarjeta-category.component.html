@@ -3,7 +3,18 @@
     'background-image': categoria.photoUrl
       ? 'url(' + categoria.photoUrl + ')'
       : 'none'
-  }"
+  }"loading="lazy"
 >
   <h3>{{ categoria.name }}</h3>
 </div>
+
+ <!-- <div *ngIf="categorias.length > 0; else noCategorias">
+  <div *ngFor="let categoria of categorias">
+    <h2>{{ categoria.name }}</h2>
+    <img [src]="categoria.photoUrl" alt="{{ categoria.name }}" width="200">
+  </div>
+</div> -->
+
+<ng-template #noCategorias>
+  <p>No se encontraron categorías.</p>
+</ng-template>

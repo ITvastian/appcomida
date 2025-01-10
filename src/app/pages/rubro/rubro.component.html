@@ -1,8 +1,9 @@
+
 <section id="container">
   <app-tarjeta-producto
     *ngFor="let producto of productos()"
     [producto]="producto"
-    [routerLink]="['/articulo', producto._id]"
+    [routerLink]="['/articulo', producto.category]"
     routerLinkActive="router-link-active"
   >
   </app-tarjeta-producto>
