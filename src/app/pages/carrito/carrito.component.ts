@@ -60,7 +60,9 @@ export class CarritoComponent {
     this.obtenerNumeroWhatsApp();
   }
   obtenerNumeroWhatsApp() {
-    this.http.get<{ numero: string }>('http://localhost:3001/api/config/whatsapp')
+    // this.http.get<{ numero: string }>('http://localhost:3001/api/config/whatsapp')
+    this.http.get<{ numero: string }>('https://mvp-admin.onrender.com/api/config/whatsapp')
+
       .subscribe({
         next: (response) => {
           this.numeroWhatsApp = response.numero;
@@ -294,8 +296,8 @@ export class CarritoComponent {
         }
       });
   }
-  private apiUrlVentas: string = 'http://localhost:3001/api/ventas';
-  // private apiUrlVentas: string = 'https://mvp-admin.onrender.com/api/ventas';
+  // private apiUrlVentas: string = 'http://localhost:3001/api/ventas';
+  private apiUrlVentas: string = 'https://mvp-admin.onrender.com/api/ventas';
 
   rate(index: number): void {
     this.rating = index;
