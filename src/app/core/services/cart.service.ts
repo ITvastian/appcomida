@@ -33,7 +33,6 @@ export class CartService {
   }
 
   addProd(idProd:  string, cantidad: number, notas: string, extras: Extra[]) {
-    console.log('idProd:', idProd);
     const i = this.carrito.findIndex((producto) => producto.idProd === idProd);
     if (i === -1) {
       const nuevoProd: Cart = { 

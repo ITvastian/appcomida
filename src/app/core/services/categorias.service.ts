@@ -1,34 +1,7 @@
-// import { Injectable } from '@angular/core';
-// import { Categoria } from '../interface/categorias';
-// import { Producto } from '../interface/productos';
-// import { Observable } from 'rxjs';
-// import { HttpClient } from '@angular/common/http';
-
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class CategoriasService {
-//   // private apiUrl = 'http://localhost:3001';
-//   private apiUrl = 'https://mvp-admin.onrender.com/api/categorias';
-
-//   constructor(private http: HttpClient) {}
-
-//   getAll(): Observable<Categoria[]> {
-//     return this.http.get<Categoria[]>(this.apiUrl);
-//   }
-
-//   getById(id: number): Observable<Categoria> {
-//     return this.http.get<Categoria>(`${this.apiUrl}/${id}`);
-//   }
-
-//   create(categoria: Categoria): Observable<Categoria> {
-//     return this.http.post<Categoria>(this.apiUrl, categoria);
-//   }
-// }
 import { Injectable } from '@angular/core';
 import { Categoria } from '../interface/categorias';
 import { Observable } from 'rxjs';
-import { AngularFirestore } from '@angular/fire/compat/firestore';  // Importar AngularFirestore
+import { AngularFirestore } from '@angular/fire/compat/firestore'; 
 import { map } from 'rxjs/operators';
 
 @Injectable({
@@ -36,7 +9,7 @@ import { map } from 'rxjs/operators';
 })
 export class CategoriasService {
   // Usamos Firebase Firestore en lugar de la API externa
-  private collectionName = 'categorias';  // Nombre de la colección en Firestore
+  private collectionName = 'categorias'; 
 
   constructor(private firestore: AngularFirestore) {}
 
@@ -49,8 +22,7 @@ export class CategoriasService {
         map((actions) =>
           actions.map((a) => {
             const data = a.payload.doc.data() as Categoria;
-            // Agregar el ID de Firestore, pero sin sobrescribir
-            return { ...data, id: a.payload.doc.id };  // Aquí, 'id' es el ID que proviene de Firestore
+            return { ...data, id: a.payload.doc.id }; 
           })
         )
       );

@@ -32,7 +32,6 @@ export class ArticuloComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       const categoryId = params.get('category');
-      console.log('Categoría recibida de la URL:', categoryId);
       if (!categoryId) {
         console.error('No se recibió categoría desde la URL.');
       }
@@ -71,27 +70,6 @@ export class ArticuloComponent implements OnInit {
     console.log('Extras seleccionados:', this.extrasSeleccionados);
   }
 
-  // agregarAlCarrito(): void {
-  //   if (!this.producto) {
-  //     console.error('Producto no está definido.');
-  //     return;
-  //   }
-
-  //   const productoId = String(this.producto._id);
-  //   if (!productoId) {
-  //     console.error('El producto no tiene un ID válido:', this.producto);
-  //     return;
-  //   }
-
-  //   this.cartService.addProd(
-  //     productoId,
-  //     this.cantidad,
-  //     this.notas,
-  //     this.extrasSeleccionados // Pasamos los extras seleccionados como un arreglo de `Extra[]`
-  //   );
-
-  //   this.router.navigate(['/carrito']);
-  // }
   agregarAlCarrito(): void {
     if (!this.producto) {
       console.error('Producto no está definido.');

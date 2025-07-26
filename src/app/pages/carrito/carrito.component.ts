@@ -16,7 +16,7 @@ import { CartService } from 'src/app/core/services/cart.service';
 import { Numero_Whats } from 'src/app/core/services/constantes/telefono';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { firstValueFrom, reduce } from 'rxjs';
-import { VentasService } from 'src/app/core/services/ventas.service';
+// import { VentasService } from 'src/app/core/services/ventas.service';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
@@ -33,7 +33,7 @@ export class CarritoComponent {
   ProductosService = inject(ProductosService);
   perfilService = inject(PerfilService);
   router = inject(Router);
-  ventasService = inject(VentasService);
+  // ventasService = inject(VentasService);
 
   productosCarrito: WritableSignal<
     (Producto & { cantidad: number; extras: any[]; notas?: string })[]
@@ -44,7 +44,7 @@ export class CarritoComponent {
   total: number = 0;
   extraTotal = 0;
   extra: number = 0;
-
+  numeroWhatsApp: string = '';
   entrega = `${this.perfilService.perfil()?.paraLlevar ? 'Si' : 'No'}`;
 
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
@@ -57,7 +57,20 @@ export class CarritoComponent {
     this.buscarInfo().then(() => {
       this.calcularinfo();
     });
+    this.obtenerNumeroWhatsApp();
   }
+  obtenerNumeroWhatsApp() {
+    this.http.get<{ numero: string }>('http://localhost:3001/api/config/whatsapp')
+      .subscribe({
+        next: (response) => {
+          this.numeroWhatsApp = response.numero;
+        },
+        error: (err) => {
+          console.error('Error al obtener el número de WhatsApp:', err);
+        }
+      });
+  }
+
   // Obteniendo Numbers en extras
   getNumbersFromExtras(extras: any[]): string[] {
     return extras
@@ -68,8 +81,8 @@ export class CarritoComponent {
   // Obteniendo String en extras
   getStringsFromExtras(extras: any[]): string[] {
     return extras
-      .map(extra => extra.name)            // Obtiene el valor de 'name' de cada extra
-      .filter(name => isNaN(Number(name)))  // Filtra solo los que no son números
+      .map(extra => extra.name)
+      .filter(name => isNaN(Number(name)))  
   }
   async buscarInfo() {
     const productos: Array<Producto & { cantidad: number; extras: Extra[]; notas?: string }> = [];
@@ -80,15 +93,12 @@ export class CarritoComponent {
       let producto = this.productosCache[itemCarrito.idProd];
       if (!producto) {
         try {
-          // Si no está en caché, hace la solicitud
-          // const productoObservable = this.ProductosService.getById(itemCarrito.idProd);
           const productoObservable = this.ProductosService.getById(itemCarrito.idProd.toString());
           producto = await firstValueFrom(productoObservable);
 
 
           if (producto) {
-            this.productosCache[itemCarrito.idProd] = producto; // Almacena en cache
-            // console.log(`Producto ${itemCarrito.idProd} cacheado`);
+            this.productosCache[itemCarrito.idProd] = producto;
           } else {
             console.warn(`Producto con id ${itemCarrito.idProd} no encontrado.`);
           }
@@ -129,31 +139,8 @@ export class CarritoComponent {
     this.actualizarCarrito();
   }
 
-  // cambiarProductoCantidad(id: number, nuevaCantidad: number) {
-  //   const itemActual = this.CartService.carrito.find(item => String(item.idProd) === String(id));
-  //   console.log(`itemActual - cambiarProductoCantidad ${itemActual}`);
-
-  //   if (!itemActual) return;
-
-  //   this.CartService.cambiarProd(String(id), nuevaCantidad);
-
-  //   const productosActualizados = this.productosCarrito().map(producto => {
-  //     if (producto._id === id) {
-  //       return {
-  //         ...producto,
-  //         cantidad: nuevaCantidad,
-  //       };
-  //     }
-  //     return producto;
-  //   });
-
-  //   this.productosCarrito.set(productosActualizados);
-  //   this.calcularinfo();
-  // }
   cambiarProductoCantidad(category: string, nuevaCantidad: number) {
     const itemActual = this.CartService.carrito.find(item => String(item.idProd) === String(category));
-    // console.log(`itemActual - cambiarProductoCantidad ${itemActual}`);
-
     if (!itemActual) {
       console.log("No se encontró el producto en el carrito.");
       return;
@@ -246,51 +233,33 @@ export class CarritoComponent {
       ${entrega}
     -----------------------------------
       Muchas Gracias!!!`;
-      this.http.get<{ numero: string }>('http://localhost:3001/api/config/whatsapp').subscribe({
-        next: (response) => {
-          const numeroWhats = response.numero;
-      
-          const link = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensaje)}`;
-          window.open(link, '_blank');
-          this.dialog.nativeElement.showModal();
-      
-          // Enviar venta al backend
-          const venta = {
-            mensaje,
-            timestamp: new Date().toISOString()
-          };
-      
-          this.http.post(this.apiUrlVentas, venta).subscribe({
-            next: (response) => {
-              console.log('Venta enviada exitosamente al backend:', response);
-            },
-            error: (error) => {
-              console.error('Error al enviar la venta al backend:', error);
-            }
-          });
-        },
-        error: (err) => {
-          console.error('Error al obtener el número de WhatsApp:', err);
-          alert('No se pudo obtener el número de WhatsApp.');
-        }
-      });
-  //   const link = `https://wa.me/${Numero_Whats}?text=${encodeURIComponent(mensaje)}`;
-  //   window.open(link, '_blank');
-  //   this.dialog.nativeElement.showModal();
-  //     // ✅ Enviar al backend
-  // const venta = {
-  //   mensaje,
-  //   timestamp: new Date().toISOString()
-  // };
+    this.http.get<{ numero: string }>('http://localhost:3001/api/config/whatsapp').subscribe({
+      next: (response) => {
+        const numeroWhats = response.numero;
+        const link = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensaje)}`;
+        window.open(link, '_blank');
+        this.dialog.nativeElement.showModal();
 
-  // this.http.post(this.apiUrlVentas, venta).subscribe({
-  //   next: (response) => {
-  //     console.log('Venta enviada exitosamente al backend:', response);
-  //   },
-  //   error: (error) => {
-  //     console.error('Error al enviar la venta al backend:', error);
-  //   }
-  // });
+        // Enviar venta al backend
+        const venta = {
+          mensaje,
+          timestamp: new Date().toISOString()
+        };
+
+        this.http.post(this.apiUrlVentas, venta).subscribe({
+          next: (response) => {
+            console.log('Venta enviada exitosamente al backend:', response);
+          },
+          error: (error) => {
+            console.error('Error al enviar la venta al backend:', error);
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error al obtener el número de WhatsApp:', err);
+        alert('No se pudo obtener el número de WhatsApp.');
+      }
+    });
   }
 
   stars: any[] = new Array(5);
@@ -328,20 +297,6 @@ export class CarritoComponent {
   private apiUrlVentas: string = 'http://localhost:3001/api/ventas';
   // private apiUrlVentas: string = 'https://mvp-admin.onrender.com/api/ventas';
 
-  // Enviando reporte de ventas al backend
-  // enviarVenta(venta: any) {
-  //   this.http.post(this.apiUrlVentas, venta).subscribe({
-  //     next: (response) => {
-  //       console.log('Venta enviada exitosamente:', response);
-  //     },
-  //     error: (error) => {
-  //       console.error('Error al enviar la venta:', error);
-  //     }
-  //   });
-  // }
-
-
-
   rate(index: number): void {
     this.rating = index;
     this.playSound();
@@ -355,21 +310,19 @@ export class CarritoComponent {
     this.clickSound.play();
   }
 
-  
+
   finalizarPedido() {
     const venta = {
       productos: this.CartService.carrito,
       subtotal: this.subtotal,
       extras: this.extraTotal,
       total: this.total,
-      // perfil: this.perfil,
       fecha: new Date()
     };
     this.CartService.vaciar();
     this.dialog.nativeElement.close();
     this.router.navigate(['/home']);
     this.enviarCalificacion();
-    // this.enviarVenta(venta);
     this.suggestionText = '';
     this.rating = 0;
   }
