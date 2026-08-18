@@ -1,4 +1,3 @@
-
 <div *ngIf="producto?.photoUrl; else noFoto">
   <img [src]="producto?.photoUrl" [alt]="producto?.name" id="fotoProducto" />
 </div>
@@ -31,7 +30,8 @@
         <div *ngFor="let extra of extras" class="extra-item">
           <label class="extra-label">
             <input type="checkbox" class="extra-checkbox" (change)="actualizarExtrasSeleccionados(extra)" />
-            <span>{{ extra.name }}</span>
+            <span class="extra-name">{{ extra.name }}</span>
+            <span class="extra-price">${{ extra.price }}</span>
           </label>
         </div>
       </div>

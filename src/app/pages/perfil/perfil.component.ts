@@ -27,9 +27,8 @@ export class PerfilComponent {
   perfil: Perfil = {
     nombre: '',
     direccion: '',
-    telefono: '',
     detalleEntrega: '',
-    paraLlevar: false
+    takeAway: false
   };
   guardarDatosPerfil() {
     this.perfilService.guardarDatos(this.perfil)

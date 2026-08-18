@@ -15,11 +15,15 @@ import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
     declarations: [
         AppComponent,
         TabsComponent,
-        HeaderComponent,
     ],
     bootstrap: [AppComponent],
-    imports: [BrowserModule, AppRoutingModule, AngularFireModule.initializeApp(environment.firebase),
-        AngularFireDatabaseModule,],
+    imports: [
+        BrowserModule, 
+        AppRoutingModule, 
+        AngularFireModule.initializeApp(environment.firebase),
+        AngularFireDatabaseModule,
+        HeaderComponent, // ← HeaderComponent es standalone
+    ],
     providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule { }

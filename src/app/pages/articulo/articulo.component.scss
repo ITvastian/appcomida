@@ -2,7 +2,6 @@
 
 #fotoProducto {
   width: 100%;
-  // height: 290px;
   height: 230px;
   object-fit: cover;
   position: absolute;
@@ -11,11 +10,13 @@
 }
 
 .margenChico {
-  // margin-top: 250px;
   margin-top: 185px;
+  margin-left: 10px;
+  margin-right: 10px;
+
   ul {
     text-transform: capitalize;
-    font-size: 2vh;
+    font-size: 0.9rem;
   }
 }
 
@@ -25,7 +26,9 @@
   font-weight: bold;
   display: flex;
   justify-content: center;
-  font-size: 2.5vh;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .margenChico>* {
@@ -40,7 +43,7 @@ ul li {
   }
 }
 #label{
-  font-size: 2vh;
+  font-size: 0.95rem;
   font-weight: bold;
   letter-spacing: 0.5px;
 }
@@ -59,13 +62,16 @@ ul li {
 textarea {
   resize: vertical;
   display: block;
-  max-height: 150px;
+  min-height: 90px;
+  max-height: 180px;
   border-radius: variables.$border-radius-grande;
   border: unset;
   background-color: variables.$color-principal-claro;
   margin-top: 10px;
-  width: calc(100% - 30px);
-  padding: 15px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  font-size: 0.95rem;
 
   &:focus {
     outline: none;
@@ -83,8 +89,9 @@ button {
   border-radius: 20px;
   border: unset;
   background-color: variables.$color-principal-claro;
-  font-size: larger;
-  padding: 10px;
+  font-size: 1rem;
+  padding: 12px;
+  min-height: 44px;
 }
 
 .extras-container {
@@ -100,7 +107,7 @@ button {
 .extra-item {
   display: flex;
   align-items: center;
-  // padding: 8px 0;
+  width: 100%;
 }
 
 .extra-item:last-child {
@@ -110,20 +117,37 @@ button {
 .extra-label {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 0.95rem;
 }
 
 .extra-checkbox {
   margin-right: 10px;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   accent-color: #139708;
 }
 
 span {
   text-transform: capitalize;
-  font-size: smaller;
+  font-size: 0.9rem;
+}
+
+.extra-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.extra-price {
+  margin-left: 12px;
+  min-width: 58px;
+  text-align: right;
+  font-weight: 600;
 }
 
 .extra-label:hover span {
@@ -137,4 +161,24 @@ span {
 
 .extras-container li {
   margin-bottom: 10px;
+}
+
+@media (max-width: 420px) {
+  #fotoProducto {
+    height: 205px;
+  }
+
+  .margenChico {
+    margin-top: 165px;
+  }
+
+  .name-product {
+    font-size: 1rem;
+  }
+
+  #label,
+  .extra-label,
+  span {
+    font-size: 0.85rem;
+  }
 }

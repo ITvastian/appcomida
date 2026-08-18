@@ -1,14 +1,12 @@
-<div
-  [ngStyle]="{
+<article class="category-card" [ngStyle]="{
     'background-image': categoria.photoUrl
       ? 'url(' + categoria.photoUrl + ')'
       : 'none'
-  }"loading="lazy"
->
+  }">
   <h3>{{ categoria.name }}</h3>
-</div>
+</article>
 
- <!-- <div *ngIf="categorias.length > 0; else noCategorias">
+<!-- <div *ngIf="categorias.length > 0; else noCategorias">
   <div *ngFor="let categoria of categorias">
     <h2>{{ categoria.name }}</h2>
     <img [src]="categoria.photoUrl" alt="{{ categoria.name }}" width="200">

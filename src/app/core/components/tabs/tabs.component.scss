@@ -12,7 +12,8 @@
   border-radius: 10px 10px 0 0;
   background-color: rgb(208 208 208);
   overflow: hidden;
-  height: 100%;
+  min-height: 64px;
+  height: 64px;
   width: auto;
   align-items: center;
 }
@@ -20,15 +21,36 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 64px;
   flex: 1;
+
   svg{
     display: block;
     margin: auto;
+    width: 30px;
+    height: 30px;
     transition: 50ms ease-in-out;
   }
+
   transition: 200ms ease-in-out;
 }
 .seleccionado{
   background-color: variables.$color-principal;
+}
+
+@media (max-width: 420px) {
+  #container {
+    min-height: 60px;
+    height: 60px;
+  }
+
+  .tab {
+    min-height: 60px;
+  }
+
+  .tab svg {
+    width: 27px;
+    height: 27px;
+  }
 }
 

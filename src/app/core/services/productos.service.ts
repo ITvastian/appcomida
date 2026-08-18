@@ -11,8 +11,70 @@ import { map } from 'rxjs/operators';
 })
 export class ProductosService {
   constructor(private firestore: AngularFirestore) { }
+
+  private parsePhotoUrl(value: unknown): string {
+    return typeof value === 'string' ? value.trim() : '';
+  }
+
+  private parsePrice(value: unknown): number {
+    if (typeof value === 'number' && !isNaN(value)) {
+      return value;
+    }
+
+    if (typeof value !== 'string') {
+      return 0;
+    }
+
+    const raw = value.trim().replace(/\$/g, '').replace(/\s/g, '');
+    if (!raw) {
+      return 0;
+    }
+
+    const hasDot = raw.includes('.');
+    const hasComma = raw.includes(',');
+    let normalized = raw;
+
+    if (hasDot && hasComma) {
+      // Si la coma aparece al final, suele ser decimal: 9.000,50
+      if (raw.lastIndexOf(',') > raw.lastIndexOf('.')) {
+        normalized = raw.replace(/\./g, '').replace(',', '.');
+      } else {
+        // Caso 9,000.50
+        normalized = raw.replace(/,/g, '');
+      }
+    } else if (hasDot) {
+      // Caso miles con punto: 9.000
+      if (/^\d{1,3}(\.\d{3})+$/.test(raw)) {
+        normalized = raw.replace(/\./g, '');
+      }
+    } else if (hasComma) {
+      // Caso miles con coma: 9,000
+      if (/^\d{1,3}(,\d{3})+$/.test(raw)) {
+        normalized = raw.replace(/,/g, '');
+      } else {
+        normalized = raw.replace(',', '.');
+      }
+    }
+
+    const parsed = Number(normalized);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
   getAllProducts(): Observable<Producto[]> {
-    return this.firestore.collection<Producto>('productos').valueChanges();
+    return this.firestore
+      .collection<Producto>('productos')
+      .valueChanges()
+      .pipe(
+        map((productos: Producto[]) =>
+          productos.map((producto: any) => ({
+            ...producto,
+            price: this.parsePrice(producto?.price),
+            photoUrl: this.parsePhotoUrl(producto?.photoUrl || producto?.photo),
+            extras: producto?.extras || [],
+            ingredients: producto?.ingredients || '',
+          }))
+        )
+      );
   }
 
   getByCategory(categoryId: string): Observable<Producto[]> {
@@ -29,13 +91,20 @@ export class ProductosService {
         map((actions) => {
           // console.log('Datos recibidos desde Firestore:', actions);
           return actions.map((a) => {
-            const data = a.payload.doc.data() as Producto;
-            return { id: a.payload.doc.id, ...data }; // Retorna los productos con sus IDs
+            const data = a.payload.doc.data() as any;
+            return {
+              id: a.payload.doc.id,
+              ...data,
+              price: this.parsePrice(data.price),
+              photoUrl: this.parsePhotoUrl(data.photoUrl || data.photo),
+              extras: data.extras || [],
+              ingredients: data.ingredients || '',
+            }; // Retorna los productos con sus IDs
           });
         })
       );
   }
-  // Nuevo método público para obtener un documento Firestore en bruto
+
   getById(id: string): Observable<Producto> {
     // console.log(`Buscando en la colección 'productos' donde el campo 'category' sea igual a: ${id}`);
     if (!id) {
@@ -73,11 +142,12 @@ export class ProductosService {
           }
           // console.log('Productos encontrados:', productos);
   
-          const producto = productos[0];
+          const producto = productos[0] as any;
           return {
             ...producto,
             _id: Number(producto._id) || 0,
-            price: Number(producto.price) || 0,
+            price: this.parsePrice(producto.price),
+            photoUrl: this.parsePhotoUrl(producto.photoUrl || producto.photo),
             extras: producto.extras || [],
             ingredients: producto.ingredients || '',
           };
@@ -94,7 +164,19 @@ export class ProductosService {
       .collection<Producto>('productos', ref =>
         ref.where('name', '>=', parametros.texto)
           .where('name', '<=', parametros.texto + '\uf8ff') // Filtro de búsqueda por nombre
-      ).valueChanges();
+      )
+      .valueChanges()
+      .pipe(
+        map((productos: Producto[]) =>
+          productos.map((producto: any) => ({
+            ...producto,
+            price: this.parsePrice(producto?.price),
+            photoUrl: this.parsePhotoUrl(producto?.photoUrl || producto?.photo),
+            extras: producto?.extras || [],
+            ingredients: producto?.ingredients || '',
+          }))
+        )
+      );
   }
 }
 

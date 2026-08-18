@@ -1,3 +1,6 @@
-<header [ngClass]="{extendido:headerService.extendido()}">
-  <h1 class="{{claseAplicada()}}" (animationend)="mostrarTituloNuevo($event)">{{tituloMostrado() }}</h1>
+<header [ngClass]="{extendido:headerService.extendido()}"
+  [ngStyle]="{'background-image': 'url(' + backgroundImageUrl() + ')'}" class="header-with-background">
+  <h1 class="{{claseAplicada()}}" (animationend)="mostrarTituloNuevo($event)">
+    {{ isHomeRoute() ? (titleActive() ? tituloBackend() : '') : (titleActive() ? tituloBackend() : tituloMostrado()) }}
+  </h1>
 </header>

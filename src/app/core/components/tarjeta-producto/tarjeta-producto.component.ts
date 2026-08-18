@@ -14,6 +14,16 @@ export class TarjetaProductoComponent implements OnChanges {
   @Input({ required: true }) producto!: Producto;
   @Input() extrasSeleccionados: Extra[] = [];
 
+  getProductImage(): string {
+    const productoAny = this.producto as any;
+    return (
+      productoAny?.photoUrl ||
+      productoAny?.photo ||
+      productoAny?.imageUrl ||
+      ''
+    );
+  }
+
 
   ngOnChanges(): void {
     console.log('Producto en TarjetaProductoComponent:', this.producto); // Verifica el objeto recibido

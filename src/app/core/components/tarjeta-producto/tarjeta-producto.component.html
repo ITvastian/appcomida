@@ -1,8 +1,6 @@
 <div id="container">
-  <div
-    id="foto"
-    [ngStyle]="{ 'background-image': 'url(' + producto.photoUrl + ')' }"
-  >
+  <div id="foto">
+    <img *ngIf="getProductImage()" [src]="getProductImage()" [alt]="producto.name" class="product-photo" />
     <!-- <img *ngIf="producto.esCeliaco" src="./../../../../assets/icons/celiaco.png" alt="Apto celiaco">
     <img *ngIf="producto.esVegano" src="./../../../../assets/icons/vegano.svg" alt="Apto vegano"> -->
   </div>

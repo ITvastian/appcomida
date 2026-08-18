@@ -13,10 +13,8 @@ import { Router, RouterModule } from '@angular/router';
 import { ContadorCantidadComponent } from 'src/app/core/components/contador-cantidad/contador-cantidad.component';
 import { Extra, Producto } from 'src/app/core/interface/productos';
 import { CartService } from 'src/app/core/services/cart.service';
-import { Numero_Whats } from 'src/app/core/services/constantes/telefono';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { firstValueFrom, reduce } from 'rxjs';
-// import { VentasService } from 'src/app/core/services/ventas.service';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
@@ -33,59 +31,72 @@ export class CarritoComponent {
   ProductosService = inject(ProductosService);
   perfilService = inject(PerfilService);
   router = inject(Router);
-  // ventasService = inject(VentasService);
 
   productosCarrito: WritableSignal<
     (Producto & { cantidad: number; extras: any[]; notas?: string })[]
   > = signal([]);
+  cargandoCarrito = signal(true);
 
   subtotal: number = 0;
   delivery: number = 0;
   total: number = 0;
   extraTotal = 0;
   extra: number = 0;
-  numeroWhatsApp: string = '';
-  entrega = `${this.perfilService.perfil()?.paraLlevar ? 'Si' : 'No'}`;
+  entrega = `${this.perfilService.perfil()?.takeAway ? 'Si' : 'No'}`;
 
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
+  private apiUrl: string = 'http://localhost:3001/api/salon/order';
+  // private apiUrl: string = 'https://mvp-admin.onrender.com/api/salon/tables';
 
   // Cache de productos para evitar llamadas duplicadas
   productosCache: { [id: string]: Producto } = {};
 
   ngOnInit(): void {
     this.headerService.titulo.set('Carrito');
-    this.buscarInfo().then(() => {
+    this.cargandoCarrito.set(true);
+    this.buscarInfo().finally(() => {
       this.calcularinfo();
+      this.cargandoCarrito.set(false);
     });
-    this.obtenerNumeroWhatsApp();
-  }
-  obtenerNumeroWhatsApp() {
-    // this.http.get<{ numero: string }>('http://localhost:3001/api/config/whatsapp')
-    this.http.get<{ numero: string }>('https://mvp-admin.onrender.com/api/config/whatsapp')
-
-      .subscribe({
-        next: (response) => {
-          this.numeroWhatsApp = response.numero;
-        },
-        error: (err) => {
-          console.error('Error al obtener el número de WhatsApp:', err);
-        }
-      });
   }
 
-  // Obteniendo Numbers en extras
-  getNumbersFromExtras(extras: any[]): string[] {
-    return extras
-      .map(extra => extra.name)
-      .filter(name => !isNaN(Number(name)))
-      .map(name => Number(name).toString());
+  getExtraName(extra: any): string {
+    if (typeof extra?.name === 'string' && extra.name.trim()) {
+      return extra.name;
+    }
+    return 'Extra';
   }
-  // Obteniendo String en extras
-  getStringsFromExtras(extras: any[]): string[] {
-    return extras
-      .map(extra => extra.name)
-      .filter(name => isNaN(Number(name)))  
+
+  getExtraPrice(extra: any): number {
+    if (extra?.price !== undefined && extra?.price !== null && !isNaN(Number(extra.price))) {
+      return Number(extra.price);
+    }
+
+    // Compatibilidad con datos viejos donde el precio llegaba en extra.name
+    if (typeof extra?.name === 'string' && !isNaN(Number(extra.name))) {
+      return Number(extra.name);
+    }
+
+    return 0;
   }
+
+  getExtrasWithPrice(extras: any[]): any[] {
+    if (!Array.isArray(extras)) {
+      return [];
+    }
+    return extras.filter((extra) => this.getExtraPrice(extra) > 0);
+  }
+  
+  formatPrice(value: number): string {
+    const safeValue = Number(value);
+    if (isNaN(safeValue)) {
+      return '0';
+    }
+    return new Intl.NumberFormat('es-AR', {
+      maximumFractionDigits: 0,
+    }).format(safeValue);
+  }
+
   async buscarInfo() {
     const productos: Array<Producto & { cantidad: number; extras: Extra[]; notas?: string }> = [];
     console.log('Productos cargados en el carrito:', productos);
@@ -173,8 +184,8 @@ export class CarritoComponent {
 
       if (Array.isArray(item.extras)) {
         item.extras.forEach(extra => {
-          const extraPrice = Number(extra.name);
-          if (!isNaN(extraPrice)) {
+          const extraPrice = this.getExtraPrice(extra);
+          if (extraPrice > 0) {
             this.extraTotal += extraPrice * itemCantidad;
           }
         });
@@ -184,82 +195,53 @@ export class CarritoComponent {
   }
 
   async actualizarCarrito() {
-    await this.buscarInfo();
-    console.log('Productos en productosCarrito después de actualizar:', this.productosCarrito());
-    this.calcularinfo();
+    this.cargandoCarrito.set(true);
+    try {
+      await this.buscarInfo();
+      console.log('Productos en productosCarrito después de actualizar:', this.productosCarrito());
+      this.calcularinfo();
+    } finally {
+      this.cargandoCarrito.set(false);
+    }
   }
 
   async enviarMensaje() {
-    let pedido = '';
+    const items: any[] = [];
+    
     for (let i = 0; i < this.CartService.carrito.length; i++) {
       const itemCarrito = this.CartService.carrito[i];
       try {
-        // const producto = await firstValueFrom(this.ProductosService.getById(itemCarrito.idProd));
         const producto = await firstValueFrom(this.ProductosService.getById(itemCarrito.idProd.toString()));
 
         if (producto) {
-          pedido += `*${itemCarrito.cantidad} X ${producto.name}\n`;
-          if (itemCarrito.extras && itemCarrito.extras.length > 0) {
-            pedido += `${itemCarrito.extras.map(extra => extra.name).join(', ')}\n`;
-          }
-          if (itemCarrito.notas) {
-            pedido += `  Notas: ${itemCarrito.notas}\n`;
-          }
+          items.push({
+            productId: producto._id,
+            name: producto.name,
+            quantity: itemCarrito.cantidad,
+            price: producto.price
+          });
         }
       } catch (error) {
         console.error(`Error al obtener el producto con id ${itemCarrito.idProd}:`, error);
       }
     }
-    const entrega = this.perfilService.perfil()?.paraLlevar ? 'Si' : 'No';
-    const mensaje = `
-      Hola! 
-      Soy ${this.perfilService.perfil()?.nombre}
-      Orden:
-    -----------------------------------
-      Pedido:
-      ${pedido}
-    -----------------------------------
-      Teléfono: 
-      ${this.perfilService.perfil()?.telefono}
-    -----------------------------------
-      Mesa N°: 
-      ${this.perfilService.perfil()?.direccion}
-    -----------------------------------
-      Notas: 
-      ${this.perfilService.perfil()?.detalleEntrega}
-    -----------------------------------
-      Total:
-      $ ${this.total}
-    -----------------------------------
-      Para llevar: 
-      ${entrega}
-    -----------------------------------
-      Muchas Gracias!!!`;
-    this.http.get<{ numero: string }>('http://localhost:3001/api/config/whatsapp').subscribe({
+
+    const orden = {
+      tableNumber: Number(this.perfilService.perfil()?.direccion) || 0,
+      orderId: `ORD-${Date.now()}`,
+      customerName: this.perfilService.perfil()?.nombre || 'Cliente',
+      takeAway: this.perfilService.perfil()?.takeAway ?? false,
+      items: items
+    };
+
+    this.http.post(this.apiUrl, orden).subscribe({
       next: (response) => {
-        const numeroWhats = response.numero;
-        const link = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensaje)}`;
-        window.open(link, '_blank');
+        console.log('Orden enviada exitosamente al servidor:', response);
         this.dialog.nativeElement.showModal();
-
-        // Enviar venta al backend
-        const venta = {
-          mensaje,
-          timestamp: new Date().toISOString()
-        };
-
-        this.http.post(this.apiUrlVentas, venta).subscribe({
-          next: (response) => {
-            console.log('Venta enviada exitosamente al backend:', response);
-          },
-          error: (error) => {
-            console.error('Error al enviar la venta al backend:', error);
-          }
-        });
       },
       error: (err) => {
-        console.error('Error al obtener el número de WhatsApp:', err);
-        alert('No se pudo obtener el número de WhatsApp.');
+        console.error('Error al enviar la orden:', err);
+        alert('Error al enviar la orden. Intenta de nuevo.');
       }
     });
   }
@@ -267,8 +249,8 @@ export class CarritoComponent {
   stars: any[] = new Array(5);
   rating: number = 0;
   hoverIndex: number = 0;
-  // private apiUrl: string = 'http://localhost:3001/api/rating';
-  private apiUrl: string = 'https://mvp-admin.onrender.com/api/rating';
+  private ratingApiUrl: string = 'http://localhost:3001/api/rating';
+  // private ratingApiUrl: string = 'https://mvp-admin.onrender.com/api/rating';
   clickSound: HTMLAudioElement;
   suggestionText = '';
 
@@ -286,7 +268,7 @@ export class CarritoComponent {
       suggestion: this.suggestionText
     };
 
-    this.http.post(this.apiUrl, feedback)
+    this.http.post(this.ratingApiUrl, feedback)
       .subscribe({
         next: (response) => {
           // console.log('Rating enviado exitosamente:', response);
@@ -296,9 +278,6 @@ export class CarritoComponent {
         }
       });
   }
-  // private apiUrlVentas: string = 'http://localhost:3001/api/ventas';
-  private apiUrlVentas: string = 'https://mvp-admin.onrender.com/api/ventas';
-
   rate(index: number): void {
     this.rating = index;
     this.playSound();

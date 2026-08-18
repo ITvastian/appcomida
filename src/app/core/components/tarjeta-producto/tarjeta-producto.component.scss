@@ -1,7 +1,8 @@
 @use "./../../../../assets/styles/variables.scss";
 
 #container {
-  height: 100px;
+  min-height: 120px;
+  max-height: 120px;
   display: flex;
   background-color: variables.$color-principal-claro;
   border-radius: variables.$border-radius-mediano;
@@ -12,49 +13,85 @@
 #detalles {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   flex: 2;
-  padding: 15px;
+  padding: 10px 12px;
+  min-width: 0;
 }
 
 #foto {
-  background-size: cover;
   height: 100%;
   width: 25%;
+  min-width: 82px;
   flex: 1;
-  background-position: center;
   display: flex;
-  gap: 5px;
-  align-items: flex-end;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
 
-  img {
-    height: 20px;
-    margin-bottom: 5px;
-    background-color: rgba(251, 251, 251, 0.63);
-    border-radius: 50%;
-
-    &:first-child {
-      margin-left: 5px;
-    }
+  .product-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 0;
+    margin: 0;
+    background-color: transparent;
   }
+
 }
 
 h4{
   padding-bottom: 2px;
   font-weight: 600;
- font-size: small;
+  font-size: 0.92rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
 }
 ul li{
- display: inline;
- font-size: small;
- &:not(:last-of-type)::after
- {
-  content: ",";
- }
+  display: block;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 #precio{
   text-align: end;
   font-weight: bold;
   text-transform: capitalize;
+  font-size: 0.92rem;
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+@media (max-width: 420px) {
+  #container {
+    min-height: 132px;
+    max-height: 132px;
+  }
+
+  #detalles {
+    padding: 8px 10px;
+  }
+
+  #foto {
+    width: 28%;
+    min-width: 78px;
+  }
+
+  h4 {
+    font-size: 0.86rem;
+  }
+
+  ul li {
+    font-size: 0.75rem;
+  }
+
+  #precio {
+    font-size: 0.86rem;
+  }
 }

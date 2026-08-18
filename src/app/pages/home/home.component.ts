@@ -19,16 +19,35 @@ export class HomeComponent implements OnInit, OnDestroy {
   headerService = inject(HeaderService);
   categoriasService = inject(CategoriasService);
   categorias: WritableSignal<Categoria[]> = signal([]);
+  cargandoCategorias = signal(true);
+  errorCategorias = signal(false);
 
   ngOnInit(): void {
-    this.headerService.titulo.set('Dyno');
+    this.headerService.titulo.set('');
     this.headerService.extendido.set(true);
+    this.cargarCategorias();
+  }
 
+  cargarCategorias() {
+    this.cargandoCategorias.set(true);
+    this.errorCategorias.set(false);
     this.categoriasService.getAll().subscribe({
-      next: (res: Categoria[]) => this.categorias.set(res),  // Tipo explícito para res
-      error: (err: any) => console.error('Error fetching categories:', err)  // Tipo explícito para err
+      next: (res: Categoria[]) => {
+        this.categorias.set(res);
+        this.cargandoCategorias.set(false);
+      },
+      error: (err: any) => {
+        console.error('Error fetching categories:', err);
+        this.errorCategorias.set(true);
+        this.cargandoCategorias.set(false);
+      },
     });
   }
+
+  reintentarCargaCategorias() {
+    this.cargarCategorias();
+  }
+
   ngOnDestroy(): void {
     this.headerService.extendido.set(false);
   }

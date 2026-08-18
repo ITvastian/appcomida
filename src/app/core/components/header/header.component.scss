@@ -2,6 +2,7 @@
 
 header{
   position: relative;
+  min-height: 60px;
   height: 60px;
   background-color: variables.$color-principal;
   border-radius: 0 0 10px 10px;
@@ -9,10 +10,15 @@ header{
   align-items: center;
   justify-content: center;
   transition: 500ms ease-in-out;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
+
 header {
   z-index: 99;
 }
+
 header::before{
   content: "";
   top: 0;
@@ -20,32 +26,54 @@ header::before{
   right: 0;
   bottom: 0;
   position: absolute;
-  background-image: url("./../../../../assets/img/flyer.jpg");
-  background-position: center;
-  background-size: cover;
+  background-color: rgba(0, 0, 0, 0.3); /* Overlay oscuro para legibilidad */
   z-index: -1;
-  opacity: 0;
+  opacity: 1;
   transition: 500ms;
 }
+
 header.extendido::before{
   opacity: 0.5;
 }
 
 h1{
   letter-spacing: 1px;
-  font-size: xx-large;
+  font-size: clamp(1.15rem, 5vw, 1.9rem);
+  line-height: 1.1;
+  padding: 0 10px;
   font-weight: 600;
   text-align: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
 }
+
 .extendido{
   height: 200px;
   background-color: unset;
-
 }
+
+@media (max-width: 420px) {
+  header {
+    min-height: 56px;
+    height: 56px;
+  }
+
+  .extendido {
+    height: 170px;
+  }
+
+  h1 {
+    font-size: clamp(1rem, 6vw, 1.4rem);
+  }
+}
+
 .fade-in{
   animation: fade-out 450ms ease-in-out backwards;
   animation-direction: reverse;
 }
+
 .fade-out{
   animation: fade-out 50ms ease-in-out;
 }
