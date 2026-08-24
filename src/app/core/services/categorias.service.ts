@@ -1,72 +1,104 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Categoria } from '../interface/categorias';
 import { Observable } from 'rxjs';
-import { AngularFirestore } from '@angular/fire/compat/firestore'; 
 import { map } from 'rxjs/operators';
+import { ApiConfigService } from './api-config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoriasService {
-  // Usamos Firebase Firestore en lugar de la API externa
-  private collectionName = 'categorias'; 
+  private readonly apiUrl: string;
+  private readonly defaultTenantId = 'big-pizza';
 
-  constructor(private firestore: AngularFirestore) {}
-
-  // Obtener todas las categorías (desde Firestore)
-  getAll(): Observable<Categoria[]> {
-    return this.firestore
-      .collection<Categoria>(this.collectionName)
-      .snapshotChanges()
-      .pipe(
-        map((actions) =>
-          actions.map((a) => {
-            const data = a.payload.doc.data() as Categoria;
-            return { ...data, id: a.payload.doc.id }; 
-          })
-        )
-      );
+  constructor(private http: HttpClient, private apiConfigService: ApiConfigService) {
+    this.apiUrl = this.apiConfigService.api('');
   }
-  getCategoryIdByName(name: string): Observable<string> {
-      return this.firestore
-        .collection('categorias', ref => ref.where('name', '==', name))
-        .get()
-        .pipe(
-          map(snapshot => {
-            if (!snapshot.empty) {
-              return snapshot.docs[0].id; // ID de la categoría encontrada
-            }
-            throw new Error('Categoría no encontrada');
-          })
-        );
+
+  private obtenerTenantId(): string {
+    const keys = ['activeTenantId', 'tenantId', 'activeRestaurantTenantId'];
+    for (const key of keys) {
+      const value = localStorage.getItem(key)?.trim();
+      if (value) {
+        return value;
+      }
+    }
+    return this.defaultTenantId;
+  }
+
+  private normalizarCategoria(data: any): Categoria {
+    return {
+      ...data,
+      id: String(data?.id || data?._id || data?.categoryId || ''),
+      name: String(data?.name || ''),
+      photoUrl: String(data?.photoUrl || data?.photo || data?.imageUrl || ''),
+      productos: Array.isArray(data?.productos) ? data.productos : [],
+    } as Categoria;
+  }
+
+  private extraerArrayCategorias(response: any): any[] {
+    if (Array.isArray(response)) {
+      return response;
     }
 
-  // Obtener una categoría por su ID (desde Firestore)
-  getById(id: string): Observable<Categoria> {
-    return this.firestore
-      .doc<Categoria>(`${this.collectionName}/${id}`)
-      .valueChanges()
-      .pipe(
-        map((data) => {
-          return { id, ...data } as Categoria;  // Retornar la categoría con su ID
-        })
-      );
+    if (Array.isArray(response?.categorias)) {
+      return response.categorias;
+    }
+
+    if (Array.isArray(response?.categories)) {
+      return response.categories;
+    }
+
+    if (Array.isArray(response?.data)) {
+      return response.data;
+    }
+
+    return [];
   }
 
-  // Crear una nueva categoría (en Firestore)
+  // Obtener todas las categorías desde API con tenantId
+  getAll(): Observable<Categoria[]> {
+    const tenantId = this.obtenerTenantId();
+    const params = new HttpParams().set('tenantId', tenantId);
+
+    return this.http.get<any>(`${this.apiUrl}/categorias`, { params }).pipe(
+      map((response) => this.extraerArrayCategorias(response).map((item) => this.normalizarCategoria(item)))
+    );
+  }
+
+  getCategoryIdByName(name: string): Observable<string> {
+    const buscada = (name || '').trim().toLowerCase();
+    return this.getAll().pipe(
+      map((categorias) => {
+        const encontrada = categorias.find((c) => (c?.name || '').trim().toLowerCase() === buscada);
+        if (!encontrada?.id) {
+          throw new Error('Categoría no encontrada');
+        }
+        return String(encontrada.id);
+      })
+    );
+  }
+
+  // Obtener una categoría por su ID (desde API)
+  getById(id: string): Observable<Categoria> {
+    return this.getAll().pipe(
+      map((categorias) => {
+        const encontrada = categorias.find((c) => String(c.id) === String(id));
+        if (!encontrada) {
+          throw new Error('Categoría no encontrada');
+        }
+        return encontrada;
+      })
+    );
+  }
+
+  // Crear categoría en API
   create(categoria: Categoria): Observable<any> {
-    const id = this.firestore.createId();  // Crear un ID único para la categoría
-    return new Observable((observer) => {
-      this.firestore
-        .doc(`${this.collectionName}/${id}`)
-        .set(categoria)  // Usar set() para crear el documento
-        .then(() => {
-          observer.next({ id, categoria });  // Devolver el documento creado con el ID
-          observer.complete();
-        })
-        .catch((error) => {
-          observer.error(error);
-        });
+    const tenantId = this.obtenerTenantId();
+    return this.http.post(`${this.apiUrl}/categorias`, {
+      ...categoria,
+      tenantId,
     });
   }
 }

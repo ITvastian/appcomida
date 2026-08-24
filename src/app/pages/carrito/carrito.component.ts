@@ -14,9 +14,11 @@ import { ContadorCantidadComponent } from 'src/app/core/components/contador-cant
 import { Extra, Producto } from 'src/app/core/interface/productos';
 import { CartService } from 'src/app/core/services/cart.service';
 import { HeaderService } from 'src/app/core/services/header.service';
+import { TenantContextService } from 'src/app/core/services/tenant-context.service';
 import { firstValueFrom, reduce } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { ApiConfigService } from 'src/app/core/services/api-config.service';
 
 @Component({
   selector: 'app-carrito',
@@ -30,6 +32,8 @@ export class CarritoComponent {
   CartService = inject(CartService);
   ProductosService = inject(ProductosService);
   perfilService = inject(PerfilService);
+  tenantContextService = inject(TenantContextService);
+  apiConfigService = inject(ApiConfigService);
   router = inject(Router);
 
   productosCarrito: WritableSignal<
@@ -45,8 +49,7 @@ export class CarritoComponent {
   entrega = `${this.perfilService.perfil()?.takeAway ? 'Si' : 'No'}`;
 
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
-  private apiUrl: string = 'http://localhost:3001/api/salon/order';
-  // private apiUrl: string = 'https://mvp-admin.onrender.com/api/salon/tables';
+  private readonly apiUrl = this.apiConfigService.api('/salon/order');
 
   // Cache de productos para evitar llamadas duplicadas
   productosCache: { [id: string]: Producto } = {};
@@ -122,12 +125,17 @@ export class CarritoComponent {
       }
 
       if (producto) {
+        const resolvedId = String(producto._id || '').trim();
+        if (!resolvedId) {
+          continue;
+        }
+
         const productoValido: Producto & {
           cantidad: number;
           extras: Extra[];
           notas?: string;
         } = {
-          _id: producto._id,
+          _id: resolvedId,
           category: producto.category,
           name: producto.name,
           price: producto.price,
@@ -160,7 +168,7 @@ export class CarritoComponent {
     }
     this.CartService.cambiarProd(String(category), nuevaCantidad);
     const productosActualizados = this.productosCarrito().map(producto => {
-      if (producto.category === category) {
+      if (String(producto._id) === String(category)) {
         return {
           ...producto,
           cantidad: nuevaCantidad,
@@ -206,6 +214,13 @@ export class CarritoComponent {
   }
 
   async enviarMensaje() {
+    const tenantId = this.tenantContextService.getTenantId();
+    const tableNumber = this.tenantContextService.getTableNumber(this.perfilService.perfil()?.direccion);
+    if (!tableNumber) {
+      alert('No encontramos el numero de mesa.');
+      return;
+    }
+
     const items: any[] = [];
     
     for (let i = 0; i < this.CartService.carrito.length; i++) {
@@ -214,11 +229,24 @@ export class CarritoComponent {
         const producto = await firstValueFrom(this.ProductosService.getById(itemCarrito.idProd.toString()));
 
         if (producto) {
+          const productId = String(producto._id ?? '').trim();
+          if (!productId) {
+            console.warn('Producto sin _id valido. Se omite en la orden.', producto);
+            continue;
+          }
+
           items.push({
-            productId: producto._id,
+            productId,
             name: producto.name,
             quantity: itemCarrito.cantidad,
-            price: producto.price
+            price: producto.price,
+            extras: Array.isArray(itemCarrito.extras)
+              ? itemCarrito.extras.map((extra) => ({
+                  name: this.getExtraName(extra),
+                  price: this.getExtraPrice(extra),
+                  quantity: 1,
+                }))
+              : [],
           });
         }
       } catch (error) {
@@ -227,30 +255,34 @@ export class CarritoComponent {
     }
 
     const orden = {
-      tableNumber: Number(this.perfilService.perfil()?.direccion) || 0,
-      orderId: `ORD-${Date.now()}`,
+      tenantId,
+      tableNumber,
       customerName: this.perfilService.perfil()?.nombre || 'Cliente',
       takeAway: this.perfilService.perfil()?.takeAway ?? false,
       items: items
     };
 
-    this.http.post(this.apiUrl, orden).subscribe({
-      next: (response) => {
-        console.log('Orden enviada exitosamente al servidor:', response);
-        this.dialog.nativeElement.showModal();
-      },
-      error: (err) => {
-        console.error('Error al enviar la orden:', err);
-        alert('Error al enviar la orden. Intenta de nuevo.');
-      }
-    });
+    try {
+      const response = await firstValueFrom(
+        this.http.post(this.apiUrl, orden, {
+          headers: new HttpHeaders({
+            'x-tenant-id': tenantId,
+          }),
+        })
+      );
+      console.log('Orden enviada exitosamente al servidor:', response);
+      return true;
+    } catch (err) {
+      console.error('Error al enviar la orden:', err);
+      alert('Error al enviar la orden. Intenta de nuevo.');
+      return false;
+    }
   }
 
   stars: any[] = new Array(5);
   rating: number = 0;
   hoverIndex: number = 0;
-  private ratingApiUrl: string = 'http://localhost:3001/api/rating';
-  // private ratingApiUrl: string = 'https://mvp-admin.onrender.com/api/rating';
+  private readonly ratingApiUrl = this.apiConfigService.api('/rating');
   clickSound: HTMLAudioElement;
   suggestionText = '';
 
@@ -263,20 +295,24 @@ export class CarritoComponent {
 
   // Enviando calificacion y notas al backend. 
   async enviarCalificacion() {
+    const tenantId = this.tenantContextService.getTenantId();
     const feedback = {
+      tenantId,
       rating: this.rating,
       suggestion: this.suggestionText
     };
 
-    this.http.post(this.ratingApiUrl, feedback)
-      .subscribe({
-        next: (response) => {
-          // console.log('Rating enviado exitosamente:', response);
-        },
-        error: (error) => {
-          console.error('Error al enviar el rating:', error);
-        }
-      });
+    try {
+      await firstValueFrom(
+        this.http.post(this.ratingApiUrl, feedback, {
+          headers: new HttpHeaders({
+            'x-tenant-id': tenantId,
+          }),
+        })
+      );
+    } catch (error) {
+      console.error('Error al enviar el rating:', error);
+    }
   }
   rate(index: number): void {
     this.rating = index;
@@ -292,7 +328,18 @@ export class CarritoComponent {
   }
 
 
-  finalizarPedido() {
+  abrirConfirmacionPedido() {
+    this.dialog.nativeElement.showModal();
+  }
+
+  async finalizarPedido() {
+    const ordenEnviada = await this.enviarMensaje();
+    if (!ordenEnviada) {
+      return;
+    }
+
+    await this.enviarCalificacion();
+
     const venta = {
       productos: this.CartService.carrito,
       subtotal: this.subtotal,
@@ -303,7 +350,6 @@ export class CarritoComponent {
     this.CartService.vaciar();
     this.dialog.nativeElement.close();
     this.router.navigate(['/home']);
-    this.enviarCalificacion();
     this.suggestionText = '';
     this.rating = 0;
   }

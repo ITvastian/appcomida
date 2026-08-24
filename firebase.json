@@ -1,1 +1,19 @@
-{}
+{
+	"hosting": [
+		{
+			"site": "dyno",
+			"public": "dist/dyno",
+			"ignore": [
+				"firebase.json",
+				"**/.*",
+				"**/node_modules/**"
+			],
+			"rewrites": [
+				{
+					"source": "**",
+					"destination": "/index.html"
+				}
+			]
+		}
+	]
+}

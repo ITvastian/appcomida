@@ -1,15 +1,26 @@
 <div id="container">
   <div id="foto">
     <img *ngIf="getProductImage()" [src]="getProductImage()" [alt]="producto.name" class="product-photo" />
-    <!-- <img *ngIf="producto.esCeliaco" src="./../../../../assets/icons/celiaco.png" alt="Apto celiaco">
-    <img *ngIf="producto.esVegano" src="./../../../../assets/icons/vegano.svg" alt="Apto vegano"> -->
   </div>
   <div id="detalles">
-    <h4>{{ producto.name }}</h4>
-    <ul>
-      <li>{{ producto.ingredients }}</li>
-    </ul>
+    <h4 class="product-name">{{ producto.name }}</h4>
+
+    <div class="info-item" *ngIf="producto.ingredients" style="margin-bottom: 10px;">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+      </svg>
+      <span>{{ producto.ingredients }}</span>
+    </div>
+
+    <div class="info-item description" *ngIf="producto.description">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ producto.description }}</span>
+    </div>
+
     <p id="precio">${{ producto.price }}</p>
   </div>
-
 </div>

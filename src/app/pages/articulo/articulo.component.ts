@@ -76,7 +76,7 @@ export class ArticuloComponent implements OnInit {
       return;
     }
   
-    const productoId = this.producto.category;
+    const productoId = String(this.producto._id || '').trim();
     if (!productoId) {
       console.error('El producto no tiene un ID válido:', this.producto);
       return;

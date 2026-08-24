@@ -1,10 +1,9 @@
+<section *ngIf="titleActive()" class="category-title">
+  <h2>{{ categoryName() | uppercase }}</h2>
+</section>
 
 <section id="container">
-  <app-tarjeta-producto
-    *ngFor="let producto of productos()"
-    [producto]="producto"
-    [routerLink]="['/articulo', producto.category]"
-    routerLinkActive="router-link-active"
-  >
+  <app-tarjeta-producto *ngFor="let producto of productos()" [producto]="producto"
+    [routerLink]="['/articulo', producto.category]" routerLinkActive="router-link-active">
   </app-tarjeta-producto>
 </section>

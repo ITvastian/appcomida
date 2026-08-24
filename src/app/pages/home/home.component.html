@@ -1,3 +1,14 @@
+<button class="home-back" type="button" (click)="volverAtras()" aria-label="Volver">
+  &larr;
+</button>
+
+<section id="barra-busqueda">
+  <img src="assets/icons/lupa.svg" alt="Buscar" />
+  <input type="text" placeholder="Busca una categoría..." autocomplete="off" [ngModel]="textoBusqueda()"
+    (ngModelChange)="textoBusqueda.set($event)" />
+  <button class="btn-clear" *ngIf="textoBusqueda()" (click)="limpiarBusqueda()">x</button>
+</section>
+
 <app-carrusel></app-carrusel>
 <section class="home-categorias margenChico">
   <h2>Selecciona una categoría</h2>
@@ -11,12 +22,14 @@
     <button type="button" (click)="reintentarCargaCategorias()">Reintentar</button>
   </div>
 
-  <div id="category-container" *ngIf="!cargandoCategorias() && !errorCategorias() && categorias().length > 0">
-    <app-tarjeta-category *ngFor="let categoria of categorias()" [categoria]="categoria"
-      [routerLink]="['/categoria', categoria.name]" routerLinkActive="router-link-active"></app-tarjeta-category>
+  <div id="category-container"
+    *ngIf="!cargandoCategorias() && !errorCategorias() && categoriasFiltradasVacio().length > 0">
+    <app-tarjeta-category *ngFor="let categoria of categoriasFiltradasVacio()" [categoria]="categoria"
+      [routerLink]="['/categoria', categoria.id || categoria.name]" [queryParams]="{ name: categoria.name }"
+      routerLinkActive="router-link-active"></app-tarjeta-category>
   </div>
 
-  <p class="empty" *ngIf="!cargandoCategorias() && !errorCategorias() && categorias().length === 0">
-    No hay categorias disponibles por ahora.
+  <p class="empty" *ngIf="!cargandoCategorias() && !errorCategorias() && categoriasFiltradasVacio().length === 0">
+    {{ textoBusqueda() ? 'No encontramos esa categoría' : 'No hay categorías disponibles por ahora.' }}
   </p>
 </section>

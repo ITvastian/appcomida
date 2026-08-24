@@ -6,14 +6,16 @@ import { BuscarComponent } from './pages/buscar/buscar.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { RubroComponent } from './pages/rubro/rubro.component';
 import { HomeComponent } from './pages/home/home.component';
+import { EntradaComponent } from './pages/entrada/entrada.component';
 
 const routes: Routes = [
+  { path: 'entrada', component: EntradaComponent },
   { path: 'carrito', component: CarritoComponent },
   { path: 'articulo/:category', component: ArticuloComponent },
   { path: 'buscar', component: BuscarComponent },
   { path: 'perfil', component: PerfilComponent },
   { path: 'categoria/:id', component: RubroComponent },
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: '', redirectTo: '/entrada', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
 ];
 

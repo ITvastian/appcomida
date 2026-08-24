@@ -33,10 +33,11 @@ export class CartService {
   }
 
   addProd(idProd:  string, cantidad: number, notas: string, extras: Extra[]) {
-    const i = this.carrito.findIndex((producto) => producto.idProd === idProd);
+    const idNormalizado = String(idProd);
+    const i = this.carrito.findIndex((producto) => String(producto.idProd) === idNormalizado);
     if (i === -1) {
       const nuevoProd: Cart = { 
-        idProd: idProd,
+        idProd: idNormalizado,
         cantidad: cantidad,
         notas: notas,
         extras: extras, // Aquí pasas los `extras` directamente
@@ -52,9 +53,10 @@ export class CartService {
   }
 
   deleteProd(idProd: string) {
-    this.carrito = this.carrito.filter((producto) => producto.idProd !== idProd);
+    const idNormalizado = String(idProd);
+    this.carrito = this.carrito.filter((producto) => String(producto.idProd) !== idNormalizado);
     if (this.carrito.length === 0) {
-      localStorage.clear();
+      localStorage.removeItem('cart');
     } else {
       this.actualizarAlmacenamiento();
     }
@@ -70,7 +72,8 @@ export class CartService {
   //   this.actualizarAlmacenamiento();
   // }
   cambiarProd(idProd: string, nuevaCantidad: number) {
-    const item = this.carrito.find(p => p.idProd === idProd);
+    const idNormalizado = String(idProd);
+    const item = this.carrito.find(p => String(p.idProd) === idNormalizado);
     if (item) {
       item.cantidad = nuevaCantidad;
     }
@@ -85,6 +88,6 @@ export class CartService {
 
   vaciar() {
     this.carrito = [];
-    localStorage.clear();
+    localStorage.removeItem('cart');
   }
 }

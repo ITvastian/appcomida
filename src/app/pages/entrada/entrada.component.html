@@ -1,0 +1,27 @@
+<section class="entrada">
+  <figure class="entrada__avatar" [class.entrada__avatar--loading]="avatarCargando()">
+    <ng-container *ngIf="avatarUrl() as url; else avatarPlaceholder">
+      <img [src]="url" alt="Atencion en mesa" />
+    </ng-container>
+    <ng-template #avatarPlaceholder>
+      <div class="entrada__avatar-placeholder" aria-hidden="true"></div>
+    </ng-template>
+  </figure>
+  <div class="entrada__card">
+    <h1>Bienvenido</h1>
+    <p>Elegi como queres continuar.</p>
+
+
+    <div class="entrada__actions">
+      <a class="btn btn--primary" routerLink="/home">Ver menu</a>
+      <button class="btn btn--secondary" type="button" [class.btn--confirmed]="mozoAvisado()"
+        [disabled]="solicitandoMozo() || mozoAvisado()" (click)="solicitarMozo()">
+        {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? 'Mozo avisado' : 'Solicitar mozo') }}
+      </button>
+      <button class="btn btn--tertiary" type="button" [class.btn--confirmed]="cuentaSolicitada()"
+        [disabled]="solicitandoCuenta() || cuentaSolicitada()" (click)="pedirCuenta()">
+        {{ solicitandoCuenta() ? 'Enviando...' : (cuentaSolicitada() ? 'Cuenta solicitada' : 'Pedir cuenta') }}
+      </button>
+    </div>
+  </div>
+</section>

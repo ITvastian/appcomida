@@ -2,7 +2,7 @@
 
 #fotoProducto {
   width: 100%;
-  height: 230px;
+  height: 236px;
   object-fit: cover;
   position: absolute;
   top: 0;
@@ -10,9 +10,14 @@
 }
 
 .margenChico {
-  margin-top: 185px;
+  margin-top: 190px;
   margin-left: 10px;
   margin-right: 10px;
+  padding: 14px 12px 16px;
+  border-radius: variables.$border-radius-grande;
+  background: linear-gradient(180deg, rgba(255, 245, 236, 0.98) 0%, rgba(255, 238, 224, 0.98) 100%);
+  border: 1px solid rgba(201, 128, 94, 0.2);
+  box-shadow: 0 8px 20px rgba(72, 30, 14, 0.12);
 
   ul {
     text-transform: capitalize;
@@ -23,12 +28,13 @@
 .name-product {
   text-transform: capitalize;
   align-items: center;
-  font-weight: bold;
+  font-weight: 800;
   display: flex;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.18rem;
   line-height: 1.2;
   text-align: center;
+  color: #2d221c;
 }
 
 .margenChico>* {
@@ -42,10 +48,11 @@ ul li {
     content: ", ";
   }
 }
-#label{
+#label {
   font-size: 0.95rem;
-  font-weight: bold;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: #54443a;
 }
 
 .apto-container {
@@ -62,11 +69,11 @@ ul li {
 textarea {
   resize: vertical;
   display: block;
-  min-height: 90px;
-  max-height: 180px;
-  border-radius: variables.$border-radius-grande;
-  border: unset;
-  background-color: variables.$color-principal-claro;
+  min-height: 96px;
+  max-height: 190px;
+  border-radius: 14px;
+  border: 1px solid rgba(188, 120, 92, 0.24);
+  background: #fff6ef;
   margin-top: 10px;
   width: 100%;
   box-sizing: border-box;
@@ -75,6 +82,8 @@ textarea {
 
   &:focus {
     outline: none;
+    border-color: rgba(186, 88, 52, 0.5);
+    box-shadow: 0 0 0 3px rgba(241, 139, 109, 0.15);
   }
 }
 
@@ -86,22 +95,28 @@ textarea {
 
 button {
   width: 100%;
-  border-radius: 20px;
+  border-radius: 14px;
   border: unset;
-  background-color: variables.$color-principal-claro;
+  background: linear-gradient(180deg, #f5a082 0%, #f18b6d 100%);
+  color: #2d190f;
   font-size: 1rem;
+  font-weight: 800;
   padding: 12px;
-  min-height: 44px;
+  min-height: 46px;
+  box-shadow: 0 6px 14px rgba(82, 32, 15, 0.2);
 }
 
 .extras-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  // align-items: flex-start;
+  justify-content: space-between;
   list-style-type: none;
-  border-radius: 8px;
-  padding: 5px;
-  margin-bottom: 0!important;
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 0 !important;
+  background: rgba(255, 249, 244, 0.92);
+  border: 1px solid rgba(197, 121, 90, 0.16);
 }
 
 .extra-item {
@@ -127,7 +142,7 @@ button {
   margin-right: 10px;
   width: 20px;
   height: 20px;
-  accent-color: #139708;
+  accent-color: #e47f5e;
 }
 
 span {
@@ -145,13 +160,14 @@ span {
 
 .extra-price {
   margin-left: 12px;
-  min-width: 58px;
+  min-width: 62px;
   text-align: right;
-  font-weight: 600;
+  font-weight: 700;
+  color: #8b3f22;
 }
 
 .extra-label:hover span {
-  color: #139708;
+  color: #a84b2b;
 }
 
 .extras-container ul {
@@ -165,11 +181,12 @@ span {
 
 @media (max-width: 420px) {
   #fotoProducto {
-    height: 205px;
+    height: 208px;
   }
 
   .margenChico {
-    margin-top: 165px;
+    margin-top: 168px;
+    padding: 12px 10px 14px;
   }
 
   .name-product {

@@ -16,13 +16,16 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  background: transparent;
 }
 app-tabs{
   margin-top: auto;
+  z-index: 25;
 }
 main{
   flex: 1;
   overflow-y: scroll;
+  padding-bottom: 6px;
 
 }
 main::-webkit-scrollbar {

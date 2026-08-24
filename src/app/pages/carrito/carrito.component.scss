@@ -1,9 +1,10 @@
 @use '../../../assets/styles/variables.scss';
 
 h2 {
-  font-size: xx-large;
+  font-size: 1.55rem;
   text-align: center;
   margin-top: 50px;
+  color: #7f6758;
 }
 
 #cart-loading {
@@ -12,7 +13,7 @@ h2 {
 
   h3 {
     font-size: 1.1rem;
-    color: #666;
+    color: #7f695e;
   }
 }
 
@@ -31,15 +32,17 @@ h2 {
 .tarjetaProdContainer {
   position: relative;
   display: flex;
-  min-height: 120px;
+  min-height: 122px;
   border-radius: variables.$border-radius-mediano;
   overflow: hidden;
-  background-color: variables.$color-principal-claro;
+  background: linear-gradient(180deg, #fff5ed 0%, #ffeadd 100%);
+  border: 1px solid rgba(192, 119, 90, 0.2);
+  box-shadow: 0 4px 13px rgba(82, 31, 14, 0.11);
 
   >div {
     display: flex;
     flex-direction: column;
-    padding: 5px;
+    padding: 7px;
   }
 }
 
@@ -90,6 +93,7 @@ h2 {
 .precio-producto {
   margin: 0;
   line-height: 18px;
+  color: #2d221c;
 }
 
 .nombre-producto {
@@ -126,7 +130,8 @@ h2 {
 
 #precio-extra {
   text-align: right;
-  font-weight: 600;
+  font-weight: 700;
+  color: #8f3f20;
 }
 
 .acciones-item {
@@ -144,8 +149,9 @@ h2 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: unset;
-  border: unset;
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(181, 110, 82, 0.24);
+  border-radius: 10px;
   cursor: pointer;
   padding: 4px;
 }
@@ -153,8 +159,9 @@ h2 {
 #mas {
   font-size: xx-large;
   text-decoration: none;
-  color: black;
-  background-color: variables.$color-principal-claro;
+  color: #2c160d;
+  background: linear-gradient(180deg, #fff3e9 0%, #ffe6d6 100%);
+  border: 1px solid rgba(192, 114, 82, 0.24);
   padding: 5px 15px;
   border-radius: variables.$border-radius-mediano;
 }
@@ -167,13 +174,14 @@ h2 {
 }
 
 #envioContainer {
-  background-color: variables.$color-principal-claro;
+  background: linear-gradient(180deg, #fff4ea 0%, #ffe9dc 100%);
   border-radius: variables.$border-radius-mediano;
-  padding: 10px;
+  border: 1px solid rgba(192, 122, 92, 0.2);
+  padding: 12px;
   margin: 10px 0;
 
   h4 {
-    font-size: larger;
+    font-size: 1.05rem;
     align-items: center;
   }
 }
@@ -203,19 +211,17 @@ h2 {
 #enviar {
   display: block;
   margin-top: 0;
-  font-size: larger;
-  background-color: variables.$color-principal;
+  background: linear-gradient(180deg, #f5a082 0%, #f18b6d 100%);
+  color: #2a150d;
   border: unset;
   cursor: pointer;
-  padding: 12px;
+  padding: 13px;
   border-radius: variables.$border-radius-mediano;
-  font-size: 22px;
+  font-size: 1.2rem;
+  font-weight: 800;
   width: 100%;
-  min-height: 48px;
-}
-
-#enviar:hover {
-  background-color: rgb(228 137 137 / 66%);
+  min-height: 50px;
+  box-shadow: 0 6px 14px rgba(83, 33, 16, 0.2);
 }
 
 .pedido-footer {
@@ -235,10 +241,10 @@ div#edit-container {
 }
 
 dialog {
-  background-color: white;
-  border-radius: 10px;
-  border: unset;
-  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.164);
+  background: #fff7f1;
+  border-radius: 14px;
+  border: 1px solid rgba(186, 117, 88, 0.22);
+  box-shadow: 0 8px 22px rgba(63, 23, 10, 0.2);
 
   div {
     margin-top: 20px;
@@ -265,11 +271,11 @@ dialog {
     backdrop-filter: blur(15px);
 
     &:first-of-type {
-      background-color: rgb(9 167 17 / 79%);
+      background: linear-gradient(180deg, #8fd17b 0%, #67b856 100%);
     }
 
     &:last-of-type {
-      background-color: rgb(215 19 19 / 73%);
+      background: linear-gradient(180deg, #f18f7a 0%, #d7644e 100%);
     }
 
     span {
@@ -365,7 +371,7 @@ dialog {
 }
 
 .rating .stars .star.filled {
-  color: gold;
+  color: #f2b01f;
 }
 
 

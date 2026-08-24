@@ -3,12 +3,14 @@
 :host {
   display: block;
   cursor: pointer;
-  transition: transform 120ms ease, filter 120ms ease;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+  max-width: 200px;
+  width: 100%;
 }
 
 :host:active {
   transform: scale(0.98);
-  filter: brightness(0.96);
+  filter: brightness(0.95);
 }
 
 .category-card {
@@ -17,26 +19,29 @@
   display: flex;
   background-size: cover;
   background-position: center;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: flex-end;
-  border-radius: variables.$border-radius-mediano;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 5px 14px rgba(64, 25, 10, 0.16);
+  // border: 1px solid rgba(255, 255, 255, 0.45);
 }
 h3{
-  text-align: center;
-  width: 100%;
-  padding: 8px 6px;
+  text-align: right;
+  // width: 100%;
+  margin: 0;
+  padding: 8px 14px;
   font-weight: bold;
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  line-height: 1.15;
-  color: #1e1e1e;
-  background-color: rgba(255, 255, 255, 0.74);
+  color: #2f2018;
+  background: linear-gradient(180deg, rgba(255, 248, 241, 0.9) 0%, rgba(255, 234, 220, 0.9) 100%);
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  border-top-left-radius: 10px;
+  min-width: 0;
 }
 
 @media (max-width: 420px) {
@@ -46,6 +51,6 @@ h3{
 
   h3 {
     font-size: 0.85rem;
-    padding: 7px 6px;
+    padding: 6px;
   }
 }

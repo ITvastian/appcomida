@@ -1,6 +1,24 @@
-#container{
-margin: 20px;
-display: flex;
-flex-direction: column;
-gap: 10px;
+@use '../../../assets/styles/variables.scss';
+
+.category-title {
+  padding: 14px 12px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(255, 245, 236, 0.95), rgba(255, 238, 224, 0.95));
+  border-bottom: 1px solid rgba(201, 135, 105, 0.18);
+  margin-bottom: 8px;
+
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #2d221c;
+    margin: 0;
+  }
+}
+
+#container {
+  margin: 10px 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

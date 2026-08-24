@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, AfterViewInit, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
 import { BannerService } from '../../services/banner.service';
+import { UiConfigService } from '../../services/ui-config.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ApiConfigService } from '../../services/api-config.service';
 
 @Component({
   selector: 'app-carrusel',
@@ -24,19 +26,24 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   intervalId: any;
   websocket: any;
   private destroy$ = new Subject<void>();
+  private reconnectTimer: any;
+  private shouldReconnect = true;
 
   constructor(
     private elementRef: ElementRef, 
     private cdr: ChangeDetectorRef,
-    private bannerService: BannerService
+    private bannerService: BannerService,
+    private uiConfigService: UiConfigService,
+    private apiConfigService: ApiConfigService
   ) {}
 
   ngOnInit() {
     // 📸 Cargar banners reactivamente (Observable)
-    this.bannerService
-      .getAllBanners()
+    this.uiConfigService
+      .getCurrentUiConfig()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((banners: any[]) => {
+      .subscribe((uiConfig) => {
+        const banners = uiConfig.banners || [];
         if (banners && banners.length > 0) {
           this.fotos = banners.map((b: any) => ({ 
             url: b.imageUrl || 'https://via.placeholder.com/1200x400' 
@@ -52,7 +59,18 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   conectarWebSocket() {
-    this.websocket = new WebSocket('ws://localhost:3001');
+    if (!this.shouldReconnect) {
+      return;
+    }
+
+    if (
+      this.websocket &&
+      (this.websocket.readyState === WebSocket.OPEN || this.websocket.readyState === WebSocket.CONNECTING)
+    ) {
+      return;
+    }
+
+    this.websocket = new WebSocket(this.apiConfigService.ws());
 
     this.websocket.onopen = () => {
       console.log('✅ WebSocket conectado');
@@ -64,18 +82,7 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
       // ✅ Cambio: Ahora recibe 'banners' (array) en lugar de 'imageUrl'
       if (data.type === 'banner_updated' && data.banners) {
         console.log(`🖼️ Banners actualizados - Slot ${data.slot}:`, data.banners[data.slot]?.imageUrl);
-        
-        // Actualizar todas las fotos
-        this.fotos = data.banners.map((b: any) => ({ 
-          url: b.imageUrl || 'https://via.placeholder.com/1200x400' 
-        }));
-        
-        // Reclonar para efecto circular
-        this.clonedFotos = [this.fotos[this.fotos.length - 1], ...this.fotos];
-        
-        // Forzar detección de cambios
-        this.cdr.detectChanges();
-        console.log(`✅ Carousel actualizado`);
+        this.bannerService.updateBannersFromWebSocket(data.banners);
       }
     };
 
@@ -84,8 +91,12 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     this.websocket.onclose = () => {
+      if (!this.shouldReconnect) {
+        return;
+      }
+
       console.log('🔴 WebSocket desconectado - Reconectando...');
-      setTimeout(() => this.conectarWebSocket(), 3000);
+      this.reconnectTimer = setTimeout(() => this.conectarWebSocket(), 3000);
     };
   }
 
@@ -114,6 +125,14 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.shouldReconnect = false;
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+    }
+
     if (this.websocket) {
       this.websocket.close();
     }

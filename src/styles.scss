@@ -23,12 +23,12 @@ time, mark, audio, video {
   user-select: none;
 	font-size: 100%;
 	// font: inherit;
-  font-family: 'Roboto';
+  font-family: 'Nunito', 'Roboto', sans-serif;
 	vertical-align: baseline;
 }
 h1,h2,h3,h4,h5,h6{
 font-weight: bold;
-font-family: 'Roboto';
+font-family: 'Nunito', 'Roboto', sans-serif;
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
@@ -38,7 +38,10 @@ footer, header, hgroup, menu, nav, section {
 body {
 	line-height: 1;
   width: 100vw;
+  min-height: 100svh;
   overflow-x: hidden;
+  color: #2d221c;
+  background: linear-gradient(180deg, #fffaf4 0%, #fff3e8 100%);
   // text-transform: capitalize;
 }
 ol, ul {
@@ -78,4 +81,12 @@ app-root{
 }
 button, input{
   cursor: pointer;
+}
+
+button {
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+
+button:active {
+  transform: translateY(1px);
 }

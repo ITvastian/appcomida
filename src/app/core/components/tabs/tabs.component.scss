@@ -9,8 +9,10 @@
   // align-items: center;
   display: flex;
   justify-content: space-around;
-  border-radius: 10px 10px 0 0;
-  background-color: rgb(208 208 208);
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg, #fff2e6 0%, #ffe6d7 100%);
+  border-top: 1px solid rgba(170, 109, 86, 0.2);
+  box-shadow: 0 -4px 18px rgba(80, 34, 18, 0.12);
   overflow: hidden;
   min-height: 64px;
   height: 64px;
@@ -33,9 +35,13 @@
   }
 
   transition: 200ms ease-in-out;
+
+  &:active {
+    transform: scale(0.97);
+  }
 }
 .seleccionado{
-  background-color: variables.$color-principal;
+  background: linear-gradient(180deg, rgba(241, 139, 109, 0.28) 0%, rgba(241, 139, 109, 0.2) 100%);
 }
 
 @media (max-width: 420px) {
@@ -49,8 +55,8 @@
   }
 
   .tab svg {
-    width: 27px;
-    height: 27px;
+    width: 32px;
+    height: 32px;
   }
 }
 

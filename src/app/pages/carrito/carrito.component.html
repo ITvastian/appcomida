@@ -41,8 +41,8 @@
 
             <div class="acciones-item">
               <app-contador-cantidad [cantidadInicial]="item.cantidad"
-                (cantidadNueva)="cambiarProductoCantidad(item.category,$event)"></app-contador-cantidad>
-              <button (click)="eliminarProd(item.category)" class="borrar">
+                (cantidadNueva)="cambiarProductoCantidad(item._id,$event)"></app-contador-cantidad>
+              <button (click)="eliminarProd(item._id)" class="borrar">
                 <img src="../../../assets/icons/borrarr.png" alt="" width="20px" />
               </button>
             </div>
@@ -93,7 +93,7 @@
         </section>
 
         <div class="pedido-footer">
-          <button id="enviar" [disabled]="!perfilService.perfil()" (click)="enviarMensaje()">
+          <button id="enviar" [disabled]="!perfilService.perfil()" (click)="abrirConfirmacionPedido()">
             Realizar pedido
           </button>
         </div>

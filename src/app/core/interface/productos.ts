@@ -1,12 +1,14 @@
 
 export interface Producto {
   category: string;
-  _id: number;
+  categoryName?: string;
+  _id: string;
   name: string;
   price: number;
   esVegano: boolean;
   esCeliaco: boolean;
   ingredients: string;
+  description?: string;
   photoUrl: string;
   extras: Extra[];
 }

@@ -1,19 +1,37 @@
-@use'../../../assets/styles/variables.scss';
+@use '../../../assets/styles/variables.scss';
+
+section {
+  min-height: 100%;
+}
 
 #barra-busqueda {
   display: flex;
   align-items: center;
-  height: 30px;
-  background-color: variables.$color-principal-claro;
-  border-radius: 25px;
-  margin: 20px 10%;
-  padding: 5px 10px;
+  height: 44px;
+  background: linear-gradient(180deg, #fff5ee 0%, #ffeade 100%);
+  border-radius: 999px;
+  margin: 16px 10px 12px;
+  padding: 6px 10px;
+  border: 1px solid rgba(194, 118, 88, 0.26);
+  box-shadow: 0 4px 12px rgba(89, 34, 15, 0.11);
+
+  img {
+    height: 18px;
+    width: 18px;
+    opacity: 0.7;
+  }
 
   input {
     width: 100%;
     background-color: unset;
     border: unset;
-    font-size: large;
+    font-size: 1rem;
+    color: #2d221c;
+    padding: 0 8px;
+
+    &::placeholder {
+      color: #8d7569;
+    }
 
     &:focus {
       outline: none;
@@ -21,49 +39,36 @@
   }
 }
 
-#apto-container {
-  display: flex;
-  align-items: center;
-  height: 25px;
-}
-
-img {
-  height: 100%;
-}
-
-#filtros {
-  display: flex;
-  justify-content: space-evenly;
-}
-
 #container {
-  margin: 20px;
+  margin: 8px 10px 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
 h2 {
-  margin-top: 40px;
-  font-size: x-large;
+  margin: 32px 12px 0;
+  font-size: 1.04rem;
   text-align: center;
-  background-color: rgb(217, 217, 217);
-  color: rgb(163, 163, 163);
-  padding: 5px 5px;
+  border-radius: 12px;
+  color: #7e6659;
+  background: #fff1e5;
+  border: 1px solid rgba(191, 118, 92, 0.22);
+  padding: 12px 10px;
 }
 
 button.btn-clear {
   border: none;
-  background-color: rgba(0, 0, 0, 0.15);
+  background: rgba(137, 72, 45, 0.16);
+  color: #5d3829;
   border-radius: 50%;
   font-size: 18px;
-  font-weight: 100;
+  line-height: 1;
   position: relative;
-  width: 30px;
+  width: 28px;
   height: 28px;
   align-items: center;
   justify-content: center;
   display: flex;
 }
-
 

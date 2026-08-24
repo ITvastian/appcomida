@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ApiConfigService } from './api-config.service';
 
 interface Product {
   nombre: string;
@@ -12,12 +13,11 @@ interface Product {
   providedIn: 'root'
 })
 export class ProductService {
-  // private apiUrl = 'http://localhost:3001/api/categorias/';
+  private apiUrl: string;
 
-  private apiUrl = 'https://mvp-admin.onrender.com/api/categorias';
-
-
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private apiConfigService: ApiConfigService) {
+    this.apiUrl = this.apiConfigService.api('/categorias');
+  }
 
   // Obtener productos
   getProducts(): Observable<Product[]> {

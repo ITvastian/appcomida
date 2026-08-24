@@ -1,54 +1,138 @@
-.home-categorias {
-  margin-top: 12px;
+:host {
+  --home-header-extendido-height: 200px;
+  --home-bar-overlap: 25px;
+}
 
-  h2 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    margin-bottom: 12px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    color: #222;
-    background: linear-gradient(90deg, rgba(255, 235, 211, 0.95), rgba(255, 247, 234, 0.95));
-    border: 1px solid rgba(229, 190, 133, 0.45);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.home-back {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: 10px;
+  z-index: 120;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(194, 118, 88, 0.3);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fff5ee 0%, #ffeade 100%);
+  color: #5d3829;
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+  box-shadow: 0 6px 14px rgba(74, 30, 16, 0.12);
+}
+
+#barra-busqueda {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  background: linear-gradient(180deg, #fff5ee 0%, #ffeade 100%);
+  border-radius: 999px;
+  padding: 6px 10px;
+  border: 1px solid rgba(194, 118, 88, 0.26);
+  position: fixed;
+  top: calc(var(--home-header-extendido-height) - var(--home-bar-overlap));
+  left: 50%;
+  z-index: 101;
+  width: 90%;
+  box-sizing: border-box;
+  transform: translateX(-50%);
+
+  img {
+    height: 18px;
+    width: 18px;
+    opacity: 0.7;
+  }
+
+  input {
+    width: 100%;
+    background-color: unset;
+    border: unset;
+    font-size: 1rem;
+    color: #2d221c;
+    padding: 0 8px;
+
+    &::placeholder {
+      color: #8d7569;
+    }
+
+    &:focus {
+      outline: none;
+    }
   }
 }
 
-#category-container{
+button.btn-clear {
+  border: none;
+  background: rgba(137, 72, 45, 0.16);
+  color: #5d3829;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  position: relative;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  cursor: pointer;
+}
+
+.home-categorias {
+  margin-top: 14px;
+
+  h2 {
+    font-size: 1.06rem;
+    font-weight: 800;
+    letter-spacing: 0.35px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    color: #2d221c;
+    background: linear-gradient(110deg, rgba(255, 235, 216, 0.96), rgba(255, 247, 239, 0.94));
+    border: 1px solid rgba(204, 136, 102, 0.24);
+    box-shadow: 0 5px 14px rgba(74, 30, 16, 0.1);
+  }
+}
+
+#category-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
   justify-items: center;
   gap: 14px;
-  margin: 0 0 12px;
+  margin: 0 0 14px;
 }
 
-app-tarjeta-category{
+app-tarjeta-category {
   width: 100%;
 }
 
-.loading{
+.loading {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 
   .skeleton-card {
     min-height: 108px;
-    border-radius: 12px;
-    background: linear-gradient(90deg, #ececec 25%, #f5f5f5 37%, #ececec 63%);
+    border-radius: 14px;
+    background: linear-gradient(90deg, #ffe8da 22%, #fff4eb 37%, #ffe8da 61%);
     background-size: 400% 100%;
-    animation: home-skeleton 1.4s ease infinite;
+    animation: home-skeleton 1.2s ease infinite;
+    border: 1px solid rgba(205, 141, 114, 0.2);
   }
 }
 
 .error,
 .empty {
   text-align: center;
-  background-color: #f0f0f0;
-  color: #666;
-  border-radius: 10px;
-  padding: 12px;
+  background: #fff2e7;
+  color: #7a675d;
+  border: 1px solid rgba(196, 122, 92, 0.2);
+  border-radius: 12px;
+  padding: 14px;
 }
 
 .error {
@@ -56,8 +140,10 @@ app-tarjeta-category{
     margin-top: 10px;
     border: unset;
     border-radius: 10px;
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 0.9rem;
+    color: #2f190f;
+    background: linear-gradient(180deg, #f5a082 0%, #f18b6d 100%);
     cursor: pointer;
   }
 }
@@ -68,10 +154,23 @@ app-tarjeta-category{
 }
 
 @media (max-width: 420px) {
+  :host {
+    --home-header-extendido-height: 170px;
+  }
+
+  .home-back {
+    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    left: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
   .home-categorias h2 {
-    font-size: 0.98rem;
+    font-size: 0.97rem;
     margin-bottom: 10px;
-    padding: 10px 10px;
+    padding: 10px 11px;
+    text-align: center;
   }
 
   #category-container {
@@ -89,6 +188,10 @@ app-tarjeta-category{
 }
 
 @media (max-width: 340px) {
+  .home-back {
+    left: 6px;
+  }
+
   #category-container,
   .loading {
     grid-template-columns: 1fr;
