@@ -4,11 +4,18 @@
   font-size: 1rem;
 }
 
+section {
+  display: flex;
+  min-height: 100%;
+}
+
 form {
   margin-top: 18px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 1.5rem;
+  flex: 1;
+  // min-height: calc(100svh - 170px);
 
   div {
     display: flex;
@@ -43,24 +50,34 @@ form {
 }
 
 button {
-  font-size: 1rem;
-  min-height: 46px;
-  background: linear-gradient(180deg, #f5a082 0%, #f18b6d 100%);
-  color: #2f190f;
-  border: unset;
-  border-radius: 14px;
-  cursor: pointer;
-  padding: 10px 0;
-  letter-spacing: 0.5px;
-  margin-top: 10px;
-  font-weight: 800;
-  box-shadow: 0 5px 14px rgba(75, 29, 15, 0.18);
-
   &:disabled {
     pointer-events: none;
     background: #e5d5ca;
     color: #9b887f;
     box-shadow: none;
+  }
+}
+
+.pedido-footer {
+  position: sticky;
+  padding-bottom: 8px;
+  z-index: 2;
+  margin: 20px 0 12px;
+
+  button {
+    display: block;
+    margin-top: 0;
+    background: linear-gradient(180deg, #f5a082 0%, #f18b6d 100%);
+    color: white;
+    border: unset;
+    cursor: pointer;
+    padding: 13px;
+    border-radius: 14px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    width: 100%;
+    min-height: 50px;
+    box-shadow: 0 6px 14px rgba(83, 33, 16, 0.2);
   }
 }
 
@@ -86,16 +103,16 @@ button {
   width: 0;
 }
 
-.checkbox.style-h input:checked ~ .checkbox__checkmark {
+.checkbox.style-h input:checked~.checkbox__checkmark {
   background-color: #f08f6b;
 }
 
-.checkbox.style-h input:checked ~ .checkbox__checkmark:after {
+.checkbox.style-h input:checked~.checkbox__checkmark:after {
   opacity: 1;
   top: -2px;
 }
 
-.checkbox.style-h input:checked ~ .checkbox__body {
+.checkbox.style-h input:checked~.checkbox__body {
   color: #311d14;
   border-color: rgba(180, 96, 65, 0.36);
 }
@@ -141,10 +158,19 @@ button {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
+.resumen-final {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+}
+
 @media (max-width: 420px) {
   form {
     margin-top: 14px;
     gap: 12px;
+    min-height: calc(100svh - 160px);
   }
 
   form div input {
@@ -157,4 +183,3 @@ button {
     padding-left: 46px;
   }
 }
-

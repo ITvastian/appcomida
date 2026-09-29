@@ -28,18 +28,22 @@ export class EntradaComponent {
   cuentaSolicitada = signal(false);
   avatarCargando = signal(true);
   avatarUrl = signal<string | null>(null);
+  tieneNumeroMesa = signal(false);
+  modalAbierto = signal(false);
+  modalMensaje = signal('');
 
   ngOnInit(): void {
     this.hidratarContextoDesdeQr();
+    this.actualizarDisponibilidadMesa();
     this.cargarAvatarActual();
   }
 
   solicitarMozo(): void {
     const tenantId = this.tenantContextService.getTenantId();
 
-    const tableNumber = this.tenantContextService.getTableNumber(this.perfilService.perfil()?.direccion);
+    const tableNumber = this.tenantContextService.getTableNumber(undefined);
     if (!tableNumber) {
-      window.alert('No encontramos el numero de mesa.');
+      this.mostrarModal('No encontramos el numero de mesa.');
       return;
     }
 
@@ -57,7 +61,7 @@ export class EntradaComponent {
         },
         error: (error) => {
           console.error('Error al solicitar mozo:', error);
-          window.alert('No se pudo enviar la solicitud. Intenta de nuevo.');
+          this.mostrarModal('No se pudo enviar la solicitud. Intenta de nuevo.');
         },
       });
   }
@@ -65,9 +69,9 @@ export class EntradaComponent {
   pedirCuenta(): void {
     const tenantId = this.tenantContextService.getTenantId();
 
-    const tableNumber = this.tenantContextService.getTableNumber(this.perfilService.perfil()?.direccion);
+    const tableNumber = this.tenantContextService.getTableNumber(undefined);
     if (!tableNumber) {
-      window.alert('No encontramos el numero de mesa.');
+      this.mostrarModal('No encontramos el numero de mesa.');
       return;
     }
 
@@ -85,9 +89,14 @@ export class EntradaComponent {
         },
         error: (error) => {
           console.error('Error al pedir cuenta:', error);
-          window.alert('No se pudo enviar el pedido de cuenta. Intenta de nuevo.');
+          this.mostrarModal('No se pudo enviar el pedido de cuenta. Intenta de nuevo.');
         },
       });
+  }
+
+  cerrarModal(): void {
+    this.modalAbierto.set(false);
+    this.modalMensaje.set('');
   }
 
   private hidratarContextoDesdeQr(): void {
@@ -98,7 +107,11 @@ export class EntradaComponent {
       localStorage.setItem('activeTenantId', tenantId);
     }
 
-    const tableParam = queryParams.get('tableNumber')?.trim();
+    const tableParam =
+      queryParams.get('tableNumber')?.trim() ||
+      queryParams.get('table')?.trim() ||
+      queryParams.get('mesa')?.trim() ||
+      queryParams.get('numeroMesa')?.trim();
     const tableNumber = Number(tableParam);
     if (tableParam && Number.isFinite(tableNumber) && tableNumber > 0) {
       localStorage.setItem('tableNumber', String(tableNumber));
@@ -122,5 +135,21 @@ export class EntradaComponent {
           this.avatarUrl.set(EntradaComponent.FALLBACK_AVATAR_URL);
         },
       });
+  }
+
+  onAvatarError(): void {
+    if (this.avatarUrl() !== EntradaComponent.FALLBACK_AVATAR_URL) {
+      this.avatarUrl.set(EntradaComponent.FALLBACK_AVATAR_URL);
+    }
+  }
+
+  private actualizarDisponibilidadMesa(): void {
+    const tableNumber = this.tenantContextService.getTableNumber(undefined);
+    this.tieneNumeroMesa.set(Boolean(tableNumber));
+  }
+
+  private mostrarModal(mensaje: string): void {
+    this.modalMensaje.set(mensaje);
+    this.modalAbierto.set(true);
   }
 }

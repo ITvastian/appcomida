@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://mvp-admin.onrender.com/api',
-  wsBaseUrl: 'wss://mvp-admin.onrender.com',
+  apiBaseUrl: 'https://mvp-admin-api.onrender.com/api',
+  wsBaseUrl: 'wss://mvp-admin-api.onrender.com',
   firebase: {
     apiKey: 'AIzaSyB0O9TKtAQ_ZJIpgcH9MH06XXIbpTHB_Pg',
     authDomain: 'admin-mvp.firebaseapp.com',

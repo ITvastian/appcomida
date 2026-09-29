@@ -1,7 +1,7 @@
 <section class="entrada">
   <figure class="entrada__avatar" [class.entrada__avatar--loading]="avatarCargando()">
     <ng-container *ngIf="avatarUrl() as url; else avatarPlaceholder">
-      <img [src]="url" alt="Atencion en mesa" />
+      <img [src]="url" alt="Atencion en mesa" (error)="onAvatarError()" />
     </ng-container>
     <ng-template #avatarPlaceholder>
       <div class="entrada__avatar-placeholder" aria-hidden="true"></div>
@@ -19,9 +19,16 @@
         {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? 'Mozo avisado' : 'Solicitar mozo') }}
       </button>
       <button class="btn btn--tertiary" type="button" [class.btn--confirmed]="cuentaSolicitada()"
-        [disabled]="solicitandoCuenta() || cuentaSolicitada()" (click)="pedirCuenta()">
+        [disabled]="!tieneNumeroMesa() || solicitandoCuenta() || cuentaSolicitada()" (click)="pedirCuenta()">
         {{ solicitandoCuenta() ? 'Enviando...' : (cuentaSolicitada() ? 'Cuenta solicitada' : 'Pedir cuenta') }}
       </button>
     </div>
   </div>
 </section>
+
+<div class="popup-backdrop" *ngIf="modalAbierto()" (click)="cerrarModal()" aria-hidden="true">
+  <div class="popup" role="dialog" aria-modal="true" aria-label="Mensaje" (click)="$event.stopPropagation()">
+    <p>{{ modalMensaje() }}</p>
+    <button class="btn btn--primary" type="button" (click)="cerrarModal()">Entendido</button>
+  </div>
+</div>

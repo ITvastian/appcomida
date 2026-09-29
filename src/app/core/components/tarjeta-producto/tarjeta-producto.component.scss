@@ -1,20 +1,34 @@
 @use "./../../../../assets/styles/variables.scss";
 
 #container {
-  min-height: 90px;
+  min-height: 92px;
+  width: 100%;
+
   display: flex;
-  background: linear-gradient(180deg, #fff5ed 0%, #ffe9dc 100%);
+  align-items: stretch;
+
+  background: linear-gradient(180deg,
+      #fff5ed 0%,
+      #ffe9dc 100%);
+
   border-radius: variables.$border-radius-mediano;
   border: 1px solid rgba(202, 126, 96, 0.2);
-  box-shadow: 0 4px 14px rgba(95, 43, 24, 0.12);
+
+  box-shadow: 0 3px 12px rgba(95, 43, 24, 0.10);
+
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
   cursor: pointer;
 
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
   &:hover {
-    box-shadow: 0 8px 22px rgba(95, 43, 24, 0.18);
-    transform: translateY(-2px);
-    border-color: rgba(202, 126, 96, 0.35);
+    box-shadow: 0 6px 18px rgba(95, 43, 24, 0.15);
+    transform: translateY(-1px);
+    border-color: rgba(202, 126, 96, 0.32);
   }
 
   &:active {
@@ -22,81 +36,130 @@
   }
 }
 
-#detalles {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex: 2;
-  padding: 5px 9px;
-  min-width: 0;
-  gap: 2px;
-}
+
+/* =========================
+   FOTO
+   ========================= */
 
 #foto {
-  height: 100%;
-  width: 25%;
-  min-width: 82px;
-  flex: 1;
+  width: 30%;
+  min-width: 90px;
+  max-width: 125px;
+
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: center;
+
+  padding: 0 7px;
+
+  flex-shrink: 0;
+
   overflow: hidden;
-  background-color: rgba(255, 232, 212, 0.5);
+
+  background: transparent;
 
   .product-photo {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: 85%;
+
     display: block;
-    border-radius: 0;
-    margin: 0;
-    background-color: transparent;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    background-color: #f9e6d8;
+
     transition: transform 0.3s ease;
   }
 
   &:hover .product-photo {
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
 }
 
+/* =========================
+   DETALLES
+   ========================= */
+
+#detalles {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 9px 11px 8px;
+
+  gap: 5px;
+}
+
+
+/* =========================
+   NOMBRE
+   ========================= */
+
 .product-name {
-  padding: 0;
   margin: 0;
+
+  padding: 0;
+
   font-weight: 800;
-  font-size: 0.9rem;
-  line-height: 1.05;
+  font-size: 0.92rem;
+  line-height: 1.15;
+
+  color: #2d221c;
+
+  letter-spacing: 0.15px;
+
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #2d221c;
-  letter-spacing: 0.3px;
 }
+
+
+/* =========================
+   INFORMACIÓN
+   ========================= */
 
 .info-item {
   display: flex;
   align-items: flex-start;
+
   gap: 5px;
-  font-size: 0.72rem;
+
+  min-width: 0;
+
+  font-size: 0.70rem;
+  line-height: 1.2;
+
   color: #7a675d;
-  line-height: 1.05;
-  // line-height: 1.3;
+
   word-break: break-word;
 
   span {
+    min-width: 0;
+
     display: -webkit-box;
+
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
-    word-break: break-word;
+
+    overflow: hidden;
   }
 
   .icon {
-    width: 14px;
-    height: 14px;
-    min-width: 14px;
+    width: 13px;
+    height: 13px;
+
+    min-width: 13px;
+
+    margin-top: 1px;
+
     stroke: #a68070;
     stroke-width: 2.5;
+
     flex-shrink: 0;
-    margin-top: 1px;
   }
 
   &.description {
@@ -106,67 +169,125 @@
   }
 }
 
-#precio {
-  text-align: end;
-  font-weight: 800;
-  font-size: 0.94rem;
-  color: #c9876d;
-  line-height: 1;
-  margin: 0;
-  padding-top: 0;
+
+/* =========================
+   PRECIO
+   ========================= */
+
+.product-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  margin-top: auto;
 }
 
-@media (max-width: 420px) {
-  #container {
-    min-height: 86px;
-  }
 
-  #detalles {
-    padding: 5px 8px;
-    gap: 1px;
-    letter-spacing: .5px;
-      font-weight: 600;
+#precio {
+  margin: 0;
+
+  font-weight: 800;
+  font-size: 0.98rem;
+  line-height: 1;
+
+  color: #c9876d;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 420px) {
+
+  #container {
+    min-height: 88px;
   }
 
   #foto {
-    width: 28%;
-    min-width: 76px;
+    width: 30%;
+    min-width: 82px;
+    max-width: 105px;
+
+    padding: 6px;
+
+    .product-photo {
+      border-radius: 9px;
+    }
+  }
+
+  #detalles {
+    padding: 8px 9px 7px;
+    gap: 4px;
   }
 
   .product-name {
-    font-size: 0.84rem;
-    font-weight: 800;
+    font-size: 0.86rem;
+    line-height: 1.1;
   }
 
   .info-item {
-    font-size: 0.68rem;
+    font-size: 0.67rem;
+    line-height: 1.15;
+
+    gap: 4px;
 
     .icon {
-      width: 13px;
-      height: 13px;
+      width: 12px;
+      height: 12px;
+      min-width: 12px;
     }
   }
 
   #precio {
-    font-size: 0.88rem;
+    font-size: 0.90rem;
   }
 }
 
+
+/* =========================
+   CELULARES MUY ANGOSTOS
+   ========================= */
+
 @media (max-width: 340px) {
+
   #container {
-    min-height: 82px;
+    min-height: 84px;
+  }
+
+  #foto {
+    width: 29%;
+    min-width: 76px;
+
+    padding: 5px;
+
+    .product-photo {
+      border-radius: 8px;
+    }
+  }
+
+  #detalles {
+    padding: 7px 8px 6px;
+    gap: 3px;
   }
 
   .product-name {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
   }
 
   .info-item {
-    font-size: 0.66rem;
+    font-size: 0.64rem;
+
+    .icon {
+      width: 11px;
+      height: 11px;
+      min-width: 11px;
+    }
   }
 
   #precio {
-    font-size: 0.82rem;
+    font-size: 0.86rem;
   }
 }
-

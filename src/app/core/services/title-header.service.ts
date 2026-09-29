@@ -112,6 +112,11 @@ export class TitleHeaderService {
 
   private loadTitle(): void {
     const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      this.currentTitle$.next(null);
+      return;
+    }
+
     const params = new HttpParams().set('tenantId', tenantId);
     const headers = new HttpHeaders().set('x-tenant-id', tenantId);
 
@@ -149,6 +154,11 @@ export class TitleHeaderService {
 
   updateTitleFromWebSocket(titleData: TitleHeader): void {
     const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      this.currentTitle$.next(null);
+      return;
+    }
+
     this.currentTitle$.next(titleData);
     this.guardarCache(tenantId, titleData);
     console.log('Título del header actualizado:', titleData.title);

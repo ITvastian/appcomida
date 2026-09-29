@@ -5,6 +5,7 @@ import { UiConfigService } from '../../services/ui-config.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ApiConfigService } from '../../services/api-config.service';
+import { TenantContextService } from '../../services/tenant-context.service';
 
 @Component({
   selector: 'app-carrusel',
@@ -14,17 +15,12 @@ import { ApiConfigService } from '../../services/api-config.service';
   imports: [CommonModule]
 })
 export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
-  fotos = [
-    { url: 'https://via.placeholder.com/1200x400?text=Foto+1' },
-    { url: 'https://via.placeholder.com/1200x400?text=Foto+2' },
-    { url: 'https://via.placeholder.com/1200x400?text=Foto+3' },
-    { url: 'https://via.placeholder.com/1200x400?text=Foto+4' },
-    { url: 'https://via.placeholder.com/1200x400?text=Foto+5' },
-  ];
-
-  clonedFotos = [this.fotos[this.fotos.length - 1], ...this.fotos];
+  fotos: Array<{ url: string }> = [];
+  clonedFotos: Array<{ url: string }> = [];
   intervalId: any;
   websocket: any;
+  private slidesElement: HTMLElement | null = null;
+  private currentIndex = 0;
   private destroy$ = new Subject<void>();
   private reconnectTimer: any;
   private shouldReconnect = true;
@@ -34,7 +30,8 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private bannerService: BannerService,
     private uiConfigService: UiConfigService,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private tenantContextService: TenantContextService
   ) {}
 
   ngOnInit() {
@@ -46,12 +43,21 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
         const banners = uiConfig.banners || [];
         if (banners && banners.length > 0) {
           this.fotos = banners.map((b: any) => ({ 
-            url: b.imageUrl || 'https://via.placeholder.com/1200x400' 
+            url: b.imageUrl
           }));
           this.clonedFotos = [this.fotos[this.fotos.length - 1], ...this.fotos];
           this.cdr.detectChanges();
+          this.resetCarouselPosition();
+          this.startAutoSlide();
           console.log('✅ Banners cargados:', this.fotos);
+          return;
         }
+
+        this.fotos = [];
+        this.clonedFotos = [];
+        this.stopAutoSlide();
+        this.resetCarouselPosition();
+        this.cdr.detectChanges();
       });
     
     // 📡 Conectar WebSocket para actualizaciones en tiempo real
@@ -59,6 +65,11 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   conectarWebSocket() {
+    const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      return;
+    }
+
     if (!this.shouldReconnect) {
       return;
     }
@@ -101,27 +112,55 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    const slides = this.elementRef.nativeElement.querySelector('.slides');
+    const slides = this.elementRef.nativeElement.querySelector('.slides') as HTMLElement | null;
     if (!slides) {
       console.warn('⚠️ Elemento .slides no encontrado');
       return;
     }
 
-    let currentIndex = 0;
+    this.slidesElement = slides;
+    this.startAutoSlide();
+  }
 
-    const changeSlide = () => {
-      currentIndex++;
-      if (currentIndex >= this.clonedFotos.length) {
-        currentIndex = 0;
-        slides.style.transition = 'none';
-        slides.style.transform = `translateX(0)`;
-      } else {
-        slides.style.transition = 'transform 0.5s ease-in-out';
-        slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+  private startAutoSlide(): void {
+    if (!this.slidesElement || this.clonedFotos.length <= 1) {
+      return;
+    }
+
+    this.stopAutoSlide();
+
+    this.intervalId = setInterval(() => {
+      this.currentIndex++;
+      if (!this.slidesElement) {
+        return;
       }
-    };
 
-    this.intervalId = setInterval(changeSlide, 3000);
+      if (this.currentIndex >= this.clonedFotos.length) {
+        this.currentIndex = 0;
+        this.slidesElement.style.transition = 'none';
+        this.slidesElement.style.transform = 'translateX(0)';
+      } else {
+        this.slidesElement.style.transition = 'transform 0.5s ease-in-out';
+        this.slidesElement.style.transform = `translateX(-${this.currentIndex * 100}%)`;
+      }
+    }, 3000);
+  }
+
+  private stopAutoSlide(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
+  private resetCarouselPosition(): void {
+    this.currentIndex = 0;
+    if (!this.slidesElement) {
+      return;
+    }
+
+    this.slidesElement.style.transition = 'none';
+    this.slidesElement.style.transform = 'translateX(0)';
   }
 
   ngOnDestroy() {
@@ -136,8 +175,6 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.websocket) {
       this.websocket.close();
     }
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
+    this.stopAutoSlide();
   }
 }

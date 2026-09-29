@@ -62,7 +62,6 @@
               <ng-container *ngIf="perfilService.perfil(); else sinDatosEnvio">
                 <h4>{{ perfilService.perfil()!.nombre }}</h4>
                 <p>
-                  {{ perfilService.perfil()!.direccion }} -
                   {{ entrega }}
                 </p>
                 <p>{{ perfilService.perfil()!.detalleEntrega }}</p>
@@ -110,11 +109,11 @@
 </ng-template>
 
 
-<dialog method="modal" #dialog>
-  <p>¿Pudiste realizar el pedido?</p>
-  <div>
-    <button id="modal-btn" (click)="finalizarPedido()">Si</button>
-    <button id="modal-btn" (click)="editarPedido()">No</button>
+<dialog method="modal" #dialog class="app-dialog confirm-dialog">
+  <p class="confirm-dialog__title">¿Pudiste realizar el pedido?</p>
+  <div class="confirm-dialog__actions">
+    <button type="button" class="confirm-dialog__btn confirm-dialog__btn--yes" (click)="finalizarPedido()">Si</button>
+    <button type="button" class="confirm-dialog__btn confirm-dialog__btn--no" (click)="editarPedido()">No</button>
   </div>
   <div class="rating">
     <p>Califica la app:</p>
@@ -127,4 +126,37 @@
     <p>Sugerencias:</p>
     <textarea [(ngModel)]="suggestionText" rows="3" placeholder="Escribe tus sugerencias aquí"></textarea>
   </div>
+</dialog>
+
+<dialog method="modal" #tableDialog class="app-dialog table-dialog">
+
+  <p class="table-dialog__title">
+    No encontramos tu mesa
+  </p>
+
+  <p class="table-dialog__text">
+    {{ mensajeMesaDialog }}
+  </p>
+
+  <label for="numeroMesa" class="table-dialog__label">
+    Número de mesa
+  </label>
+
+  <input id="numeroMesa" type="number" min="1" inputmode="numeric" [(ngModel)]="numeroMesaIngresado"
+    (ngModelChange)="errorNumeroMesa = ''" class="table-dialog__input" placeholder="Ej: 12" />
+
+  <p *ngIf="errorNumeroMesa" class="table-dialog__error">
+    {{ errorNumeroMesa }}
+  </p>
+
+  <div class="table-dialog__actions">
+    <button type="button" class="table-dialog__btn table-dialog__btn--cancel" (click)="cancelarIngresoMesa()">
+      Cancelar
+    </button>
+
+    <button type="button" class="table-dialog__btn table-dialog__btn--save" (click)="confirmarNumeroMesa()">
+      Continuar
+    </button>
+  </div>
+
 </dialog>

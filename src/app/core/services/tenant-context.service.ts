@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environmets/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TenantContextService {
-  private readonly defaultTenantId = 'big-pizza';
+  private readonly devTenantId = 'big-pizza';
 
   getTenantId(): string {
     const keys = ['activeTenantId', 'tenantId', 'activeRestaurantTenantId'];
@@ -38,19 +39,23 @@ export class TenantContextService {
       }
     }
 
-    localStorage.setItem('activeTenantId', this.defaultTenantId);
-    return this.defaultTenantId;
+    if (!environment.production) {
+      localStorage.setItem('activeTenantId', this.devTenantId);
+      return this.devTenantId;
+    }
+
+    return '';
   }
 
   getTableNumber(profileAddress: unknown): number {
-    const fromPerfil = Number(profileAddress);
-    if (Number.isFinite(fromPerfil) && fromPerfil > 0) {
-      return fromPerfil;
-    }
-
     const fromLocalStorage = Number(localStorage.getItem('tableNumber'));
     if (Number.isFinite(fromLocalStorage) && fromLocalStorage > 0) {
       return fromLocalStorage;
+    }
+
+    const fromPerfil = Number(profileAddress);
+    if (Number.isFinite(fromPerfil) && fromPerfil > 0) {
+      return fromPerfil;
     }
 
     return 0;

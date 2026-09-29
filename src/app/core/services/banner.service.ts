@@ -130,6 +130,11 @@ export class BannerService {
 
   private loadBanners(): void {
     const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      this.banners$.next([]);
+      return;
+    }
+
     const params = new HttpParams().set('tenantId', tenantId);
     const headers = new HttpHeaders().set('x-tenant-id', tenantId);
 
@@ -169,6 +174,11 @@ export class BannerService {
 
   updateBannersFromWebSocket(rawBanners: unknown): void {
     const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      this.banners$.next([]);
+      return;
+    }
+
     const banners = this.normalizeBanners(rawBanners);
     if (banners.length === 0) {
       return;

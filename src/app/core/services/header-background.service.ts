@@ -117,6 +117,11 @@ export class HeaderBackgroundService {
 
   private loadBackground(): void {
     const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      this.currentBackground$.next(null);
+      return;
+    }
+
     const params = new HttpParams().set('tenantId', tenantId);
     const headers = new HttpHeaders().set('x-tenant-id', tenantId);
 
@@ -154,6 +159,11 @@ export class HeaderBackgroundService {
 
   updateBackgroundFromWebSocket(imageUrl: string): void {
     const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      this.currentBackground$.next(null);
+      return;
+    }
+
     const current = this.currentBackground$.value;
     const updated: TitleBackground = {
       ...current,

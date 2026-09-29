@@ -49,6 +49,7 @@ export class CarritoComponent {
   entrega = `${this.perfilService.perfil()?.takeAway ? 'Si' : 'No'}`;
 
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('tableDialog') tableDialog!: ElementRef<HTMLDialogElement>;
   private readonly apiUrl = this.apiConfigService.api('/salon/order');
 
   // Cache de productos para evitar llamadas duplicadas
@@ -215,10 +216,11 @@ export class CarritoComponent {
 
   async enviarMensaje() {
     const tenantId = this.tenantContextService.getTenantId();
-    const tableNumber = this.tenantContextService.getTableNumber(this.perfilService.perfil()?.direccion);
-    if (!tableNumber) {
-      alert('No encontramos el numero de mesa.');
-      return;
+    const takeAway = this.perfilService.perfil()?.takeAway ?? false;
+    const tableNumber = this.tenantContextService.getTableNumber(undefined);
+    if (!takeAway && !tableNumber) {
+      this.abrirDialogoMesa('No encontramos el numero de mesa de ingreso. Volve a entrar desde el QR de la mesa.');
+      return false;
     }
 
     const items: any[] = [];
@@ -258,7 +260,7 @@ export class CarritoComponent {
       tenantId,
       tableNumber,
       customerName: this.perfilService.perfil()?.nombre || 'Cliente',
-      takeAway: this.perfilService.perfil()?.takeAway ?? false,
+      takeAway,
       items: items
     };
 
@@ -274,7 +276,7 @@ export class CarritoComponent {
       return true;
     } catch (err) {
       console.error('Error al enviar la orden:', err);
-      alert('Error al enviar la orden. Intenta de nuevo.');
+      this.abrirDialogoMesa('Error al enviar la orden. Intenta de nuevo.');
       return false;
     }
   }
@@ -285,6 +287,9 @@ export class CarritoComponent {
   private readonly ratingApiUrl = this.apiConfigService.api('/rating');
   clickSound: HTMLAudioElement;
   suggestionText = '';
+  numeroMesaIngresado = '';
+  mensajeMesaDialog = 'Ingresa el numero de mesa para continuar.';
+  errorNumeroMesa = '';
 
   constructor(private http: HttpClient) {
     this.clickSound = new Audio('assets/sounds/click.wav');
@@ -329,7 +334,42 @@ export class CarritoComponent {
 
 
   abrirConfirmacionPedido() {
+    const takeAway = this.perfilService.perfil()?.takeAway ?? false;
+    const tableNumber = this.tenantContextService.getTableNumber(undefined);
+    if (!takeAway && !tableNumber) {
+      this.abrirDialogoMesa('No encontramos el numero de mesa de ingreso. Volve a entrar desde el QR de la mesa.');
+      return;
+    }
     this.dialog.nativeElement.showModal();
+  }
+
+  abrirDialogoMesa(mensajeInfo?: string) {
+    this.mensajeMesaDialog = mensajeInfo || 'Ingresa el numero de mesa para continuar.';
+    this.errorNumeroMesa = '';
+    this.numeroMesaIngresado = '';
+    if (this.dialog?.nativeElement?.open) {
+      this.dialog.nativeElement.close();
+    }
+    this.tableDialog?.nativeElement?.showModal();
+  }
+
+  cancelarIngresoMesa() {
+    this.errorNumeroMesa = '';
+    this.numeroMesaIngresado = '';
+    this.tableDialog.nativeElement.close();
+  }
+
+  confirmarNumeroMesa() {
+    const mesa = Number(this.numeroMesaIngresado);
+    if (!Number.isInteger(mesa) || mesa <= 0) {
+      this.errorNumeroMesa = 'El número de mesa debe ser mayor a 0';
+      return;
+    }
+
+    localStorage.setItem('tableNumber', String(mesa));
+    this.errorNumeroMesa = '';
+    this.tableDialog.nativeElement.close();
+    this.abrirConfirmacionPedido();
   }
 
   async finalizarPedido() {

@@ -9,6 +9,7 @@ import { Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { takeUntil } from 'rxjs/operators';
 import { ApiConfigService } from '../../services/api-config.service';
+import { TenantContextService } from '../../services/tenant-context.service';
 
 @Component({
   selector: 'app-header',
@@ -24,6 +25,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   uiConfigService = inject(UiConfigService);
   router = inject(Router);
   apiConfigService = inject(ApiConfigService);
+  tenantContextService = inject(TenantContextService);
   
   claseAplicada = signal('');
   tituloMostrado = signal('');
@@ -72,6 +74,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   conectarWebSocket() {
+    const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      return;
+    }
+
     if (!this.shouldReconnect) {
       return;
     }
