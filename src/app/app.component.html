@@ -1,7 +1,7 @@
 <div id="container">
-  <app-header *ngIf="mostrarLayoutPrincipal" />
+  <app-header *ngIf="mostrarHeader" />
   <main>
     <router-outlet />
   </main>
-  <app-tabs *ngIf="mostrarLayoutPrincipal" />
+  <app-tabs *ngIf="mostrarTabs" />
 </div>

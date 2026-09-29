@@ -69,11 +69,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   volverAtras() {
-    // if (window.history.length > 1) {
-    //   this.location.back();
-    //   return;
-    // }
-
     this.router.navigateByUrl('/entrada');
   }
 

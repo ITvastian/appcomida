@@ -3,7 +3,7 @@ import { HeaderBackgroundService } from 'src/app/core/services/header-background
 import { TitleHeaderService } from 'src/app/core/services/title-header.service';
 import { UiConfigService } from 'src/app/core/services/ui-config.service';
 import { Component, effect, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -24,6 +24,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   titleHeaderService = inject(TitleHeaderService);
   uiConfigService = inject(UiConfigService);
   router = inject(Router);
+  location = inject(Location);
   apiConfigService = inject(ApiConfigService);
   tenantContextService = inject(TenantContextService);
   
@@ -72,7 +73,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // Conectar WebSocket para actualizaciones en tiempo real
     this.conectarWebSocket();
   }
-
+  volverAtras() {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+    this.router.navigateByUrl('/home');
+  }
   conectarWebSocket() {
     const tenantId = this.tenantContextService.getTenantId();
     if (!tenantId) {

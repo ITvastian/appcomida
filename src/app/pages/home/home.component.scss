@@ -38,11 +38,11 @@
   z-index: 101;
   width: 90%;
   box-sizing: border-box;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-110%);
 
   img {
-    height: 18px;
-    width: 18px;
+    height: 22px;
+    width: 22px;
     opacity: 0.7;
   }
 
@@ -64,16 +64,41 @@
   }
 }
 
+.categorias-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 0 2px;
+}
+
+.section-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: #ef6242;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+}
+
+.categorias-header h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 button.btn-clear {
   border: none;
-  background: rgba(137, 72, 45, 0.16);
-  color: #5d3829;
+  background: rgb(80 80 80 / 37%);
+  color: #ffffff;
   border-radius: 50%;
   font-size: 18px;
   line-height: 1;
   position: relative;
   width: 28px;
-  height: 28px;
+  height: 25px;
   align-items: center;
   justify-content: center;
   display: flex;
@@ -85,15 +110,11 @@ button.btn-clear {
 
   h2 {
     font-size: 1.06rem;
-    font-weight: 800;
+    font-weight: 400;
     letter-spacing: 0.35px;
     margin-bottom: 14px;
-    padding: 12px 14px;
     border-radius: 14px;
     color: #2d221c;
-    background: linear-gradient(110deg, rgba(255, 235, 216, 0.96), rgba(255, 247, 239, 0.94));
-    border: 1px solid rgba(204, 136, 102, 0.24);
-    box-shadow: 0 5px 14px rgba(74, 30, 16, 0.1);
   }
 }
 
@@ -149,11 +170,20 @@ app-tarjeta-category {
 }
 
 @keyframes home-skeleton {
-  0% { background-position: 100% 50%; }
-  100% { background-position: 0 50%; }
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 @media (max-width: 420px) {
+  #barra-busqueda {
+    transform: translateX(-50%) translateY(-40%);
+  }
+
   :host {
     --home-header-extendido-height: 170px;
   }
@@ -169,7 +199,7 @@ app-tarjeta-category {
   .home-categorias h2 {
     font-size: 0.97rem;
     margin-bottom: 10px;
-    padding: 10px 11px;
+    // padding: 10px 11px;
     text-align: center;
   }
 
@@ -197,4 +227,3 @@ app-tarjeta-category {
     grid-template-columns: 1fr;
   }
 }
-

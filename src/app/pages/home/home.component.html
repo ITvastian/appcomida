@@ -1,6 +1,6 @@
-<button class="home-back" type="button" (click)="volverAtras()" aria-label="Volver">
+<!-- <button class="home-back" type="button" (click)="volverAtras()" aria-label="Volver">
   &larr;
-</button>
+</button> -->
 
 <section id="barra-busqueda">
   <img src="assets/icons/lupa.svg" alt="Buscar" />
@@ -11,8 +11,13 @@
 
 <app-carrusel></app-carrusel>
 <section class="home-categorias margenChico">
-  <h2>Selecciona una categoría</h2>
-
+  <!-- <h2>Selecciona una categoría</h2> -->
+  <div class="categorias-header">
+    <div>
+      <span class="section-eyebrow">MENÚ</span>
+      <h2>Selecciona una categoría</h2>
+    </div>
+  </div>
   <div class="loading" *ngIf="cargandoCategorias()">
     <div class="skeleton-card" *ngFor="let _ of [1, 2, 3, 4]"></div>
   </div>

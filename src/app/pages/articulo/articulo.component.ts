@@ -1,5 +1,5 @@
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, EventEmitter, Input, Output, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { ProductosService } from 'src/app/core/services/productos.service';
@@ -27,9 +27,13 @@ export class ArticuloComponent implements OnInit {
   producto?: Producto;
   cantidad: number = 1;
   notas: string = '';
-  extrasSeleccionados: any[] = [];
+  // extrasSeleccionados: any[] = [];
+  extrasSeleccionados: Extra[] = [];
+
 
   ngOnInit(): void {
+    this.numero.set(this.cantidadInicial);
+
     this.route.paramMap.subscribe((params) => {
       const categoryId = params.get('category');
       if (!categoryId) {
@@ -59,16 +63,51 @@ export class ArticuloComponent implements OnInit {
       }
     });
   }
+  numero = signal(1);
+  @Output() cantidadNueva = new EventEmitter<number>();
+  @Input () cantidadInicial = 1;
 
-  actualizarExtrasSeleccionados(extra: Extra): void {
-    const index = this.extrasSeleccionados.findIndex((e) => e.name === extra.name);
-    if (index === -1) {
-      this.extrasSeleccionados.push(extra);
-    } else {
-      this.extrasSeleccionados.splice(index, 1);
-    }
-    console.log('Extras seleccionados:', this.extrasSeleccionados);
+
+  actualizarNum(dif: number) {
+    this.numero.set(Math.max(this.numero() + dif, 1));
+    this.cantidadNueva.emit(this.numero());
   }
+  // actualizarExtrasSeleccionados(extra: Extra): void {
+  //   const index = this.extrasSeleccionados.findIndex((e) => e.name === extra.name);
+  //   if (index === -1) {
+  //     this.extrasSeleccionados.push(extra);
+  //   } else {
+  //     this.extrasSeleccionados.splice(index, 1);
+  //   }
+  //   console.log('Extras seleccionados:', this.extrasSeleccionados);
+  // }
+actualizarExtrasSeleccionados(extra: Extra): void {
+
+  const index = this.extrasSeleccionados.findIndex(
+    (e) => e.name === extra.name
+  );
+
+  if (index === -1) {
+
+    if (this.extrasSeleccionados.length >= 3) {
+      return;
+    }
+
+    this.extrasSeleccionados.push(extra);
+
+  } else {
+
+    this.extrasSeleccionados.splice(index, 1);
+
+  }
+
+  console.log(
+    'Extras seleccionados:',
+    this.extrasSeleccionados
+  );
+}
+
+
 
   agregarAlCarrito(): void {
     if (!this.producto) {
@@ -95,4 +134,23 @@ export class ArticuloComponent implements OnInit {
   isArray(value: any): boolean {
     return Array.isArray(value);
   }
+  extraSeleccionado(extra: Extra): boolean {
+  return this.extrasSeleccionados.some(
+    (e) => e.name === extra.name
+  );
+}
+
+get totalExtras(): number {
+  return this.extrasSeleccionados.reduce(
+    (total, extra) => total + Number(extra.price || 0),
+    0
+  );
+}
+
+get total(): number {
+  const precioProducto = Number(this.producto?.price || 0);
+
+  return (precioProducto + this.totalExtras) * this.cantidad;
+}
+
 }

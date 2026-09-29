@@ -1,6 +1,6 @@
 <div class="resumen-final">
   <section>
-    <form #formulario="ngForm" class="margenChico" (ngSubmit)="guardarDatosPerfil()">
+    <form id="perfilForm" #formulario="ngForm" class="margenChico" (ngSubmit)="guardarDatosPerfil()">
       <div>
         <label for="nombre" id="nombre">Nombre</label>
         <input type="text" id="nombre" name="nombre" [(ngModel)]="perfil.nombre" #nombre="ngModel" minlength="3"
@@ -28,6 +28,6 @@
     </form>
   </section>
   <div class="pedido-footer">
-    <button [disabled]="formulario.invalid">Enviar</button>
+    <button type="submit" form="perfilForm" [disabled]="formulario.invalid">Enviar</button>
   </div>
 </div>
