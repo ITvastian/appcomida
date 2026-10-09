@@ -11,7 +11,7 @@ import { EntradaComponent } from './pages/entrada/entrada.component';
 const routes: Routes = [
   { path: 'entrada', component: EntradaComponent },
   { path: 'carrito', component: CarritoComponent },
-  { path: 'articulo/:category', component: ArticuloComponent },
+  { path: 'articulo/:id', component: ArticuloComponent },
   { path: 'buscar', component: BuscarComponent },
   { path: 'perfil', component: PerfilComponent },
   { path: 'categoria/:id', component: RubroComponent },
@@ -23,4 +23,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

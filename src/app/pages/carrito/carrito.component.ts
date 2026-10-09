@@ -90,7 +90,7 @@ export class CarritoComponent {
     }
     return extras.filter((extra) => this.getExtraPrice(extra) > 0);
   }
-  
+
   formatPrice(value: number): string {
     const safeValue = Number(value);
     if (isNaN(safeValue)) {
@@ -219,12 +219,12 @@ export class CarritoComponent {
     const takeAway = this.perfilService.perfil()?.takeAway ?? false;
     const tableNumber = this.tenantContextService.getTableNumber(undefined);
     if (!takeAway && !tableNumber) {
-      this.abrirDialogoMesa('No encontramos el numero de mesa de ingreso. Volve a entrar desde el QR de la mesa.');
+      this.abrirDialogoMesa('No encontramos el número de mesa de ingreso. Volve a entrar desde el QR de la mesa.');
       return false;
     }
 
     const items: any[] = [];
-    
+
     for (let i = 0; i < this.CartService.carrito.length; i++) {
       const itemCarrito = this.CartService.carrito[i];
       try {
@@ -244,10 +244,10 @@ export class CarritoComponent {
             price: producto.price,
             extras: Array.isArray(itemCarrito.extras)
               ? itemCarrito.extras.map((extra) => ({
-                  name: this.getExtraName(extra),
-                  price: this.getExtraPrice(extra),
-                  quantity: 1,
-                }))
+                name: this.getExtraName(extra),
+                price: this.getExtraPrice(extra),
+                quantity: 1,
+              }))
               : [],
           });
         }
@@ -337,7 +337,7 @@ export class CarritoComponent {
     const takeAway = this.perfilService.perfil()?.takeAway ?? false;
     const tableNumber = this.tenantContextService.getTableNumber(undefined);
     if (!takeAway && !tableNumber) {
-      this.abrirDialogoMesa('No encontramos el numero de mesa de ingreso. Volve a entrar desde el QR de la mesa.');
+      this.abrirDialogoMesa('No encontramos el número de mesa de ingreso. Volve a entrar desde el QR de la mesa.');
       return;
     }
     this.dialog.nativeElement.showModal();

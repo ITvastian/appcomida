@@ -27,14 +27,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   location = inject(Location);
   apiConfigService = inject(ApiConfigService);
   tenantContextService = inject(TenantContextService);
-  
+
   claseAplicada = signal('');
   tituloMostrado = signal('');
   backgroundImageUrl = signal('');
   tituloBackend = signal(''); // Título dinámico del backend
   titleActive = signal(false); // Estado del título personalizado
   isHomeRoute = signal(false);
-  
+
   websocket: any;
   private destroy$ = new Subject<void>();
   private reconnectTimer: any;
@@ -69,7 +69,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.tituloBackend.set(uiConfig.headerTitle);
         this.titleActive.set(uiConfig.headerTitleActive);
       });
-    
+
     // Conectar WebSocket para actualizaciones en tiempo real
     this.conectarWebSocket();
   }
@@ -105,7 +105,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.websocket.onmessage = (event: any) => {
       const data = JSON.parse(event.data);
-      
+
       // Escuchar evento de actualizacion de fondo del header
       if (data.type === 'title_background_updated' && data.imageUrl) {
         console.log('Fondo del header actualizado:', data.imageUrl);
@@ -115,10 +115,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
       // Escuchar evento de actualizacion de título del header
       if (data.type === 'header_title_updated' && data.title) {
         console.log('Título del header actualizado desde WebSocket:', data.title, '- Activo:', data.isActive);
-        const titleData = { 
-          title: data.title, 
-          isActive: data.isActive, 
-          updatedAt: data.timestamp || data.updatedAt 
+        const titleData = {
+          title: data.title,
+          isActive: data.isActive,
+          updatedAt: data.timestamp || data.updatedAt
         };
         this.titleHeaderService.updateTitleFromWebSocket(titleData);
       }
@@ -146,6 +146,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
+  tituloVisible(): string {
+    if (this.isHomeRoute()) {
+      return this.titleActive() ? this.tituloBackend() : '';
+    }
+
+    return this.titleActive() ? this.tituloBackend() : this.tituloMostrado();
+  }
+
   private actualizarEstadoRuta(url: string) {
     const path = (url || '').split('?')[0].split('#')[0];
     const isHome = path === '/home' || path === '/';
@@ -165,7 +173,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
     }
-    
+
     if (this.websocket) {
       this.websocket.close();
     }

@@ -35,41 +35,55 @@ export class ArticuloComponent implements OnInit {
     this.numero.set(this.cantidadInicial);
 
     this.route.paramMap.subscribe((params) => {
-      const categoryId = params.get('category');
-      if (!categoryId) {
-        console.error('No se recibió categoría desde la URL.');
+      const productId = params.get('id') || params.get('category');
+
+      if (!productId) {
+        console.error('No se recibió un identificador válido desde la URL.');
+        return;
       }
-      if (categoryId) {
-        this.productosService.getByCategory(categoryId).subscribe((productos) => {
+
+      this.productosService.getById(productId).subscribe((producto) => {
+        if (producto && producto._id) {
+          this.producto = producto;
+          this.procesarExtras(this.producto);
+          return;
+        }
+
+        this.productosService.getByCategory(productId).subscribe((productos) => {
           if (productos.length > 0) {
             this.producto = productos[0];
-            console.log('Producto encontrado:', this.producto);
-
-            if (this.producto?.extras && Array.isArray(this.producto.extras)) {
-              // Aseguramos que cada extra tenga las propiedades necesarias
-              this.producto.extras = this.producto.extras.map((extra) => ({
-                name: typeof extra === 'string' ? extra : extra.name,
-                price: extra.price || 0, // Usamos un precio predeterminado si no está definido
-                seleccionado: false, // Por defecto no seleccionado
-              })) as Extra[];
-              console.log('Extras procesados:', this.producto.extras);
-            }
-          } else {
-            console.log('No se encontraron productos para la categoría:', categoryId);
+            this.procesarExtras(this.producto);
+            console.log('Producto encontrado por categoría:', this.producto);
+            return;
           }
+
+          console.log('No se encontró ningún producto para:', productId);
         });
-      } else {
-        console.log('No se recibió una categoría válida.');
-      }
+      });
     });
+  }
+
+  private procesarExtras(producto: Producto | undefined): void {
+    if (!producto || !producto.extras || !Array.isArray(producto.extras)) {
+      return;
+    }
+
+    producto.extras = producto.extras.map((extra) => ({
+      name: typeof extra === 'string' ? extra : extra.name,
+      price: extra.price || 0,
+      seleccionado: false,
+    })) as Extra[];
+
+    console.log('Extras procesados:', producto.extras);
   }
   numero = signal(1);
   @Output() cantidadNueva = new EventEmitter<number>();
-  @Input () cantidadInicial = 1;
+  @Input() cantidadInicial = 1;
 
 
   actualizarNum(dif: number) {
     this.numero.set(Math.max(this.numero() + dif, 1));
+    this.cantidad = this.numero();
     this.cantidadNueva.emit(this.numero());
   }
   // actualizarExtrasSeleccionados(extra: Extra): void {
@@ -81,31 +95,31 @@ export class ArticuloComponent implements OnInit {
   //   }
   //   console.log('Extras seleccionados:', this.extrasSeleccionados);
   // }
-actualizarExtrasSeleccionados(extra: Extra): void {
+  actualizarExtrasSeleccionados(extra: Extra): void {
 
-  const index = this.extrasSeleccionados.findIndex(
-    (e) => e.name === extra.name
-  );
+    const index = this.extrasSeleccionados.findIndex(
+      (e) => e.name === extra.name
+    );
 
-  if (index === -1) {
+    if (index === -1) {
 
-    if (this.extrasSeleccionados.length >= 3) {
-      return;
+      if (this.extrasSeleccionados.length >= 3) {
+        return;
+      }
+
+      this.extrasSeleccionados.push(extra);
+
+    } else {
+
+      this.extrasSeleccionados.splice(index, 1);
+
     }
 
-    this.extrasSeleccionados.push(extra);
-
-  } else {
-
-    this.extrasSeleccionados.splice(index, 1);
-
+    console.log(
+      'Extras seleccionados:',
+      this.extrasSeleccionados
+    );
   }
-
-  console.log(
-    'Extras seleccionados:',
-    this.extrasSeleccionados
-  );
-}
 
 
 
@@ -114,20 +128,20 @@ actualizarExtrasSeleccionados(extra: Extra): void {
       console.error('Producto no está definido.');
       return;
     }
-  
+
     const productoId = String(this.producto._id || '').trim();
     if (!productoId) {
       console.error('El producto no tiene un ID válido:', this.producto);
       return;
     }
-  
+
     this.cartService.addProd(
       String(productoId),
       this.cantidad,
       this.notas,
       this.extrasSeleccionados
     );
-  
+
     this.router.navigate(['/carrito']);
   }
 
@@ -135,22 +149,22 @@ actualizarExtrasSeleccionados(extra: Extra): void {
     return Array.isArray(value);
   }
   extraSeleccionado(extra: Extra): boolean {
-  return this.extrasSeleccionados.some(
-    (e) => e.name === extra.name
-  );
-}
+    return this.extrasSeleccionados.some(
+      (e) => e.name === extra.name
+    );
+  }
 
-get totalExtras(): number {
-  return this.extrasSeleccionados.reduce(
-    (total, extra) => total + Number(extra.price || 0),
-    0
-  );
-}
+  get totalExtras(): number {
+    return this.extrasSeleccionados.reduce(
+      (total, extra) => total + Number(extra.price || 0),
+      0
+    );
+  }
 
-get total(): number {
-  const precioProducto = Number(this.producto?.price || 0);
+  get total(): number {
+    const precioProducto = Number(this.producto?.price || 0);
 
-  return (precioProducto + this.totalExtras) * this.cantidad;
-}
+    return (precioProducto + this.totalExtras) * this.cantidad;
+  }
 
 }

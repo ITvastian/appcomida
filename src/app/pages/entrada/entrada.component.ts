@@ -43,7 +43,7 @@ export class EntradaComponent {
 
     const tableNumber = this.tenantContextService.getTableNumber(undefined);
     if (!tableNumber) {
-      this.mostrarModal('No encontramos el numero de mesa.');
+      this.mostrarModal('No encontramos el número de mesa.');
       return;
     }
 
@@ -71,7 +71,7 @@ export class EntradaComponent {
 
     const tableNumber = this.tenantContextService.getTableNumber(undefined);
     if (!tableNumber) {
-      this.mostrarModal('No encontramos el numero de mesa.');
+      this.mostrarModal('No encontramos el número de mesa.');
       return;
     }
 
