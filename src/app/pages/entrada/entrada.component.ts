@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AvatarService } from 'src/app/core/services/avatar.service';
@@ -14,8 +14,8 @@ import { WaiterRequestsService } from 'src/app/core/services/waiter-requests.ser
   standalone: true,
   imports: [CommonModule, RouterModule],
 })
-export class EntradaComponent {
-  private static readonly FALLBACK_AVATAR_URL = 'assets/img/mano.png';
+export class EntradaComponent implements OnDestroy {
+  private static readonly FALLBACK_AVATAR_URL = 'assets/img/dynologo.png';
 
   private readonly perfilService = inject(PerfilService);
   private readonly waiterRequestsService = inject(WaiterRequestsService);
@@ -28,14 +28,23 @@ export class EntradaComponent {
   cuentaSolicitada = signal(false);
   avatarCargando = signal(true);
   avatarUrl = signal<string | null>(null);
+  introAvatarLoaded = signal(false);
   tieneNumeroMesa = signal(false);
   modalAbierto = signal(false);
   modalMensaje = signal('');
+  introVisible = signal(true);
+  private introTimer?: ReturnType<typeof setTimeout>;
 
   ngOnInit(): void {
     this.hidratarContextoDesdeQr();
     this.actualizarDisponibilidadMesa();
     this.cargarAvatarActual();
+  }
+
+  ngOnDestroy(): void {
+    if (this.introTimer) {
+      clearTimeout(this.introTimer);
+    }
   }
 
   solicitarMozo(): void {
@@ -128,13 +137,30 @@ export class EntradaComponent {
       .subscribe({
         next: (response) => {
           const remoteUrl = response?.imageUrl?.trim();
-          this.avatarUrl.set(remoteUrl || EntradaComponent.FALLBACK_AVATAR_URL);
+          const avatarUrl = remoteUrl || EntradaComponent.FALLBACK_AVATAR_URL;
+          this.avatarUrl.set(avatarUrl);
         },
         error: (error) => {
           console.error('Error al cargar avatar actual:', error);
           this.avatarUrl.set(EntradaComponent.FALLBACK_AVATAR_URL);
         },
       });
+  }
+
+  onIntroAvatarLoad(): void {
+    this.introAvatarLoaded.set(true);
+    this.iniciarPermanenciaIntro();
+  }
+
+  onIntroAvatarError(): void {
+    this.iniciarPermanenciaIntro();
+  }
+
+  private iniciarPermanenciaIntro(): void {
+    if (this.introTimer) {
+      clearTimeout(this.introTimer);
+    }
+    this.introTimer = setTimeout(() => this.introVisible.set(false), 5000);
   }
 
   onAvatarError(): void {

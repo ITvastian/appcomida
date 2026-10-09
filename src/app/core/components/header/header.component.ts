@@ -74,6 +74,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.conectarWebSocket();
   }
   volverAtras() {
+    if (this.isHomeRoute()) {
+      this.router.navigateByUrl('/entrada');
+      return;
+    }
+
     if (window.history.length > 1) {
       this.location.back();
       return;
