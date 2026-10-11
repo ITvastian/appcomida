@@ -116,6 +116,125 @@
   text-align: center;
 }
 
+.entrada--payment {
+  justify-content: center;
+  background: radial-gradient(ellipse at top, #fffdf9 0%, #fff4e9 58%, #f8e7d9 100%);
+}
+
+.entrada__payment-card {
+  max-width: 520px;
+  padding: 24px 20px;
+  text-align: left;
+}
+
+.entrada__payment-card h1,
+.entrada__payment-card>p {
+  text-align: center;
+}
+
+.entrada__order-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 22px 0;
+}
+
+.entrada__order-meta>div {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid rgba(194, 118, 88, 0.18);
+  border-radius: 8px;
+  background: #fffaf6;
+}
+
+.entrada__order-meta dt {
+  margin-bottom: 4px;
+  color: #7a675d;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.entrada__order-meta dd {
+  margin: 0;
+  color: #2d221c;
+  font-size: 0.92rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.entrada__order-items {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entrada__order-items li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(122, 103, 93, 0.16);
+  color: #49372e;
+  line-height: 1.4;
+}
+
+.entrada__order-item-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.entrada__order-item-heading span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.entrada__order-item-heading strong {
+  flex: 0 0 auto;
+  text-align: right;
+  white-space: nowrap;
+  color: #2d221c;
+}
+
+.entrada__order-item-unit-price,
+.entrada__order-item-extras {
+  display: block;
+  margin-top: 4px;
+  color: #7a675d;
+  font-size: 0.84rem;
+}
+
+.entrada__order-item-extras span {
+  display: block;
+}
+
+.entrada__order-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 14px 0;
+  border-top: 1px solid rgba(194, 118, 88, 0.24);
+  color: #2d221c;
+  font-size: 1rem;
+}
+
+.entrada__order-total strong {
+  color: #a64f32;
+  font-size: 1.25rem;
+}
+
+.entrada__payment-card>.btn--primary {
+  min-height: 54px;
+  color: #fff;
+}
+
+.entrada__payment-card>.btn--primary span {
+  display: block;
+  visibility: visible;
+}
+
 h1 {
   margin: 0 0 8px;
   font-size: clamp(1.5rem, 6vw, 1.9rem);

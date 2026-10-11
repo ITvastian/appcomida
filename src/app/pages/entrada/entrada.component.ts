@@ -140,13 +140,14 @@ export class EntradaComponent implements OnDestroy {
       .pipe(finalize(() => this.iniciandoTransferencia.set(false)))
       .subscribe({
         next: (response) => {
-          if (!response.success || !response.orderId || !response.order || !Number.isFinite(Number(response.amount))) {
+          const amount = Number(response.amount ?? response.order?.total);
+          if (!response.success || !response.orderId || !response.order || !Number.isFinite(amount)) {
             this.mostrarModal('El servidor no devolvió los datos completos de la orden.');
             return;
           }
 
           this.paymentIdPendiente = null;
-          this.transferenciaResumen.set(response);
+          this.transferenciaResumen.set({ ...response, amount });
           this.mediosPagoVisibles.set(false);
         },
         error: (error) => {

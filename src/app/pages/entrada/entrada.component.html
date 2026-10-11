@@ -66,28 +66,39 @@
             <dd>{{ resumen.tableNumber }}</dd>
           </div>
           <div>
-            <dt>Fecha</dt>
-            <dd>
-              <time [attr.datetime]="resumen.order.createdAt || resumen.order.timestamp">
-                {{ (resumen.order.createdAt || resumen.order.timestamp) | date:'dd/MM/yyyy HH:mm' }}
-              </time>
-            </dd>
+            <dt>Cliente</dt>
+            <dd>{{ resumen.customerName || resumen.order.customerName || 'No disponible' }}</dd>
+          </div>
+          <div>
+            <dt>Para llevar</dt>
+            <dd>{{ resumen.order.takeAway ? 'Sí' : 'No' }}</dd>
           </div>
         </dl>
 
         <ul class="entrada__order-items">
           <li *ngFor="let item of resumen.order.items">
-            <span>{{ item.quantity }} x {{ item.name }}</span>
+            <div class="entrada__order-item-heading">
+              <span>{{ item.name }}</span>
+              <strong>{{ item.price | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</strong>
+            </div>
+            <small class="entrada__order-item-unit-price">
+              Cantidad: {{ item.quantity }}
+            </small>
+            <div class="entrada__order-item-extras" *ngIf="item.extras?.length">
+              <span *ngFor="let extra of item.extras">
+                + {{ extra.name }} ({{ extra.price | currency:'ARS':'symbol':'1.0-0':'es-AR' }})
+              </span>
+            </div>
           </li>
         </ul>
 
         <div class="entrada__order-total">
-          <span>Total</span>
+          <span>Monto total</span>
           <strong>{{ resumen.amount | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</strong>
         </div>
 
         <button class="btn btn--primary" type="button" [disabled]="procesandoPago()" (click)="continuarConPago()">
-          {{ procesandoPago() ? 'Conectando con Mercado Pago...' : 'Continuar con el pago' }}
+          <span>{{ procesandoPago() ? 'Conectando con Mercado Pago...' : 'Continuar con el pago' }}</span>
         </button>
       </div>
     </section>

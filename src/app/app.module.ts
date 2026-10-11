@@ -1,4 +1,6 @@
 import { NgModule } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEsAr from '@angular/common/locales/es-AR';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -10,22 +12,23 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 
+registerLocaleData(localeEsAr);
 
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        TabsComponent,
-    ],
-    bootstrap: [AppComponent],
-    imports: [
-        BrowserModule, 
-        AppRoutingModule, 
-        AngularFireModule.initializeApp(environment.firebase),
-        AngularFireDatabaseModule,
-        AngularFirestoreModule,
-        HeaderComponent, // ← HeaderComponent es standalone
-    ],
-    providers: [provideHttpClient(withInterceptorsFromDi())]
+  declarations: [
+    AppComponent,
+    TabsComponent,
+  ],
+  bootstrap: [AppComponent],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireDatabaseModule,
+    AngularFirestoreModule,
+    HeaderComponent, // ← HeaderComponent es standalone
+  ],
+  providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule { }

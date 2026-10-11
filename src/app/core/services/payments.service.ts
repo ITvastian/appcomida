@@ -14,6 +14,12 @@ export interface TransferOrderItem {
   name: string;
   quantity: number;
   price: number;
+  extras?: TransferOrderExtra[];
+}
+
+export interface TransferOrderExtra {
+  name: string;
+  price: number;
 }
 
 export interface TransferOrder {
@@ -22,8 +28,8 @@ export interface TransferOrder {
   tableNumber: string | number;
   items: TransferOrderItem[];
   total: number;
-  createdAt?: string;
-  timestamp?: string;
+  customerName?: string;
+  takeAway?: boolean;
 }
 
 export interface TransferInitializationResponse {
@@ -33,6 +39,7 @@ export interface TransferInitializationResponse {
   orderId: string;
   tableNumber: string | number;
   amount: number;
+  customerName?: string;
   order: TransferOrder;
   firestoreDocumentId?: string;
 }
