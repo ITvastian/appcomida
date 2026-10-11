@@ -20,8 +20,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  aspect-ratio: 19 / 5.5;
-  min-height: 160px;
+  aspect-ratio: 19 / 4.5;
+  min-height: 220px;
 }
 
 img {

@@ -10,19 +10,6 @@
       <div id="container">
         <div *ngFor="let item of productosCarrito(); index as i" class="tarjetaProdContainer margenChico">
           <div class="izq" [ngStyle]="{ 'background-image': 'url(' + item.photoUrl + ')' }">
-
-            <!-- <div>
-          <img
-            *ngIf="item.esCeliaco"
-            src="../../../assets/icons/celiaco.png"
-            alt="celiaco"
-          />
-          <img
-            *ngIf="item.esVegano"
-            src="../../../assets/icons/vegano.svg"
-            alt="vegano"
-          />
-        </div> -->
           </div>
           <div class="contenido">
             <div class="fila-principal">

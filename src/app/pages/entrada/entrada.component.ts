@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AvatarService } from 'src/app/core/services/avatar.service';
 import { PerfilService } from 'src/app/core/services/perfil.service';
+import { PaymentsService, TransferInitializationResponse } from 'src/app/core/services/payments.service';
 import { TenantContextService } from 'src/app/core/services/tenant-context.service';
 import { WaiterRequestsService } from 'src/app/core/services/waiter-requests.service';
 
@@ -19,11 +20,16 @@ export class EntradaComponent implements OnDestroy {
 
   private readonly perfilService = inject(PerfilService);
   private readonly waiterRequestsService = inject(WaiterRequestsService);
+  private readonly paymentsService = inject(PaymentsService);
   private readonly avatarService = inject(AvatarService);
   private readonly tenantContextService = inject(TenantContextService);
   private readonly route = inject(ActivatedRoute);
   solicitandoMozo = signal(false);
   solicitandoCuenta = signal(false);
+  iniciandoTransferencia = signal(false);
+  procesandoPago = signal(false);
+  transferenciaResumen = signal<TransferInitializationResponse | null>(null);
+  mediosPagoVisibles = signal(false);
   mozoAvisado = signal(false);
   cuentaSolicitada = signal(false);
   avatarCargando = signal(true);
@@ -33,6 +39,7 @@ export class EntradaComponent implements OnDestroy {
   modalAbierto = signal(false);
   modalMensaje = signal('');
   introVisible = signal(true);
+  private paymentIdPendiente: string | null = null;
   private introTimer?: ReturnType<typeof setTimeout>;
 
   ngOnInit(): void {
@@ -75,7 +82,16 @@ export class EntradaComponent implements OnDestroy {
       });
   }
 
-  pedirCuenta(): void {
+  alternarMediosPago(): void {
+    this.mediosPagoVisibles.update((visible) => !visible);
+  }
+
+  pedirCuenta(medioPago: string): void {
+    if (medioPago === 'Transferencia') {
+      this.iniciarTransferencia();
+      return;
+    }
+
     const tenantId = this.tenantContextService.getTenantId();
 
     const tableNumber = this.tenantContextService.getTableNumber(undefined);
@@ -89,18 +105,100 @@ export class EntradaComponent implements OnDestroy {
       .createBillRequest({
         tenantId,
         tableNumber,
-        message: 'El cliente pide cuenta',
+        message: `El cliente pide cuenta. Medio de pago: ${medioPago}`,
       })
       .pipe(finalize(() => this.solicitandoCuenta.set(false)))
       .subscribe({
         next: () => {
           this.cuentaSolicitada.set(true);
+          this.mediosPagoVisibles.set(false);
         },
         error: (error) => {
           console.error('Error al pedir cuenta:', error);
           this.mostrarModal('No se pudo enviar el pedido de cuenta. Intenta de nuevo.');
         },
       });
+  }
+
+  iniciarTransferencia(): void {
+    const tenantId = this.tenantContextService.getTenantId();
+    const tableNumber = this.tenantContextService.getTableNumber(undefined);
+    if (!tenantId || !tableNumber) {
+      this.mostrarModal('No encontramos los datos de la mesa para iniciar la transferencia.');
+      return;
+    }
+
+    this.paymentIdPendiente ??= `pago_${crypto.randomUUID()}`;
+    this.iniciandoTransferencia.set(true);
+    this.paymentsService
+      .initializeTransfer({
+        paymentId: this.paymentIdPendiente,
+        tenantId,
+        tableNumber,
+        paymentMethod: 'transfer',
+      })
+      .pipe(finalize(() => this.iniciandoTransferencia.set(false)))
+      .subscribe({
+        next: (response) => {
+          if (!response.success || !response.orderId || !response.order || !Number.isFinite(Number(response.amount))) {
+            this.mostrarModal('El servidor no devolvió los datos completos de la orden.');
+            return;
+          }
+
+          this.paymentIdPendiente = null;
+          this.transferenciaResumen.set(response);
+          this.mediosPagoVisibles.set(false);
+        },
+        error: (error) => {
+          console.error('Error al iniciar la transferencia:', error);
+          this.mostrarModal('No se pudo cargar la orden para transferir. Intenta de nuevo.');
+        },
+      });
+  }
+
+  continuarConPago(): void {
+    const resumen = this.transferenciaResumen();
+    if (!resumen) {
+      return;
+    }
+
+    this.procesandoPago.set(true);
+    this.paymentsService
+      .createMercadoPagoCheckout({
+        paymentId: resumen.paymentId,
+        tenantId: resumen.tenantId,
+        orderId: resumen.orderId,
+        tableNumber: Number(resumen.tableNumber),
+        amount: Number(resumen.amount),
+      })
+      .pipe(finalize(() => this.procesandoPago.set(false)))
+      .subscribe({
+        next: (response) => {
+          if (!response.success || !response.checkoutUrl) {
+            this.mostrarModal('El servidor no devolvió el enlace de pago.');
+            return;
+          }
+
+          try {
+            const checkoutUrl = new URL(response.checkoutUrl);
+            if (checkoutUrl.protocol !== 'https:') {
+              throw new Error('La URL de pago debe usar HTTPS.');
+            }
+            window.location.assign(checkoutUrl.toString());
+          } catch (error) {
+            console.error('URL de pago inválida:', error);
+            this.mostrarModal('El enlace de pago recibido no es válido.');
+          }
+        },
+        error: (error) => {
+          console.error('Error al crear el checkout de Mercado Pago:', error);
+          this.mostrarModal('No se pudo continuar con el pago. Intenta de nuevo.');
+        },
+      });
+  }
+
+  volverAtras(): void {
+    this.transferenciaResumen.set(null);
   }
 
   cerrarModal(): void {

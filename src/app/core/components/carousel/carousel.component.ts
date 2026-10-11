@@ -26,13 +26,13 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   private shouldReconnect = true;
 
   constructor(
-    private elementRef: ElementRef, 
+    private elementRef: ElementRef,
     private cdr: ChangeDetectorRef,
     private bannerService: BannerService,
     private uiConfigService: UiConfigService,
     private apiConfigService: ApiConfigService,
     private tenantContextService: TenantContextService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // 📸 Cargar banners reactivamente (Observable)
@@ -42,7 +42,7 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe((uiConfig) => {
         const banners = uiConfig.banners || [];
         if (banners && banners.length > 0) {
-          this.fotos = banners.map((b: any) => ({ 
+          this.fotos = banners.map((b: any) => ({
             url: b.imageUrl
           }));
           this.clonedFotos = [this.fotos[this.fotos.length - 1], ...this.fotos];
@@ -59,7 +59,7 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
         this.resetCarouselPosition();
         this.cdr.detectChanges();
       });
-    
+
     // 📡 Conectar WebSocket para actualizaciones en tiempo real
     this.conectarWebSocket();
   }
@@ -89,7 +89,7 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.websocket.onmessage = (event: any) => {
       const data = JSON.parse(event.data);
-      
+
       // ✅ Cambio: Ahora recibe 'banners' (array) en lugar de 'imageUrl'
       if (data.type === 'banner_updated' && data.banners) {
         console.log(`🖼️ Banners actualizados - Slot ${data.slot}:`, data.banners[data.slot]?.imageUrl);
