@@ -50,6 +50,12 @@ export interface MercadoPagoCheckoutPayload {
   orderId: string;
   tableNumber: number;
   amount: number;
+  back_urls: {
+    success: string;
+    failure: string;
+    pending: string;
+  };
+  auto_return: 'approved';
 }
 
 export interface MercadoPagoCheckoutResponse {

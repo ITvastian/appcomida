@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Perfil } from 'src/app/core/interface/perfil';
 import { HeaderService } from 'src/app/core/services/header.service';
@@ -20,8 +20,8 @@ export class PerfilComponent {
 
   ngOnInit(): void {
     this.headerService.titulo.set('Perfil');
-    if(this.perfilService.perfil()){
-      this.perfil = {...this.perfilService.perfil()!}
+    if (this.perfilService.perfil()) {
+      this.perfil = { ...this.perfilService.perfil()! }
     }
   }
   perfil: Perfil = {
@@ -30,7 +30,12 @@ export class PerfilComponent {
     detalleEntrega: '',
     takeAway: false
   };
-  guardarDatosPerfil() {
+  guardarDatosPerfil(formulario: NgForm) {
+    formulario.form.markAllAsTouched();
+    if (formulario.invalid) {
+      return;
+    }
+
     this.perfilService.guardarDatos(this.perfil)
     this.router.navigate(["/carrito"])
   }

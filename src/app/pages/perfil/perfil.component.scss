@@ -45,6 +45,12 @@ form {
         border-color: rgba(186, 88, 52, 0.5);
         box-shadow: 0 0 0 3px rgba(241, 139, 109, 0.16);
       }
+
+      &.campo-invalido {
+        border-color: #c43f20;
+        background: #fff1ef;
+        box-shadow: 0 0 0 3px rgba(196, 63, 32, 0.16);
+      }
     }
   }
 }

@@ -17,6 +17,7 @@ import { WaiterRequestsService } from 'src/app/core/services/waiter-requests.ser
 })
 export class EntradaComponent implements OnDestroy {
   private static readonly FALLBACK_AVATAR_URL = 'assets/img/dynologo.png';
+  private static readonly PAYMENT_RETURN_URL = 'https://dyno.web.app';
 
   private readonly perfilService = inject(PerfilService);
   private readonly waiterRequestsService = inject(WaiterRequestsService);
@@ -171,6 +172,12 @@ export class EntradaComponent implements OnDestroy {
         orderId: resumen.orderId,
         tableNumber: Number(resumen.tableNumber),
         amount: Number(resumen.amount),
+        back_urls: {
+          success: EntradaComponent.PAYMENT_RETURN_URL,
+          failure: EntradaComponent.PAYMENT_RETURN_URL,
+          pending: EntradaComponent.PAYMENT_RETURN_URL,
+        },
+        auto_return: 'approved',
       })
       .pipe(finalize(() => this.procesandoPago.set(false)))
       .subscribe({

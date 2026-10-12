@@ -1,10 +1,11 @@
 <div class="resumen-final">
   <section>
-    <form id="perfilForm" #formulario="ngForm" class="margenChico" (ngSubmit)="guardarDatosPerfil()">
+    <form id="perfilForm" #formulario="ngForm" class="margenChico" (ngSubmit)="guardarDatosPerfil(formulario)">
       <div>
         <label for="nombre" id="nombre">Nombre</label>
         <input type="text" id="nombre" name="nombre" [(ngModel)]="perfil.nombre" #nombre="ngModel" minlength="3"
-          required />
+          [class.campo-invalido]="nombre.invalid && nombre.touched"
+          [attr.aria-invalid]="nombre.invalid && nombre.touched" required />
         <p class="error" *ngIf="nombre.invalid && nombre.touched">
           Ingrese un nombre
         </p>
@@ -28,6 +29,6 @@
     </form>
   </section>
   <div class="pedido-footer">
-    <button type="submit" form="perfilForm" [disabled]="formulario.invalid">Enviar</button>
+    <button type="submit" form="perfilForm">Enviar</button>
   </div>
 </div>

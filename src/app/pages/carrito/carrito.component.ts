@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
+  OnDestroy,
   ViewChild,
   inject,
   WritableSignal,
@@ -27,7 +28,7 @@ import { ApiConfigService } from 'src/app/core/services/api-config.service';
   imports: [CommonModule, ContadorCantidadComponent, RouterModule, FormsModule],
   standalone: true,
 })
-export class CarritoComponent {
+export class CarritoComponent implements OnDestroy {
   headerService = inject(HeaderService);
   CartService = inject(CartService);
   ProductosService = inject(ProductosService);
@@ -40,6 +41,10 @@ export class CarritoComponent {
     (Producto & { cantidad: number; extras: any[]; notas?: string })[]
   > = signal([]);
   cargandoCarrito = signal(true);
+  perfilIncompletoAlert = signal(false);
+  private perfilAlertTimer?: ReturnType<typeof setTimeout>;
+  private perfilAlertRestartTimer?: ReturnType<typeof setTimeout>;
+  paso = 1;
 
   subtotal: number = 0;
   delivery: number = 0;
@@ -62,6 +67,15 @@ export class CarritoComponent {
       this.calcularinfo();
       this.cargandoCarrito.set(false);
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.perfilAlertTimer) {
+      clearTimeout(this.perfilAlertTimer);
+    }
+    if (this.perfilAlertRestartTimer) {
+      clearTimeout(this.perfilAlertRestartTimer);
+    }
   }
 
   getExtraName(extra: any): string {
@@ -334,13 +348,36 @@ export class CarritoComponent {
 
 
   abrirConfirmacionPedido() {
+    if (!this.perfilService.perfil()) {
+      this.animarPerfilIncompleto();
+      return;
+    }
+
     const takeAway = this.perfilService.perfil()?.takeAway ?? false;
     const tableNumber = this.tenantContextService.getTableNumber(undefined);
     if (!takeAway && !tableNumber) {
       this.abrirDialogoMesa('No encontramos el número de mesa de ingreso. Volve a entrar desde el QR de la mesa.');
       return;
     }
+    this.paso = 1;
     this.dialog.nativeElement.showModal();
+  }
+
+  private animarPerfilIncompleto(): void {
+    if (this.perfilAlertTimer) {
+      clearTimeout(this.perfilAlertTimer);
+    }
+    if (this.perfilAlertRestartTimer) {
+      clearTimeout(this.perfilAlertRestartTimer);
+    }
+
+    this.perfilIncompletoAlert.set(false);
+    this.perfilAlertRestartTimer = setTimeout(() => {
+      this.perfilIncompletoAlert.set(true);
+      this.perfilAlertTimer = setTimeout(() => {
+        this.perfilIncompletoAlert.set(false);
+      }, 1000);
+    }, 0);
   }
 
   abrirDialogoMesa(mensajeInfo?: string) {
@@ -372,13 +409,15 @@ export class CarritoComponent {
     this.abrirConfirmacionPedido();
   }
 
-  async finalizarPedido() {
+  async finalizarPedido(enviarCalificacion: boolean) {
     const ordenEnviada = await this.enviarMensaje();
     if (!ordenEnviada) {
       return;
     }
 
-    await this.enviarCalificacion();
+    if (enviarCalificacion) {
+      await this.enviarCalificacion();
+    }
 
     const venta = {
       productos: this.CartService.carrito,

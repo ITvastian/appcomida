@@ -44,7 +44,7 @@
       <div class="resumen-final">
         <section class="margenChico" id="informacion">
           <h3>Información:</h3>
-          <div class="flexApart" id="envioContainer">
+          <div class="flexApart" id="envioContainer" [class.perfil-incompleto-alerta]="perfilIncompletoAlert()">
             <div>
               <ng-container *ngIf="perfilService.perfil(); else sinDatosEnvio">
                 <h4>{{ perfilService.perfil()!.nombre }}</h4>
@@ -79,7 +79,7 @@
         </section>
 
         <div class="pedido-footer">
-          <button id="enviar" [disabled]="!perfilService.perfil()" (click)="abrirConfirmacionPedido()">
+          <button id="enviar" (click)="abrirConfirmacionPedido()">
             Realizar pedido
           </button>
         </div>
@@ -96,7 +96,7 @@
 </ng-template>
 
 
-<dialog method="modal" #dialog class="app-dialog confirm-dialog">
+<!-- <dialog method="modal" #dialog class="app-dialog confirm-dialog">
   <p class="confirm-dialog__title">¿Pudiste realizar el pedido?</p>
   <div class="confirm-dialog__actions">
     <button type="button" class="confirm-dialog__btn confirm-dialog__btn--yes" (click)="finalizarPedido()">Si</button>
@@ -113,8 +113,50 @@
     <p>Sugerencias:</p>
     <textarea [(ngModel)]="suggestionText" rows="3" placeholder="Escribe tus sugerencias aquí"></textarea>
   </div>
-</dialog>
+</dialog> -->
+<dialog #dialog class="app-dialog confirm-dialog">
+  <!-- PASO 1 -->
+  <section *ngIf="paso === 1" class="confirm-dialog__step">
+    <div class="confirm-dialog__icon">🛍️</div>
+    <h2 class="confirm-dialog__title">¿Pudiste realizar el pedido?</h2>
+    <p class="confirm-dialog__subtitle">Contanos cómo te fue en WhatsApp</p>
 
+    <div class="confirm-dialog__actions">
+      <button type="button" class="btn btn--ghost" (click)="editarPedido()">
+        No, editar
+      </button>
+      <button type="button" class="btn btn--primary" (click)="paso = 2">
+        Sí, listo
+      </button>
+    </div>
+  </section>
+
+  <!-- PASO 2 -->
+  <section *ngIf="paso === 2" class="confirm-dialog__step">
+    <div class="confirm-dialog__icon">🎉</div>
+    <h2 class="confirm-dialog__title">¡Genial! ¿Nos ayudás a mejorar?</h2>
+
+    <div class="stars" role="radiogroup" aria-label="Calificación">
+      <button type="button" class="star" *ngFor="let star of stars; let i = index"
+        [class.filled]="i < (hoverIndex || rating)" [attr.aria-label]="(i + 1) + ' estrellas'" (click)="rate(i + 1)"
+        (mouseover)="hover(i + 1)" (mouseleave)="hover(0)">
+        ★
+      </button>
+    </div>
+
+    <textarea class="confirm-dialog__textarea" [(ngModel)]="suggestionText" rows="3"
+      placeholder="¿Algo que podamos mejorar? (opcional)"></textarea>
+
+    <div class="confirm-dialog__actions">
+      <button type="button" class="btn btn--ghost" (click)="finalizarPedido(false)">
+        Omitir
+      </button>
+      <button type="button" class="btn btn--primary" (click)="finalizarPedido(true)">
+        Enviar
+      </button>
+    </div>
+  </section>
+</dialog>
 <dialog method="modal" #tableDialog class="app-dialog table-dialog">
 
   <p class="table-dialog__title">
