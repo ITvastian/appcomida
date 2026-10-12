@@ -17,6 +17,7 @@
               <p class="negrita precio-producto">${{ formatPrice(item.price) }}</p>
             </div>
 
+            <!-- 
             <p *ngIf="item.notas" id="notas-carrito">{{ item.notas }}</p>
 
             <ul class="extras-grid">
@@ -32,17 +33,38 @@
               <button (click)="eliminarProd(item._id)" class="borrar">
                 <img src="../../../assets/icons/borrarr.png" alt="" width="20px" />
               </button>
+            </div> -->
+            <p *ngIf="item.notas" class="item-notas">{{ item.notas }}</p>
+
+            <ul class="extras-grid">
+              <li *ngFor="let extra of getExtrasWithPrice(item.extras)" class="extra-fila">
+                <span class="extra-nombre">{{ getExtraName(extra) }}</span>
+                <span class="extra-precio">${{ formatPrice(getExtraPrice(extra)) }}</span>
+              </li>
+            </ul>
+
+            <div class="acciones-item">
+              <app-contador-cantidad [cantidadInicial]="item.cantidad"
+                (cantidadNueva)="cambiarProductoCantidad(item._id,$event)"></app-contador-cantidad>
+              <button type="button" (click)="eliminarProd(item._id)" class="borrar" aria-label="Eliminar producto">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                  <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <div class="flex-mas">
+      <!-- <div class="flex-mas">
         <a id="mas" [routerLink]="['/home']" routerLinkActive="router-link-active"><img
             src="../../../assets/img/mano.png" alt=""></a>
-      </div>
+      </div> -->
+      <a class="agregar-mas" [routerLink]="['/home']">
+        <span aria-hidden="true">+</span> Agregar más productos
+      </a>
 
       <div class="resumen-final">
-        <section class="margenChico" id="informacion">
+        <!-- <section class="margenChico" id="informacion">
           <h3>Información:</h3>
           <div class="flexApart" id="envioContainer" [class.perfil-incompleto-alerta]="perfilIncompletoAlert()">
             <div>
@@ -76,11 +98,56 @@
             </div>
 
           </div>
-        </section>
+        </section> -->
+        <section class="margenChico" id="informacion">
+          <h3>Información:</h3>
 
+          <div class="info-card" id="envioContainer" [class.perfil-incompleto-alerta]="perfilIncompletoAlert()">
+            <ng-container *ngIf="perfilService.perfil() as perfil; else sinDatosEnvio">
+              <div class="info-card__body">
+                <h4 class="info-card__nombre">{{ perfil.nombre }}</h4>
+                <span class="info-chip" [class.info-chip--takeaway]="perfil.takeAway">
+                  <span aria-hidden="true">{{ perfil.takeAway ? '🥡' : '🍽️' }}</span>
+                  {{ perfil.takeAway ? 'Para llevar' : 'En mesa' }}
+                </span>
+                <p class="info-card__notas" *ngIf="perfil.detalleEntrega">
+                  <span aria-hidden="true">📝</span> {{ perfil.detalleEntrega }}
+                </p>
+              </div>
+            </ng-container>
+            <ng-template #sinDatosEnvio>
+              <p class="info-card__vacio">Ingresá tus datos para continuar</p>
+            </ng-template>
+
+            <a class="info-card__edit" [routerLink]="['/perfil']" aria-label="Editar datos">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" />
+              </svg>
+              Editar
+            </a>
+          </div>
+
+          <div class="totales">
+            <div class="totales__fila">
+              <span>Subtotal</span>
+              <span>${{ formatPrice(subtotal) }}</span>
+            </div>
+            <div class="totales__fila" *ngIf="extraTotal > 0">
+              <span>Extras</span>
+              <span>${{ formatPrice(extraTotal) }}</span>
+            </div>
+            <div class="totales__fila totales__fila--total">
+              <span>Total</span>
+              <strong>${{ formatPrice(total) }}</strong>
+            </div>
+          </div>
+        </section>
         <div class="pedido-footer">
-          <button id="enviar" (click)="abrirConfirmacionPedido()">
+          <!-- <button id="enviar" (click)="abrirConfirmacionPedido()">
             Realizar pedido
+          </button> -->
+          <button id="enviar" type="button" (click)="abrirConfirmacionPedido()">
+            Realizar pedido · ${{ formatPrice(total) }}
           </button>
         </div>
       </div>
@@ -119,7 +186,7 @@
   <section *ngIf="paso === 1" class="confirm-dialog__step">
     <div class="confirm-dialog__icon">🛍️</div>
     <h2 class="confirm-dialog__title">¿Pudiste realizar el pedido?</h2>
-    <p class="confirm-dialog__subtitle">Contanos cómo te fue en WhatsApp</p>
+    <p class="confirm-dialog__subtitle">Contanos cómo te fue en los comentarios</p>
 
     <div class="confirm-dialog__actions">
       <button type="button" class="btn btn--ghost" (click)="editarPedido()">
@@ -145,7 +212,7 @@
     </div>
 
     <textarea class="confirm-dialog__textarea" [(ngModel)]="suggestionText" rows="3"
-      placeholder="¿Algo que podamos mejorar? (opcional)"></textarea>
+      placeholder="¿Algo que podamos mejorar?"></textarea>
 
     <div class="confirm-dialog__actions">
       <button type="button" class="btn btn--ghost" (click)="finalizarPedido(false)">

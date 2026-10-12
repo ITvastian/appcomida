@@ -33,15 +33,26 @@
           {{ iniciandoTransferencia() ? 'Preparando...' : (solicitandoCuenta() ? 'Enviando...' : (cuentaSolicitada() ?
           'Cuenta solicitada' : 'Medios de pago')) }}
         </button>
+
         <div *ngIf="mediosPagoVisibles() && !cuentaSolicitada()" id="medios-pago" class="entrada__payment-methods">
-          <button class="btn btn--tertiary" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
-            (click)="pedirCuenta('Efectivo')">Efectivo</button>
-          <button class="btn btn--tertiary" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
-            (click)="pedirCuenta('Tarjeta')">Tarjeta</button>
-          <button class="btn btn--tertiary" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
-            (click)="pedirCuenta('Transferencia')">
-            {{ iniciandoTransferencia() ? 'Preparando...' : 'Transferencia' }}
-          </button>
+          <p class="payment-tray__title">¿Cómo querés pagar?</p>
+          <div class="payment-tray__grid">
+            <button class="pay-chip" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
+              (click)="pedirCuenta('Efectivo')">
+              <span class="pay-chip__icon" aria-hidden="true">💵</span>
+              <span>Efectivo</span>
+            </button>
+            <button class="pay-chip" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
+              (click)="pedirCuenta('Tarjeta')">
+              <span class="pay-chip__icon" aria-hidden="true">💳</span>
+              <span>Tarjeta</span>
+            </button>
+            <button class="pay-chip" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
+              (click)="pedirCuenta('Transferencia')">
+              <span class="pay-chip__icon" aria-hidden="true">🏦</span>
+              <span>{{ iniciandoTransferencia() ? 'Preparando...' : 'Transferencia' }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -56,25 +67,27 @@
         <h1>Revisá tu orden</h1>
         <p>Confirmá los datos antes de continuar con el pago.</p>
 
-        <dl class="entrada__order-meta">
-          <div>
-            <dt>Orden</dt>
-            <dd>{{ resumen.orderId }}</dd>
-          </div>
-          <div>
+        <div class="entrada__order-head">
+          <span class="entrada__order-id">Orden {{ resumen.orderId }}</span>
+          <span class="entrada__method-chip">
+            <span aria-hidden="true">🏦</span> Transferencia
+          </span>
+        </div>
+
+        <dl class="entrada__order-meta entrada__order-meta--three">
+          <div class="entrada__order-meta-main">
             <dt>Mesa</dt>
             <dd>{{ resumen.tableNumber }}</dd>
           </div>
-          <div>
-            <dt>Cliente</dt>
-            <dd>{{ resumen.customerName || resumen.order.customerName || 'No disponible' }}</dd>
-          </div>
-          <div>
+          <div class="entrada__order-meta-main">
             <dt>Para llevar</dt>
             <dd>{{ resumen.order.takeAway ? 'Sí' : 'No' }}</dd>
           </div>
+          <div class="entrada__order-meta-wide">
+            <dt>Cliente</dt>
+            <dd>{{ resumen.customerName || resumen.order.customerName || 'No disponible' }}</dd>
+          </div>
         </dl>
-
         <ul class="entrada__order-items">
           <li *ngFor="let item of resumen.order.items">
             <div class="entrada__order-item-heading">
