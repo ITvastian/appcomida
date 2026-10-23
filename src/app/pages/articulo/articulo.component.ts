@@ -1,5 +1,7 @@
 
-import { Component, OnInit, inject, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, EventEmitter, Input, Output, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RealtimeService } from 'src/app/core/services/realtime.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { ProductosService } from 'src/app/core/services/productos.service';
@@ -23,6 +25,8 @@ export class ArticuloComponent implements OnInit {
   cartService = inject(CartService);
   router = inject(Router);
   route = inject(ActivatedRoute);
+  realtimeService = inject(RealtimeService);
+  private destroyRef = inject(DestroyRef);
 
   producto?: Producto;
   cantidad: number = 1;
@@ -60,6 +64,30 @@ export class ArticuloComponent implements OnInit {
           console.log('No se encontró ningún producto para:', productId);
         });
       });
+    });
+
+    this.realtimeService
+      .menuChanges('productos')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refrescarProducto());
+  }
+
+  // Trae precio/extras actualizados y conserva los extras elegidos que sigan existiendo.
+  private refrescarProducto(): void {
+    const productoId = String(this.producto?._id || '').trim();
+    if (!productoId) {
+      return;
+    }
+
+    this.productosService.getById(productoId).subscribe((producto) => {
+      if (!producto?._id) {
+        return;
+      }
+      this.procesarExtras(producto);
+      this.producto = producto;
+      this.extrasSeleccionados = this.extrasSeleccionados
+        .map((elegido) => producto.extras.find((extra) => extra.name === elegido.name))
+        .filter((extra): extra is Extra => !!extra);
     });
   }
 

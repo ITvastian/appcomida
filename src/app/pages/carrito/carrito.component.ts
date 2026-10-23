@@ -3,6 +3,7 @@ import { ProductosService } from './../../core/services/productos.service';
 import { CommonModule } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   ElementRef,
   OnDestroy,
   ViewChild,
@@ -20,6 +21,8 @@ import { firstValueFrom, reduce } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ApiConfigService } from 'src/app/core/services/api-config.service';
+import { RealtimeService } from 'src/app/core/services/realtime.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-carrito',
@@ -36,6 +39,8 @@ export class CarritoComponent implements OnDestroy {
   tenantContextService = inject(TenantContextService);
   apiConfigService = inject(ApiConfigService);
   router = inject(Router);
+  realtimeService = inject(RealtimeService);
+  private destroyRef = inject(DestroyRef);
 
   productosCarrito: WritableSignal<
     (Producto & { cantidad: number; extras: any[]; notas?: string })[]
@@ -55,6 +60,9 @@ export class CarritoComponent implements OnDestroy {
 
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
   @ViewChild('tableDialog') tableDialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('errorDialog') errorDialog!: ElementRef<HTMLDialogElement>;
+  tituloErrorPedido = '';
+  mensajeErrorPedido = '';
   private readonly apiUrl = this.apiConfigService.api('/salon/order');
 
   // Cache de productos para evitar llamadas duplicadas
@@ -67,6 +75,53 @@ export class CarritoComponent implements OnDestroy {
       this.calcularinfo();
       this.cargandoCarrito.set(false);
     });
+
+    this.realtimeService
+      .menuChanges('productos')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.sincronizarConMenu());
+  }
+
+  // El servidor siempre cobra el precio actual: al cambiar el menú se recalcula el carrito
+  // y se sacan los productos que ya no existen, avisándole al cliente.
+  private async sincronizarConMenu(): Promise<void> {
+    let catalogo: Producto[];
+    try {
+      catalogo = await firstValueFrom(this.ProductosService.getAllProducts());
+    } catch (error) {
+      // Sin catálogo no se puede saber qué se borró; no tocar el carrito.
+      console.error('No se pudo sincronizar el carrito con el menú:', error);
+      return;
+    }
+
+    const existe = (id: string) =>
+      catalogo.some((p) => String(p._id).trim() === id || String(p.category).trim() === id);
+
+    const eliminados: string[] = [];
+    for (const item of [...this.CartService.carrito]) {
+      const id = String(item.idProd).trim();
+      if (!existe(id)) {
+        const nombre = this.productosCarrito().find((p) => String(p._id) === id)?.name
+          ?? this.productosCache[id]?.name;
+        eliminados.push(nombre || 'Un producto');
+        this.CartService.deleteProd(id);
+      }
+    }
+
+    this.productosCache = {};
+    for (const producto of catalogo) {
+      this.productosCache[String(producto._id).trim()] = producto;
+    }
+    await this.buscarInfo();
+
+    if (eliminados.length > 0) {
+      this.abrirDialogoAviso(
+        'Actualizamos el menú',
+        eliminados.length === 1
+          ? `${eliminados[0]} ya no está disponible y lo sacamos de tu pedido.`
+          : `Estos productos ya no están disponibles y los sacamos de tu pedido: ${eliminados.join(', ')}.`
+      );
+    }
   }
 
   ngOnDestroy(): void {
@@ -96,6 +151,31 @@ export class CarritoComponent implements OnDestroy {
     }
 
     return 0;
+  }
+
+  // Los extras guardados en localStorage solo identifican cuáles eligió el cliente (por nombre).
+  // El precio siempre sale del producto que devuelve la API; los que no existen en el producto se descartan.
+  private resolverExtrasDesdeProducto(extrasCarrito: any[] | undefined, producto: Producto): Extra[] {
+    if (!Array.isArray(extrasCarrito) || !Array.isArray(producto.extras)) {
+      return [];
+    }
+
+    const extrasProducto = new Map<string, Extra>();
+    for (const extra of producto.extras as any[]) {
+      const name = typeof extra === 'string' ? extra : extra?.name;
+      if (typeof name === 'string' && name.trim()) {
+        extrasProducto.set(name.trim(), { name: name.trim(), price: this.getExtraPrice(extra) });
+      }
+    }
+
+    const resueltos: Extra[] = [];
+    for (const extra of extrasCarrito) {
+      const encontrado = extrasProducto.get(this.getExtraName(extra).trim());
+      if (encontrado && !resueltos.some((e) => e.name === encontrado.name)) {
+        resueltos.push(encontrado);
+      }
+    }
+    return resueltos;
   }
 
   getExtrasWithPrice(extras: any[]): any[] {
@@ -159,7 +239,7 @@ export class CarritoComponent implements OnDestroy {
           photoUrl: producto.photoUrl,
           ingredients: producto.ingredients,
           cantidad: itemCarrito.cantidad,
-          extras: itemCarrito.extras || [],
+          extras: this.resolverExtrasDesdeProducto(itemCarrito.extras, producto),
           notas: itemCarrito.notas || '',
         };
 
@@ -256,13 +336,11 @@ export class CarritoComponent implements OnDestroy {
             name: producto.name,
             quantity: itemCarrito.cantidad,
             price: producto.price,
-            extras: Array.isArray(itemCarrito.extras)
-              ? itemCarrito.extras.map((extra) => ({
-                name: this.getExtraName(extra),
-                price: this.getExtraPrice(extra),
-                quantity: 1,
-              }))
-              : [],
+            extras: this.resolverExtrasDesdeProducto(itemCarrito.extras, producto).map((extra) => ({
+              name: extra.name,
+              price: extra.price,
+              quantity: 1,
+            })),
           });
         }
       } catch (error) {
@@ -290,7 +368,12 @@ export class CarritoComponent implements OnDestroy {
       return true;
     } catch (err) {
       console.error('Error al enviar la orden:', err);
-      this.abrirDialogoMesa('Error al enviar la orden. Intenta de nuevo.');
+      const mensajeBackend = (err as any)?.error?.message ?? (err as any)?.error?.error;
+      this.abrirDialogoError(
+        typeof mensajeBackend === 'string' && mensajeBackend.trim()
+          ? mensajeBackend
+          : 'Error al enviar la orden. Intenta de nuevo.'
+      );
       return false;
     }
   }
@@ -388,6 +471,23 @@ export class CarritoComponent implements OnDestroy {
       this.dialog.nativeElement.close();
     }
     this.tableDialog?.nativeElement?.showModal();
+  }
+
+  abrirDialogoError(mensaje: string) {
+    this.abrirDialogoAviso('No pudimos enviar tu pedido', mensaje);
+  }
+
+  private abrirDialogoAviso(titulo: string, mensaje: string) {
+    this.tituloErrorPedido = titulo;
+    this.mensajeErrorPedido = mensaje;
+    if (this.dialog?.nativeElement?.open) {
+      this.dialog.nativeElement.close();
+    }
+    this.errorDialog?.nativeElement?.showModal();
+  }
+
+  cerrarDialogoError() {
+    this.errorDialog.nativeElement.close();
   }
 
   cancelarIngresoMesa() {

@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, AfterViewInit, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
-import { BannerService } from '../../services/banner.service';
 import { UiConfigService } from '../../services/ui-config.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ApiConfigService } from '../../services/api-config.service';
-import { TenantContextService } from '../../services/tenant-context.service';
 
 @Component({
   selector: 'app-carrusel',
@@ -18,20 +15,14 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   fotos: Array<{ url: string }> = [];
   clonedFotos: Array<{ url: string }> = [];
   intervalId: any;
-  websocket: any;
   private slidesElement: HTMLElement | null = null;
   private currentIndex = 0;
   private destroy$ = new Subject<void>();
-  private reconnectTimer: any;
-  private shouldReconnect = true;
 
   constructor(
     private elementRef: ElementRef,
     private cdr: ChangeDetectorRef,
-    private bannerService: BannerService,
-    private uiConfigService: UiConfigService,
-    private apiConfigService: ApiConfigService,
-    private tenantContextService: TenantContextService
+    private uiConfigService: UiConfigService
   ) { }
 
   ngOnInit() {
@@ -59,56 +50,7 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
         this.resetCarouselPosition();
         this.cdr.detectChanges();
       });
-
-    // 📡 Conectar WebSocket para actualizaciones en tiempo real
-    this.conectarWebSocket();
-  }
-
-  conectarWebSocket() {
-    const tenantId = this.tenantContextService.getTenantId();
-    if (!tenantId) {
-      return;
-    }
-
-    if (!this.shouldReconnect) {
-      return;
-    }
-
-    if (
-      this.websocket &&
-      (this.websocket.readyState === WebSocket.OPEN || this.websocket.readyState === WebSocket.CONNECTING)
-    ) {
-      return;
-    }
-
-    this.websocket = new WebSocket(this.apiConfigService.ws());
-
-    this.websocket.onopen = () => {
-      console.log('✅ WebSocket conectado');
-    };
-
-    this.websocket.onmessage = (event: any) => {
-      const data = JSON.parse(event.data);
-
-      // ✅ Cambio: Ahora recibe 'banners' (array) en lugar de 'imageUrl'
-      if (data.type === 'banner_updated' && data.banners) {
-        console.log(`🖼️ Banners actualizados - Slot ${data.slot}:`, data.banners[data.slot]?.imageUrl);
-        this.bannerService.updateBannersFromWebSocket(data.banners);
-      }
-    };
-
-    this.websocket.onerror = (error: any) => {
-      console.error('❌ Error WebSocket:', error);
-    };
-
-    this.websocket.onclose = () => {
-      if (!this.shouldReconnect) {
-        return;
-      }
-
-      console.log('🔴 WebSocket desconectado - Reconectando...');
-      this.reconnectTimer = setTimeout(() => this.conectarWebSocket(), 3000);
-    };
+    // Las actualizaciones en tiempo real llegan vía BannerService (RealtimeService).
   }
 
   ngAfterViewInit() {
@@ -164,17 +106,8 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.shouldReconnect = false;
     this.destroy$.next();
     this.destroy$.complete();
-
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-    }
-
-    if (this.websocket) {
-      this.websocket.close();
-    }
     this.stopAutoSlide();
   }
 }

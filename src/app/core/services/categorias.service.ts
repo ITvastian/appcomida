@@ -92,13 +92,4 @@ export class CategoriasService {
       })
     );
   }
-
-  // Crear categoría en API
-  create(categoria: Categoria): Observable<any> {
-    const tenantId = this.obtenerTenantId();
-    return this.http.post(`${this.apiUrl}/categorias`, {
-      ...categoria,
-      tenantId,
-    });
-  }
 }

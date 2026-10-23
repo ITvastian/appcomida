@@ -16,24 +16,6 @@
               <p class="negrita nombre-producto">{{ item.name }}</p>
               <p class="negrita precio-producto">${{ formatPrice(item.price) }}</p>
             </div>
-
-            <!-- 
-            <p *ngIf="item.notas" id="notas-carrito">{{ item.notas }}</p>
-
-            <ul class="extras-grid">
-              <li *ngFor="let extra of getExtrasWithPrice(item.extras)" class="extra-fila">
-                <span id="extra-nombre">{{ getExtraName(extra) }}</span>
-                <span id="precio-extra">${{ formatPrice(getExtraPrice(extra)) }}</span>
-              </li>
-            </ul>
-
-            <div class="acciones-item">
-              <app-contador-cantidad [cantidadInicial]="item.cantidad"
-                (cantidadNueva)="cambiarProductoCantidad(item._id,$event)"></app-contador-cantidad>
-              <button (click)="eliminarProd(item._id)" class="borrar">
-                <img src="../../../assets/icons/borrarr.png" alt="" width="20px" />
-              </button>
-            </div> -->
             <p *ngIf="item.notas" class="item-notas">{{ item.notas }}</p>
 
             <ul class="extras-grid">
@@ -55,50 +37,13 @@
           </div>
         </div>
       </div>
-      <!-- <div class="flex-mas">
-        <a id="mas" [routerLink]="['/home']" routerLinkActive="router-link-active"><img
-            src="../../../assets/img/mano.png" alt=""></a>
-      </div> -->
+
       <a class="agregar-mas" [routerLink]="['/home']">
         <span aria-hidden="true">+</span> Agregar más productos
       </a>
 
       <div class="resumen-final">
-        <!-- <section class="margenChico" id="informacion">
-          <h3>Información:</h3>
-          <div class="flexApart" id="envioContainer" [class.perfil-incompleto-alerta]="perfilIncompletoAlert()">
-            <div>
-              <ng-container *ngIf="perfilService.perfil(); else sinDatosEnvio">
-                <h4>{{ perfilService.perfil()!.nombre }}</h4>
-                <p>
-                  {{ entrega }}
-                </p>
-                <p>{{ perfilService.perfil()!.detalleEntrega }}</p>
-              </ng-container>
-              <ng-template #sinDatosEnvio>
-                <p>Ingresa tus datos</p>
-              </ng-template>
-            </div>
-            <div id="edit-container">
-              <a href="" [routerLink]="['/perfil']" routerLinkActive="router-link-active">
-                <img src="../../../assets/icons/lapizz.png" alt="editar" />
-              </a>
-            </div>
-          </div>
-          <div id="totales" class="flexApart">
-            <div>
-              <p class="subtitle-negrita">Subtotal</p>
-              <p class="extras-negrita">Extras</p>
-              <p class="negrita">Total</p>
-            </div>
-            <div id="montos">
-              <p>${{ formatPrice(subtotal) }}</p>
-              <p>${{ formatPrice(extraTotal) }}</p>
-              <p>${{ formatPrice(total) }}</p>
-            </div>
 
-          </div>
-        </section> -->
         <section class="margenChico" id="informacion">
           <h3>Información:</h3>
 
@@ -143,9 +88,6 @@
           </div>
         </section>
         <div class="pedido-footer">
-          <!-- <button id="enviar" (click)="abrirConfirmacionPedido()">
-            Realizar pedido
-          </button> -->
           <button id="enviar" type="button" (click)="abrirConfirmacionPedido()">
             Realizar pedido · ${{ formatPrice(total) }}
           </button>
@@ -162,25 +104,6 @@
   <img src="../../../assets/icons/cart.png" alt="" class="animated-image" />
 </ng-template>
 
-
-<!-- <dialog method="modal" #dialog class="app-dialog confirm-dialog">
-  <p class="confirm-dialog__title">¿Pudiste realizar el pedido?</p>
-  <div class="confirm-dialog__actions">
-    <button type="button" class="confirm-dialog__btn confirm-dialog__btn--yes" (click)="finalizarPedido()">Si</button>
-    <button type="button" class="confirm-dialog__btn confirm-dialog__btn--no" (click)="editarPedido()">No</button>
-  </div>
-  <div class="rating">
-    <p>Califica la app:</p>
-    <div class="stars">
-      <span class="star" *ngFor="let star of stars; let i = index" [class.filled]="i < rating || i < hoverIndex"
-        (click)="rate(i + 1)" (mouseover)="hover(i + 1)" (mouseleave)="hover(0)">☆</span>
-    </div>
-  </div>
-  <div class="suggestions">
-    <p>Sugerencias:</p>
-    <textarea [(ngModel)]="suggestionText" rows="3" placeholder="Escribe tus sugerencias aquí"></textarea>
-  </div>
-</dialog> -->
 <dialog #dialog class="app-dialog confirm-dialog">
   <!-- PASO 1 -->
   <section *ngIf="paso === 1" class="confirm-dialog__step">
@@ -252,6 +175,24 @@
 
     <button type="button" class="table-dialog__btn table-dialog__btn--save" (click)="confirmarNumeroMesa()">
       Continuar
+    </button>
+  </div>
+
+</dialog>
+
+<dialog method="modal" #errorDialog class="app-dialog table-dialog">
+
+  <p class="table-dialog__title">
+    {{ tituloErrorPedido }}
+  </p>
+
+  <p class="table-dialog__text">
+    {{ mensajeErrorPedido }}
+  </p>
+
+  <div class="table-dialog__actions">
+    <button type="button" class="table-dialog__btn table-dialog__btn--save" (click)="cerrarDialogoError()">
+      Entendido
     </button>
   </div>
 

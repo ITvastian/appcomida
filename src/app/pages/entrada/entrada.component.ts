@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AvatarService } from 'src/app/core/services/avatar.service';
 import { PerfilService } from 'src/app/core/services/perfil.service';
 import { PaymentsService, TransferInitializationResponse } from 'src/app/core/services/payments.service';
+import { RealtimeService } from 'src/app/core/services/realtime.service';
 import { TenantContextService } from 'src/app/core/services/tenant-context.service';
 import { WaiterRequestsService } from 'src/app/core/services/waiter-requests.service';
 
@@ -25,6 +27,8 @@ export class EntradaComponent implements OnDestroy {
   private readonly avatarService = inject(AvatarService);
   private readonly tenantContextService = inject(TenantContextService);
   private readonly route = inject(ActivatedRoute);
+  private readonly realtimeService = inject(RealtimeService);
+  private readonly destroyRef = inject(DestroyRef);
   solicitandoMozo = signal(false);
   solicitandoCuenta = signal(false);
   iniciandoTransferencia = signal(false);
@@ -45,8 +49,22 @@ export class EntradaComponent implements OnDestroy {
 
   ngOnInit(): void {
     this.hidratarContextoDesdeQr();
+    // Con el tenant del QR ya guardado, (re)abre el canal en tiempo real del local.
+    this.realtimeService.conectar();
     this.actualizarDisponibilidadMesa();
     this.cargarAvatarActual();
+
+    this.realtimeService
+      .on('avatar_updated')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event.imageUrl) {
+          this.avatarUrl.set(RealtimeService.conVersion(event.imageUrl, event.timestamp));
+        }
+      });
+    this.realtimeService.resync$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cargarAvatarActual());
   }
 
   ngOnDestroy(): void {

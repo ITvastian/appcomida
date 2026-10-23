@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TenantContextService } from './tenant-context.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ApiConfigService } from './api-config.service';
+import { RealtimeService } from './realtime.service';
 
 export interface TitleHeader {
   id?: string;
@@ -24,10 +25,22 @@ export class TitleHeaderService {
     private http: HttpClient,
     private tenantContextService: TenantContextService,
     private firestore: AngularFirestore,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private realtimeService: RealtimeService
   ) {
     this.apiUrl = this.apiConfigService.api('/title-header/current');
     this.loadTitle();
+
+    this.realtimeService
+      .on('header_title_updated')
+      .subscribe((event) => {
+        this.updateTitleFromWebSocket({
+          title: event.title ?? '',
+          isActive: event.isActive === true,
+          updatedAt: event.timestamp,
+        });
+      });
+    this.realtimeService.resync$.subscribe(() => this.loadTitle());
   }
 
   private getCacheKey(tenantId: string): string {

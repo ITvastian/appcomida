@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TenantContextService } from './tenant-context.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ApiConfigService } from './api-config.service';
+import { RealtimeService } from './realtime.service';
 
 export interface Banner {
   imageUrl: string;
@@ -25,10 +26,16 @@ export class BannerService {
     private http: HttpClient,
     private tenantContextService: TenantContextService,
     private firestore: AngularFirestore,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private realtimeService: RealtimeService
   ) {
     this.apiUrl = this.apiConfigService.api('/banner/current');
     this.loadBanners();
+
+    this.realtimeService
+      .on('banner_updated')
+      .subscribe((event) => this.updateBannersFromWebSocket(event.banners, event.timestamp));
+    this.realtimeService.resync$.subscribe(() => this.loadBanners());
   }
 
   private getCacheKey(tenantId: string): string {
@@ -172,14 +179,17 @@ export class BannerService {
     return this.banners$.asObservable();
   }
 
-  updateBannersFromWebSocket(rawBanners: unknown): void {
+  updateBannersFromWebSocket(rawBanners: unknown, timestamp?: string): void {
     const tenantId = this.tenantContextService.getTenantId();
     if (!tenantId) {
       this.banners$.next([]);
       return;
     }
 
-    const banners = this.normalizeBanners(rawBanners);
+    const banners = this.normalizeBanners(rawBanners).map((banner) => ({
+      ...banner,
+      imageUrl: RealtimeService.conVersion(banner.imageUrl, timestamp),
+    }));
     if (banners.length === 0) {
       return;
     }

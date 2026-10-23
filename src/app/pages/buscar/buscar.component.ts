@@ -5,6 +5,7 @@ import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Busqueda } from 'src/app/core/interface/busqueda';
 import { HeaderService } from 'src/app/core/services/header.service';
+import { RealtimeService } from 'src/app/core/services/realtime.service';
 import { TarjetaProductoComponent } from 'src/app/core/components/tarjeta-producto/tarjeta-producto.component';
 import { RouterModule } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
@@ -20,7 +21,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class BuscarComponent implements OnInit, OnDestroy {
   headerService = inject(HeaderService);
   productosService = inject(ProductosService);
-  
+  realtimeService = inject(RealtimeService);
+
   productos: Producto[] = [];
   productosCompletos: Producto[] = []; // Todos los productos cargados
 
@@ -50,13 +52,18 @@ export class BuscarComponent implements OnInit, OnDestroy {
       });
 
     this.subscriptions.push(searchSubscription);
+
+    this.subscriptions.push(
+      this.realtimeService.menuChanges('productos').subscribe(() => this.cargarTodosLosProductos())
+    );
   }
 
   cargarTodosLosProductos() {
     const allProductsSubscription = this.productosService.getAllProducts().subscribe({
       next: (productos) => {
         this.productosCompletos = productos;
-        this.productos = productos;
+        // Mantener el filtro que el cliente ya escribió.
+        this.filtrarLocalmente(this.parametrosBusqueda.texto);
       },
       error: (err) => console.error('Error fetching all products:', err)
     });

@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { CategoriasService } from './../../core/services/categorias.service';
-import { Component, inject, OnDestroy, OnInit, signal, WritableSignal, computed } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, WritableSignal, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RealtimeService } from 'src/app/core/services/realtime.service';
 import { TarjetaCategoryComponent } from 'src/app/core/components/tarjeta-category/tarjeta-category.component';
 import { Categoria } from 'src/app/core/interface/categorias';
 import { HeaderService } from 'src/app/core/services/header.service';
@@ -23,6 +25,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   categoriasService = inject(CategoriasService);
   location = inject(Location);
   router = inject(Router);
+  realtimeService = inject(RealtimeService);
+  private destroyRef = inject(DestroyRef);
   categorias: WritableSignal<Categoria[]> = signal([]);
   textoBusqueda = signal('');
   cargandoCategorias = signal(true);
@@ -42,6 +46,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.headerService.titulo.set('');
     this.headerService.extendido.set(true);
     this.cargarCategorias();
+
+    this.realtimeService
+      .menuChanges('categorias')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.recargarCategoriasEnSegundoPlano());
+  }
+
+  // Sin spinner: el cliente ya está viendo el menú, solo se reemplaza al llegar.
+  private recargarCategoriasEnSegundoPlano() {
+    this.categoriasService.getAll().subscribe({
+      next: (res: Categoria[]) => {
+        this.categorias.set(res);
+        this.errorCategorias.set(false);
+      },
+      error: (err: any) => console.error('Error recargando categorías:', err),
+    });
   }
 
   cargarCategorias() {

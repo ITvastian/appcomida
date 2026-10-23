@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { Cart } from '../interface/carrito';
 import { Extra } from '../interface/productos'; // Asegúrate de que la ruta sea correcta
 
+// Límites que valida el backend en POST /salon/order
+export const MAX_CANTIDAD_POR_ITEM = 50;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -38,14 +41,14 @@ export class CartService {
     if (i === -1) {
       const nuevoProd: Cart = { 
         idProd: idNormalizado,
-        cantidad: cantidad,
+        cantidad: Math.min(cantidad, MAX_CANTIDAD_POR_ITEM),
         notas: notas,
         extras: extras, // Aquí pasas los `extras` directamente
         precio: 0 // Asegúrate de actualizar el precio más tarde si es necesario
       };
       this.carrito.push(nuevoProd);
     } else {
-      this.carrito[i].cantidad += cantidad;
+      this.carrito[i].cantidad = Math.min(this.carrito[i].cantidad + cantidad, MAX_CANTIDAD_POR_ITEM);
       this.carrito[i].extras = extras; // Actualiza los `extras` si ya existe el producto
       this.carrito[i].notas = notas;
     }

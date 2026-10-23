@@ -1,4 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RealtimeService } from 'src/app/core/services/realtime.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { WritableSignal, signal } from '@angular/core';
 import { CategoriasService } from 'src/app/core/services/categorias.service';
@@ -25,6 +27,8 @@ export class RubroComponent implements OnInit {
   categoryName = signal('');
   titleActive = signal(false);
   ac = inject(ActivatedRoute);
+  realtimeService = inject(RealtimeService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     // Obtener estado de titleActive de Firestore
@@ -46,6 +50,15 @@ export class RubroComponent implements OnInit {
 
       this.cargarProductosPorCategoria(categoryParam, categoryNameFromQuery);
     });
+
+    this.realtimeService
+      .menuChanges('productos')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        const categoryParam = String(this.ac.snapshot.params['id'] || '').trim();
+        const categoryNameFromQuery = this.ac.snapshot.queryParamMap.get('name')?.trim() || '';
+        this.cargarProductosPorCategoria(categoryParam, categoryNameFromQuery);
+      });
   }
 
   private cargarProductosPorCategoria(categoryParam: string, categoryNameFromQuery: string): void {

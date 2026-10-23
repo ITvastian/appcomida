@@ -8,8 +8,6 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { takeUntil } from 'rxjs/operators';
-import { ApiConfigService } from '../../services/api-config.service';
-import { TenantContextService } from '../../services/tenant-context.service';
 
 @Component({
   selector: 'app-header',
@@ -25,8 +23,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   uiConfigService = inject(UiConfigService);
   router = inject(Router);
   location = inject(Location);
-  apiConfigService = inject(ApiConfigService);
-  tenantContextService = inject(TenantContextService);
 
   claseAplicada = signal('');
   tituloMostrado = signal('');
@@ -35,10 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   titleActive = signal(false); // Estado del título personalizado
   isHomeRoute = signal(false);
 
-  websocket: any;
   private destroy$ = new Subject<void>();
-  private reconnectTimer: any;
-  private shouldReconnect = true;
 
   esconderTitulo = effect(
     () => {
@@ -69,9 +62,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.tituloBackend.set(uiConfig.headerTitle);
         this.titleActive.set(uiConfig.headerTitleActive);
       });
-
-    // Conectar WebSocket para actualizaciones en tiempo real
-    this.conectarWebSocket();
+    // Las actualizaciones en tiempo real llegan vía HeaderBackgroundService/TitleHeaderService (RealtimeService).
   }
   volverAtras() {
     if (this.isHomeRoute()) {
@@ -85,64 +76,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
     this.router.navigateByUrl('/home');
   }
-  conectarWebSocket() {
-    const tenantId = this.tenantContextService.getTenantId();
-    if (!tenantId) {
-      return;
-    }
-
-    if (!this.shouldReconnect) {
-      return;
-    }
-
-    if (
-      this.websocket &&
-      (this.websocket.readyState === WebSocket.OPEN || this.websocket.readyState === WebSocket.CONNECTING)
-    ) {
-      return;
-    }
-
-    this.websocket = new WebSocket(this.apiConfigService.ws());
-
-    this.websocket.onopen = () => {
-      console.log('WebSocket conectado para header');
-    };
-
-    this.websocket.onmessage = (event: any) => {
-      const data = JSON.parse(event.data);
-
-      // Escuchar evento de actualizacion de fondo del header
-      if (data.type === 'title_background_updated' && data.imageUrl) {
-        console.log('Fondo del header actualizado:', data.imageUrl);
-        this.headerBackgroundService.updateBackgroundFromWebSocket(data.imageUrl);
-      }
-
-      // Escuchar evento de actualizacion de título del header
-      if (data.type === 'header_title_updated' && data.title) {
-        console.log('Título del header actualizado desde WebSocket:', data.title, '- Activo:', data.isActive);
-        const titleData = {
-          title: data.title,
-          isActive: data.isActive,
-          updatedAt: data.timestamp || data.updatedAt
-        };
-        this.titleHeaderService.updateTitleFromWebSocket(titleData);
-      }
-    };
-
-    this.websocket.onerror = (error: any) => {
-      console.error('Error WebSocket Header:', error);
-    };
-
-    this.websocket.onclose = () => {
-      if (!this.shouldReconnect) {
-        return;
-      }
-
-      console.log('WebSocket Header desconectado - Reconectando...');
-      this.reconnectTimer = setTimeout(() => this.conectarWebSocket(), 3000);
-    };
-  }
-
   mostrarTituloNuevo(e: AnimationEvent) {
     if (e.animationName.includes('fade-out')) {
       this.tituloMostrado.set(this.headerService.titulo());
@@ -171,16 +104,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.shouldReconnect = false;
     this.destroy$.next();
     this.destroy$.complete();
-
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-    }
-
-    if (this.websocket) {
-      this.websocket.close();
-    }
   }
 }

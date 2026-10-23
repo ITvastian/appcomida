@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TenantContextService } from './tenant-context.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ApiConfigService } from './api-config.service';
+import { RealtimeService } from './realtime.service';
 
 export interface TitleBackground {
   id?: string;
@@ -30,10 +31,20 @@ export class HeaderBackgroundService {
     private http: HttpClient,
     private tenantContextService: TenantContextService,
     private firestore: AngularFirestore,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private realtimeService: RealtimeService
   ) {
     this.apiUrl = this.apiConfigService.api('/title-background/current');
     this.loadBackground();
+
+    this.realtimeService
+      .on('title_background_updated')
+      .subscribe((event) => {
+        if (event.imageUrl) {
+          this.updateBackgroundFromWebSocket(RealtimeService.conVersion(event.imageUrl, event.timestamp));
+        }
+      });
+    this.realtimeService.resync$.subscribe(() => this.loadBackground());
   }
 
   private getCacheKey(tenantId: string): string {

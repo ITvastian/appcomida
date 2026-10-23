@@ -54,15 +54,6 @@ h2 {
   border-radius: variables.$border-radius-mediano;
 }
 
-// .flex-mas {
-//   #mas {
-//     img {
-//       width: 35px;
-//     }
-//   }
-// }
-
-
 .contenido {
   width: 75%;
   min-width: 0;
@@ -105,24 +96,6 @@ h2 {
   min-height: 18px;
 }
 
-// #extra-nombre,
-// #precio-extra {
-//   margin: 0;
-//   line-height: 18px;
-// }
-
-// #extra-nombre {
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   white-space: nowrap;
-// }
-
-// #precio-extra {
-//   text-align: right;
-//   font-weight: 700;
-//   color: #8f3f20;
-// }
-
 .acciones-item {
   margin-top: auto;
   display: flex;
@@ -132,34 +105,10 @@ h2 {
   padding-top: 2px;
 }
 
-// .borrar {
-//   min-width: 40px;
-//   min-height: 40px;
-//   display: inline-flex;
-//   align-items: center;
-//   justify-content: center;
-//   background-color: rgba(255, 255, 255, 0.55);
-//   border: 1px solid rgba(181, 110, 82, 0.24);
-//   border-radius: 10px;
-//   cursor: pointer;
-//   padding: 4px;
-// }
-
-// #mas {
-//   font-size: xx-large;
-//   text-decoration: none;
-//   color: #2c160d;
-//   background: linear-gradient(180deg, #fff3e9 0%, #ffe6d6 100%);
-//   border: 1px solid rgba(192, 114, 82, 0.24);
-//   padding: 5px 15px;
-//   border-radius: variables.$border-radius-mediano;
-// }
-
 #informacion {
   font-size: larger;
   padding-bottom: 0;
   margin-bottom: 0;
-
 }
 
 /* Producto: notas y extras */
@@ -366,19 +315,6 @@ h2 {
   }
 }
 
-// #envioContainer {
-//   background: linear-gradient(180deg, #fff4ea 0%, #ffe9dc 100%);
-//   border-radius: variables.$border-radius-mediano;
-//   border: 1px solid rgba(192, 122, 92, 0.2);
-//   padding: 12px;
-//   margin: 10px 0;
-
-//   h4 {
-//     font-size: 1.05rem;
-//     align-items: center;
-//   }
-// }
-
 .perfil-incompleto-alerta {
   animation: perfilIncompletoPulse 3s ease-in-out 1;
 }
@@ -400,28 +336,6 @@ h2 {
     box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.18);
   }
 }
-
-
-// #montos {
-//   display: flex;
-//   flex-direction: column;
-//   gap: 12px;
-//   text-align: end;
-// }
-
-// #totales>div {
-//   display: flex;
-//   flex-direction: column;
-//   gap: 12px;
-// }
-
-// #totales {
-//   align-items: flex-start;
-// }
-
-// #totales #montos {
-//   min-width: 96px;
-// }
 
 #enviar {
   display: block;
@@ -446,10 +360,6 @@ h2 {
 .resumen-final {
   margin-top: auto;
 }
-
-// div#edit-container {
-//   width: 25px;
-// }
 
 dialog::backdrop {
   background: rgba(44, 22, 13, 0.46);
@@ -490,12 +400,6 @@ dialog::backdrop {
   transform: translateY(-50%);
 }
 
-// .subtitle-negrita,
-// .extras-negrita {
-//   font-weight: 500;
-//   font-size: medium;
-// }
-
 @media (max-width: 420px) {
   .tarjetaProdContainer {
     min-height: 132px;
@@ -516,17 +420,10 @@ dialog::backdrop {
     gap: 6px;
   }
 
-  // #extra-nombre,
-  // #precio-extra,
   .nombre-producto,
   .precio-producto {
     font-size: 13px;
   }
-
-  // #notas-carrito {
-  //   font-size: 12px;
-  //   line-height: 1.2;
-  // }
 
   .pedido-footer {
     margin: 20px 8px 10px;
@@ -601,20 +498,6 @@ dialog::backdrop {
   background: linear-gradient(180deg, #8fd17b 0%, #67b856 100%);
   color: #13270d;
 }
-
-// @media (max-width: 420px) {
-//   .app-dialog {
-//     padding: 16px;
-//   }
-
-//   .confirm-dialog__title {
-//     font-size: 1.03rem;
-//   }
-
-//   .table-dialog__btn {
-//     font-size: 0.92rem;
-//   }
-// }
 
 .confirm-dialog {
   border: none;
