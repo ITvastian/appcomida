@@ -19,6 +19,12 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
   private currentIndex = 0;
   private destroy$ = new Subject<void>();
 
+  // clonedFotos = [última, ...fotos]: el índice 0 es el clon de la última foto.
+  get dotActivo(): number {
+    const n = this.fotos.length;
+    return n === 0 ? 0 : (this.currentIndex - 1 + n) % n;
+  }
+
   constructor(
     private elementRef: ElementRef,
     private cdr: ChangeDetectorRef,
@@ -82,7 +88,7 @@ export class CarruselComponent implements OnInit, AfterViewInit, OnDestroy {
         this.slidesElement.style.transition = 'none';
         this.slidesElement.style.transform = 'translateX(0)';
       } else {
-        this.slidesElement.style.transition = 'transform 0.5s ease-in-out';
+        this.slidesElement.style.transition = 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)';
         this.slidesElement.style.transform = `translateX(-${this.currentIndex * 100}%)`;
       }
     }, 3000);

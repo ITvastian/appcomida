@@ -1,33 +1,26 @@
-// app-tabs{
-//   // margin-top: auto;
-//   position:fixed;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-// }
-*{
-  user-select: none;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-#container{
+#container {
+  position: relative;
   height: 100svh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: transparent;
 }
-app-tabs{
-  margin-top: auto;
-  z-index: 25;
-}
-main{
-  flex: 1;
-  overflow-y: scroll;
-  padding-bottom: 6px;
 
+main {
+  position: relative;
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
 }
-main::-webkit-scrollbar {
-  display: none;
+
+app-header {
+  flex: none;
+  z-index: 30;
+}
+
+// La tabbar flota sobre el contenido; el padding evita que tape lo último.
+#container.con-tabs main {
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 8px);
 }

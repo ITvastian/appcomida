@@ -1,7 +1,7 @@
-<div id="container">
+<div id="container" [class.con-tabs]="mostrarTabs">
   <app-header *ngIf="mostrarHeader" />
-  <main>
-    <router-outlet />
+  <main [@routeAnimations]="ordenDeRuta(outlet)" #main>
+    <router-outlet #outlet="outlet" />
   </main>
   <app-tabs *ngIf="mostrarTabs" />
 </div>

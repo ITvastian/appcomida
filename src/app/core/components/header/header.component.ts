@@ -77,10 +77,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('/home');
   }
   mostrarTituloNuevo(e: AnimationEvent) {
-    if (e.animationName.includes('fade-out')) {
+    if (e.animationName.includes('titulo-out')) {
       this.tituloMostrado.set(this.headerService.titulo());
       this.claseAplicada.set('fade-in');
-      setTimeout(() => this.claseAplicada.set(''), 250);
+      setTimeout(() => this.claseAplicada.set(''), 550);
     }
   }
 

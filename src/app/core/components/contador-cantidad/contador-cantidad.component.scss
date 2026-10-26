@@ -1,35 +1,52 @@
-@use '../../../../assets/styles/variables.scss';
-$width: 92px;
-
-#container {
-  display: flex;
-  justify-content: space-between;
-  width: $width;
+.stepper {
+  display: inline-flex;
   align-items: center;
-  background: #fff2e8;
-  border-radius: variables.$border-radius-mediano;
-  overflow: hidden;
-  border: 1px solid rgba(185, 113, 85, 0.28);
-  box-shadow: 0 3px 10px rgba(86, 36, 17, 0.12);
+  gap: 2px;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--surface-2);
 
   span {
-    color: variables.$color-texto;
-    font-weight: 700;
+    min-width: 24px;
+    text-align: center;
+    font-weight: 800;
     font-size: 0.95rem;
+    animation: numero-pop 340ms var(--ease-spring);
   }
 }
 
 button {
-  border: unset;
-  cursor: pointer;
-  font-weight: 800;
-  background: linear-gradient(180deg, #f5a082 0%, #f18b6d 100%);
-  color: white;
-  min-width: 28px;
-  min-height: 28px;
-  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: var(--surface);
+  box-shadow: var(--sh-1);
+
+  &:disabled {
+    opacity: 0.4;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
 }
 
-button[disabled] {
-  opacity: 0.45;
+@keyframes numero-pop {
+  from {
+    transform: translateY(-6px) scale(0.6);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
 }

@@ -1,11 +1,12 @@
-<section>
-  <form id="perfilForm" #formulario="ngForm" class="perfil-form" (ngSubmit)="guardarDatosPerfil(formulario)">
-    <header class="perfil-form__intro">
+<section class="perfil">
+  <form id="perfilForm" #formulario="ngForm" class="perfil-form stagger" (ngSubmit)="guardarDatosPerfil(formulario)">
+    <header class="perfil-form__intro" style="--i: 0">
+      <span class="eyebrow">Perfil</span>
       <h2>Tus datos</h2>
       <p>Los usamos para identificar tu pedido.</p>
     </header>
 
-    <div class="perfil-card">
+    <div class="perfil-card" style="--i: 1">
       <div class="field" [class.field--error]="nombre.invalid && nombre.touched">
         <label for="nombre">Nombre</label>
         <div class="field__control">
@@ -13,7 +14,7 @@
             <circle cx="12" cy="8" r="4" />
             <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
           </svg>
-          <input type="text" id="nombre" name="nombre" placeholder="¿Ingresa un nombre?" autocomplete="given-name"
+          <input type="text" id="nombre" name="nombre" placeholder="¿Cómo te llamás?" autocomplete="given-name"
             [(ngModel)]="perfil.nombre" #nombre="ngModel" minlength="3" required
             [attr.aria-invalid]="nombre.invalid && nombre.touched" />
         </div>
@@ -23,7 +24,7 @@
       </div>
 
       <div class="field">
-        <label for="notas"><span class="field__optional">(opcional)</span></label>
+        <label for="notas">Notas <span class="field__optional">(opcional)</span></label>
         <div class="field__control field__control--top">
           <svg class="field__icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5 4h14v16H5z" />
@@ -35,16 +36,18 @@
       </div>
     </div>
 
-    <label class="perfil-switch" for="takeAway">
+    <label class="perfil-switch" for="takeAway" style="--i: 2">
+      <span class="perfil-switch__emoji" aria-hidden="true">{{ perfil.takeAway ? '🥡' : '🍽️' }}</span>
       <span class="perfil-switch__text">
-        <strong>Take Away</strong>
-        <small>Lo retiro para llevar</small>
+        <strong>Para llevar</strong>
+        <small>{{ perfil.takeAway ? 'Lo retiro para llevar' : 'Lo como en la mesa' }}</small>
       </span>
       <input type="checkbox" id="takeAway" name="takeAway" [(ngModel)]="perfil.takeAway" />
       <span class="perfil-switch__track" aria-hidden="true"></span>
     </label>
   </form>
+
+  <div class="pedido-footer">
+    <button class="btn btn--primary" type="submit" form="perfilForm">Guardar y continuar</button>
+  </div>
 </section>
-<div class="pedido-footer">
-  <button type="submit" form="perfilForm">Enviar</button>
-</div>

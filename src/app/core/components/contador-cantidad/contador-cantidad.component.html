@@ -1,5 +1,9 @@
-<div id="container">
-  <button (click)="actualizarNum(1)">+</button>
-  <span>{{ numero() }}</span>
-  <button (click)="actualizarNum(-1)" [disabled]="numero() === 1">-</button>
+<div class="stepper" role="group" aria-label="Cantidad">
+  <button type="button" (click)="actualizarNum(-1)" [disabled]="numero() === 1" aria-label="Restar">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12" /></svg>
+  </button>
+  <span *ngFor="let n of [numero()]">{{ n }}</span>
+  <button type="button" (click)="actualizarNum(1)" aria-label="Sumar">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12" /></svg>
+  </button>
 </div>

@@ -1,7 +1,11 @@
-<header [ngClass]="{extendido:headerService.extendido()}"
-  [ngStyle]="{'background-image': 'url(' + backgroundImageUrl() + ')'}" class="header-with-background">
-  <button class="home-back" type="button" (click)="volverAtras()" aria-label="Volver">
-    &larr;
+<header [ngClass]="{ extendido: headerService.extendido() }" class="header">
+  <div class="header__fondo" [style.background-image]="backgroundImageUrl() ? 'url(' + backgroundImageUrl() + ')' : null">
+  </div>
+
+  <button class="header__back" type="button" (click)="volverAtras()" aria-label="Volver">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M15 5l-7 7 7 7" />
+    </svg>
   </button>
 
   <h1 [ngClass]="[claseAplicada(), !tituloVisible() ? 'sin-titulo' : '']" (animationend)="mostrarTituloNuevo($event)">

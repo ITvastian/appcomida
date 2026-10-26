@@ -1,18 +1,16 @@
-<article class="category-card" [ngStyle]="{
-    'background-image': categoria.photoUrl
-      ? 'url(' + categoria.photoUrl + ')'
-      : 'none'
-  }">
-  <h3>{{ categoria.name }}</h3>
-</article>
+<article class="card">
+  <img *ngIf="categoria.photoUrl; else sinFoto" class="card__foto" [src]="categoria.photoUrl" [alt]="categoria.name"
+    loading="lazy" />
+  <ng-template #sinFoto>
+    <div class="card__foto card__foto--vacia" aria-hidden="true"></div>
+  </ng-template>
 
-<!-- <div *ngIf="categorias.length > 0; else noCategorias">
-  <div *ngFor="let categoria of categorias">
-    <h2>{{ categoria.name }}</h2>
-    <img [src]="categoria.photoUrl" alt="{{ categoria.name }}" width="200">
+  <div class="card__info">
+    <h3>{{ categoria.name }}</h3>
+    <span class="card__flecha" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M9 5l7 7-7 7" />
+      </svg>
+    </span>
   </div>
-</div> -->
-
-<ng-template #noCategorias>
-  <p>No se encontraron categorías.</p>
-</ng-template>
+</article>

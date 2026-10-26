@@ -17,17 +17,17 @@
         <img [src]="url" alt="Atencion en mesa" (error)="onAvatarError()" />
       </ng-container>
     </figure>
-    <div class="entrada__card">
+    <div class="entrada__card rise-in">
       <h1>Bienvenido</h1>
-      <p>Elegi como queres continuar.</p>
+      <p>¿Cómo querés seguir?</p>
 
-      <div class="entrada__actions">
-        <a class="btn btn--primary" routerLink="/home">Ver menu</a>
-        <button class="btn btn--secondary" type="button" [class.btn--confirmed]="mozoAvisado()"
+      <div class="entrada__actions stagger">
+        <a class="btn btn--primary" routerLink="/home" style="--i: 1">Ver menú</a>
+        <button class="btn btn--secondary" style="--i: 2" type="button" [class.btn--confirmed]="mozoAvisado()"
           [disabled]="solicitandoMozo() || mozoAvisado()" (click)="solicitarMozo()">
           {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? 'Mozo avisado' : 'Solicitar mozo') }}
         </button>
-        <button class="btn btn--tertiary" type="button" [class.btn--confirmed]="cuentaSolicitada()"
+        <button class="btn btn--tertiary" style="--i: 3" type="button" [class.btn--confirmed]="cuentaSolicitada()"
           [disabled]="solicitandoCuenta() || iniciandoTransferencia() || cuentaSolicitada()"
           [attr.aria-expanded]="mediosPagoVisibles()" aria-controls="medios-pago" (click)="alternarMediosPago()">
           {{ iniciandoTransferencia() ? 'Preparando...' : (solicitandoCuenta() ? 'Enviando...' : (cuentaSolicitada() ?
@@ -63,7 +63,7 @@
       <button class="home-back" type="button" (click)="volverAtras()" aria-label="Volver">
         &larr;
       </button>
-      <div class="entrada__card entrada__payment-card" *ngIf="transferenciaResumen() as resumen">
+      <div class="entrada__card entrada__payment-card rise-in" *ngIf="transferenciaResumen() as resumen">
         <h1>Revisá tu orden</h1>
         <p>Confirmá los datos antes de continuar con el pago.</p>
 

@@ -1,181 +1,85 @@
-<div class="producto-page" *ngIf="producto">
-
-  <!-- IMAGEN -->
-  <div class="producto-image-wrapper">
-    <div *ngIf="producto.photoUrl; else noFoto" class="producto-image">
-      <img [src]="producto.photoUrl" [alt]="producto.name" />
-    </div>
-
+<div class="articulo" *ngIf="producto">
+  <div class="hero">
+    <img *ngIf="producto.photoUrl; else noFoto" class="hero__foto" [src]="producto.photoUrl" [alt]="producto.name" />
     <ng-template #noFoto>
-      <div class="no-foto">
-        <span>Sin imagen</span>
-      </div>
+      <div class="hero__foto hero__foto--vacia" aria-hidden="true"></div>
     </ng-template>
 
-    <!-- Botón volver -->
-    <button type="button" class="back-button" (click)="router.navigate(['/'])" aria-label="Volver">
-      ←
+    <button type="button" class="hero__back" (click)="volver()" aria-label="Volver">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 5l-7 7 7 7" />
+      </svg>
     </button>
-
-    <!-- Badge -->
-    <span class="badge-producto">
-      <span class="badge-dot"></span>
-      Más pedido
-    </span>
   </div>
 
+  <div class="hoja stagger">
+    <header class="hoja__head" style="--i: 0">
+      <h1>{{ producto.name }}</h1>
+      <span class="hoja__precio">${{ producto.price | number:'1.0-0':'es-AR' }}</span>
+    </header>
 
-  <!-- CONTENIDO -->
-  <div class="producto-content">
-
-    <!-- CABECERA -->
-    <div class="producto-header">
-
-      <div class="producto-info">
-
-        <span class="producto-categoria">
-          DETALLE DEL PRODUCTO
-        </span>
-
-        <h1 class="name-product">
-          {{ producto.name }}
-        </h1>
-
-      </div>
-
-      <div class="producto-precio">
-        ${{ producto.price | number:'1.2-2' }}
-      </div>
-
-    </div>
-
-
-    <!-- INGREDIENTES -->
-    <div class="descripcion-producto">
-
+    <p class="hoja__desc" style="--i: 1" *ngIf="producto.ingredients">
       <ng-container *ngIf="isArray(producto.ingredients); else textIngredients">
-        <span *ngFor="let ingrediente of producto.ingredients; let last = last">
-          {{ ingrediente }}<span *ngIf="!last">, </span>
-        </span>
+        <span *ngFor="let ingrediente of producto.ingredients; let last = last">{{ ingrediente }}<span
+            *ngIf="!last">, </span></span>
       </ng-container>
+      <ng-template #textIngredients>{{ producto.ingredients }}</ng-template>
+    </p>
 
-      <ng-template #textIngredients>
-        {{ producto.ingredients }}
-      </ng-template>
-
-    </div>
-
-
-    <!-- EXTRAS -->
-    <section class="extras-section" *ngIf="producto.extras && producto.extras.length > 0">
-
-      <div class="section-header">
-
+    <section class="bloque" style="--i: 2" *ngIf="producto.extras && producto.extras.length > 0">
+      <div class="bloque__head">
         <div>
-          <h2>Agrega extras</h2>
-          <span>Opcional · Selecciona hasta 3</span>
+          <h2>Agregá extras</h2>
+          <span>Opcional · hasta 3</span>
         </div>
-
-        <span class="extras-counter">
-          {{ extrasSeleccionados.length }} de 3
+        <span class="contador-extras" [class.contador-extras--lleno]="extrasSeleccionados.length >= 3">
+          {{ extrasSeleccionados.length }}/3
         </span>
-
       </div>
 
-
-      <div class="extras-list">
-
-        <label *ngFor="let extra of producto.extras" class="extra-card" [class.selected]="extraSeleccionado(extra)"
-          [class.disabled]="
-            !extraSeleccionado(extra) &&
-            extrasSeleccionados.length >= 3
-          ">
-
-          <input type="checkbox" [checked]="extraSeleccionado(extra)" [disabled]="
-              !extraSeleccionado(extra) &&
-              extrasSeleccionados.length >= 3
-            " (change)="actualizarExtrasSeleccionados(extra)" />
-
-          <div class="extra-info">
-
-            <strong>
-              {{ extra.name }}
-            </strong>
-
-            <span>
-              Extra {{ extra.name | lowercase }}
-            </span>
-
-          </div>
-
-          <div class="extra-right">
-
-            <span class="extra-price">
-              +${{ extra.price | number:'1.2-2' }}
-            </span>
-
-            <span class="check-circle">
-              ✓
-            </span>
-
-          </div>
-
+      <div class="extras">
+        <label *ngFor="let extra of producto.extras" class="extra" [class.extra--on]="extraSeleccionado(extra)"
+          [class.extra--off]="!extraSeleccionado(extra) && extrasSeleccionados.length >= 3">
+          <input type="checkbox" [checked]="extraSeleccionado(extra)"
+            [disabled]="!extraSeleccionado(extra) && extrasSeleccionados.length >= 3"
+            (change)="actualizarExtrasSeleccionados(extra)" />
+          <span class="extra__check" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          </span>
+          <span class="extra__nombre">{{ extra.name }}</span>
+          <span class="extra__precio">+${{ extra.price | number:'1.0-0':'es-AR' }}</span>
         </label>
-
       </div>
-
     </section>
 
-
-    <!-- NOTAS -->
-    <section class="notas-section">
-
-      <div class="section-header notas-header">
-
+    <section class="bloque" style="--i: 3">
+      <div class="bloque__head">
         <div>
           <h2>Notas para la cocina</h2>
           <span>Opcional</span>
         </div>
-
       </div>
-
-      <textarea id="notas" name="notas" [(ngModel)]="notas" placeholder="Ej. sin cebolla, aderezo aparte..."></textarea>
-
+      <textarea id="notas" name="notas" rows="3" [(ngModel)]="notas"
+        placeholder="Ej. sin cebolla, aderezo aparte..."></textarea>
     </section>
-
-
-
   </div>
 
-</div>
-<!-- CANTIDAD -->
-<section class="cantidad-section">
-  <div class="cantidad-left">
-    <span class="cantidad-label">
-      CANTIDAD
-    </span>
-
-    <!-- <app-contador-cantidad (cantidadNueva)="cantidad = $event"></app-contador-cantidad> -->
-    <div id="container">
-      <button (click)="actualizarNum(1)">+</button>
-      <span>{{ numero() }}</span>
-      <button (click)="actualizarNum(-1)" [disabled]="numero() === 1">-</button>
+  <div class="barra">
+    <div class="stepper" role="group" aria-label="Cantidad">
+      <button type="button" (click)="actualizarNum(-1)" [disabled]="numero() === 1" aria-label="Restar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12" /></svg>
+      </button>
+      <span class="stepper__n" *ngFor="let n of [numero()]">{{ n }}</span>
+      <button type="button" (click)="actualizarNum(1)" aria-label="Sumar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12" /></svg>
+      </button>
     </div>
-  </div>
 
-  <div class="pedido-footer">
-    <button type="button" class="add-button" (click)="agregarAlCarrito()">
-      <span class="cart-icon">
-        🛍
-      </span>
-
-      <span>
-        Agregar
-      </span>
-
-      <strong>
-        ${{ total | number:'1.2-2' }}
-      </strong>
+    <button type="button" class="btn btn--primary barra__agregar" (click)="agregarAlCarrito()">
+      <span>Agregar</span>
+      <strong>${{ total | number:'1.0-0':'es-AR' }}</strong>
     </button>
   </div>
-</section>
+</div>

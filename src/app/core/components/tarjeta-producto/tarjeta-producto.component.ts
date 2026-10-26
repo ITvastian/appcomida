@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Extra, Producto } from '../../interface/productos';
 
 @Component({
@@ -9,7 +9,7 @@ import { Extra, Producto } from '../../interface/productos';
   standalone: true,
   imports: [CommonModule]
 })
-export class TarjetaProductoComponent implements OnChanges {
+export class TarjetaProductoComponent {
 
   @Input({ required: true }) producto!: Producto;
   @Input() extrasSeleccionados: Extra[] = [];
@@ -23,10 +23,4 @@ export class TarjetaProductoComponent implements OnChanges {
       ''
     );
   }
-
-
-  ngOnChanges(): void {
-    console.log('Producto en TarjetaProductoComponent:', this.producto); // Verifica el objeto recibido
-  }
-
 }

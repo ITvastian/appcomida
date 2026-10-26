@@ -1,130 +1,123 @@
 <ng-container *ngIf="cargandoCarrito(); else carritoListo">
-  <section id="cart-loading" class="margenChico">
-    <h3>Cargando pedido...</h3>
-  </section>
+  <div class="carrito">
+    <div class="skeleton" *ngFor="let _ of [1, 2, 3]"></div>
+  </div>
 </ng-container>
 
 <ng-template #carritoListo>
-  <ng-container *ngIf="productosCarrito().length > 0; else sinCarrito">
-    <div class="carrito-page">
-      <div id="container">
-        <div *ngFor="let item of productosCarrito(); index as i" class="tarjetaProdContainer margenChico">
-          <div class="izq" [ngStyle]="{ 'background-image': 'url(' + item.photoUrl + ')' }">
-          </div>
-          <div class="contenido">
-            <div class="fila-principal">
-              <p class="negrita nombre-producto">{{ item.name }}</p>
-              <p class="negrita precio-producto">${{ formatPrice(item.price) }}</p>
-            </div>
-            <p *ngIf="item.notas" class="item-notas">{{ item.notas }}</p>
+  <div class="carrito" *ngIf="productosCarrito().length > 0; else sinCarrito">
+    <header class="carrito__head rise-in">
+      <span class="eyebrow">Tu pedido</span>
+      <h2>{{ productosCarrito().length }} {{ productosCarrito().length === 1 ? 'producto' : 'productos' }}</h2>
+    </header>
 
-            <ul class="extras-grid">
-              <li *ngFor="let extra of getExtrasWithPrice(item.extras)" class="extra-fila">
-                <span class="extra-nombre">{{ getExtraName(extra) }}</span>
-                <span class="extra-precio">${{ formatPrice(getExtraPrice(extra)) }}</span>
-              </li>
-            </ul>
+    <div class="items stagger">
+      <article *ngFor="let item of productosCarrito(); let i = index" class="item" [style.--i]="i">
+        <div class="item__foto" [style.background-image]="item.photoUrl ? 'url(' + item.photoUrl + ')' : null"></div>
 
-            <div class="acciones-item">
-              <app-contador-cantidad [cantidadInicial]="item.cantidad"
-                (cantidadNueva)="cambiarProductoCantidad(item._id,$event)"></app-contador-cantidad>
-              <button type="button" (click)="eliminarProd(item._id)" class="borrar" aria-label="Eliminar producto">
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                  <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <a class="agregar-mas" [routerLink]="['/home']">
-        <span aria-hidden="true">+</span> Agregar más productos
-      </a>
-
-      <div class="resumen-final">
-
-        <section class="margenChico" id="informacion">
-          <h3>Información:</h3>
-
-          <div class="info-card" id="envioContainer" [class.perfil-incompleto-alerta]="perfilIncompletoAlert()">
-            <ng-container *ngIf="perfilService.perfil() as perfil; else sinDatosEnvio">
-              <div class="info-card__body">
-                <h4 class="info-card__nombre">{{ perfil.nombre }}</h4>
-                <span class="info-chip" [class.info-chip--takeaway]="perfil.takeAway">
-                  <span aria-hidden="true">{{ perfil.takeAway ? '🥡' : '🍽️' }}</span>
-                  {{ perfil.takeAway ? 'Para llevar' : 'En mesa' }}
-                </span>
-                <p class="info-card__notas" *ngIf="perfil.detalleEntrega">
-                  <span aria-hidden="true">📝</span> {{ perfil.detalleEntrega }}
-                </p>
-              </div>
-            </ng-container>
-            <ng-template #sinDatosEnvio>
-              <p class="info-card__vacio">Ingresá tus datos para continuar</p>
-            </ng-template>
-
-            <a class="info-card__edit" [routerLink]="['/perfil']" aria-label="Editar datos">
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" />
+        <div class="item__info">
+          <div class="item__fila">
+            <h3>{{ item.name }}</h3>
+            <button type="button" (click)="eliminarProd(item._id)" class="item__borrar" aria-label="Eliminar producto">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
               </svg>
-              Editar
-            </a>
+            </button>
           </div>
 
-          <div class="totales">
-            <div class="totales__fila">
-              <span>Subtotal</span>
-              <span>${{ formatPrice(subtotal) }}</span>
-            </div>
-            <div class="totales__fila" *ngIf="extraTotal > 0">
-              <span>Extras</span>
-              <span>${{ formatPrice(extraTotal) }}</span>
-            </div>
-            <div class="totales__fila totales__fila--total">
-              <span>Total</span>
-              <strong>${{ formatPrice(total) }}</strong>
-            </div>
+          <p *ngIf="item.notas" class="item__notas">“{{ item.notas }}”</p>
+
+          <ul class="item__extras" *ngIf="getExtrasWithPrice(item.extras).length">
+            <li *ngFor="let extra of getExtrasWithPrice(item.extras)">
+              + {{ getExtraName(extra) }} <span>${{ formatPrice(getExtraPrice(extra)) }}</span>
+            </li>
+          </ul>
+
+          <div class="item__fila item__pie">
+            <app-contador-cantidad [cantidadInicial]="item.cantidad"
+              (cantidadNueva)="cambiarProductoCantidad(item._id, $event)"></app-contador-cantidad>
+            <strong class="item__precio">${{ formatPrice(item.price) }}</strong>
           </div>
-        </section>
-        <div class="pedido-footer">
-          <button id="enviar" type="button" (click)="abrirConfirmacionPedido()">
-            Realizar pedido · ${{ formatPrice(total) }}
-          </button>
         </div>
-      </div>
+      </article>
     </div>
 
+    <a class="agregar-mas" [routerLink]="['/home']">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      Agregar más productos
+    </a>
 
-  </ng-container>
+    <section class="panel rise-in" id="informacion">
+      <div class="cliente" [class.perfil-incompleto-alerta]="perfilIncompletoAlert()">
+        <ng-container *ngIf="perfilService.perfil() as perfil; else sinDatosEnvio">
+          <div class="cliente__avatar" aria-hidden="true">{{ (perfil.nombre || '?').charAt(0) }}</div>
+          <div class="cliente__body">
+            <strong>{{ perfil.nombre }}</strong>
+            <span>{{ perfil.takeAway ? '🥡 Para llevar' : '🍽️ En mesa' }}</span>
+            <small *ngIf="perfil.detalleEntrega">📝 {{ perfil.detalleEntrega }}</small>
+          </div>
+        </ng-container>
+        <ng-template #sinDatosEnvio>
+          <div class="cliente__body">
+            <strong>Faltan tus datos</strong>
+            <span>Los necesitamos para tu pedido</span>
+          </div>
+        </ng-template>
+
+        <a class="cliente__editar" [routerLink]="['/perfil']">Editar</a>
+      </div>
+
+      <div class="totales">
+        <div class="totales__fila">
+          <span>Subtotal</span>
+          <span>${{ formatPrice(subtotal) }}</span>
+        </div>
+        <div class="totales__fila" *ngIf="extraTotal > 0">
+          <span>Extras</span>
+          <span>${{ formatPrice(extraTotal) }}</span>
+        </div>
+        <div class="totales__fila totales__fila--total">
+          <span>Total</span>
+          <strong>${{ formatPrice(total) }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta">
+      <button id="enviar" class="btn btn--primary" type="button" (click)="abrirConfirmacionPedido()">
+        <span>Realizar pedido</span>
+        <strong>${{ formatPrice(total) }}</strong>
+      </button>
+    </div>
+  </div>
 </ng-template>
 
-<ng-template #sinCarrito id="cart">
-  <h2>Carrito Vacío</h2>
-  <img src="../../../assets/icons/cart.png" alt="" class="animated-image" />
+<ng-template #sinCarrito>
+  <div class="vacio rise-in">
+    <div class="vacio__icono" aria-hidden="true">🛍️</div>
+    <h2>Tu pedido está vacío</h2>
+    <p>Elegí algo rico del menú para empezar.</p>
+    <a class="btn btn--primary" [routerLink]="['/home']">Ver el menú</a>
+  </div>
 </ng-template>
 
-<dialog #dialog class="app-dialog confirm-dialog">
+<dialog #dialog class="app-dialog">
   <!-- PASO 1 -->
-  <section *ngIf="paso === 1" class="confirm-dialog__step">
-    <div class="confirm-dialog__icon">🛍️</div>
-    <h2 class="confirm-dialog__title">¿Pudiste realizar el pedido?</h2>
-    <p class="confirm-dialog__subtitle">Contanos cómo te fue en los comentarios</p>
+  <section *ngIf="paso === 1">
+    <div class="app-dialog__icono">🛍️</div>
+    <h2 class="app-dialog__titulo">¿Confirmás el pedido?</h2>
+    <p class="app-dialog__texto">Lo enviamos a la cocina.</p>
 
-    <div class="confirm-dialog__actions">
-      <button type="button" class="btn btn--ghost" (click)="editarPedido()">
-        No, editar
-      </button>
-      <button type="button" class="btn btn--primary" (click)="paso = 2">
-        Sí, listo
-      </button>
+    <div class="app-dialog__acciones">
+      <button type="button" class="btn btn--ghost" (click)="editarPedido()">No, editar</button>
+      <button type="button" class="btn btn--primary" (click)="paso = 2">Sí, listo</button>
     </div>
   </section>
 
   <!-- PASO 2 -->
-  <section *ngIf="paso === 2" class="confirm-dialog__step">
-    <div class="confirm-dialog__icon">🎉</div>
-    <h2 class="confirm-dialog__title">¡Genial! ¿Nos ayudás a mejorar?</h2>
+  <section *ngIf="paso === 2">
+    <div class="app-dialog__icono">🎉</div>
+    <h2 class="app-dialog__titulo">¿Nos ayudás a mejorar?</h2>
 
     <div class="stars" role="radiogroup" aria-label="Calificación">
       <button type="button" class="star" *ngFor="let star of stars; let i = index"
@@ -134,66 +127,38 @@
       </button>
     </div>
 
-    <textarea class="confirm-dialog__textarea" [(ngModel)]="suggestionText" rows="3"
+    <textarea class="app-dialog__textarea" [(ngModel)]="suggestionText" rows="3"
       placeholder="¿Algo que podamos mejorar?"></textarea>
 
-    <div class="confirm-dialog__actions">
-      <button type="button" class="btn btn--ghost" (click)="finalizarPedido(false)">
-        Omitir
-      </button>
-      <button type="button" class="btn btn--primary" (click)="finalizarPedido(true)">
-        Enviar
-      </button>
+    <div class="app-dialog__acciones">
+      <button type="button" class="btn btn--ghost" (click)="finalizarPedido(false)">Omitir</button>
+      <button type="button" class="btn btn--primary" (click)="finalizarPedido(true)">Enviar</button>
     </div>
   </section>
 </dialog>
-<dialog method="modal" #tableDialog class="app-dialog table-dialog">
 
-  <p class="table-dialog__title">
-    No encontramos tu mesa
-  </p>
+<dialog #tableDialog class="app-dialog">
+  <div class="app-dialog__icono">🪑</div>
+  <h2 class="app-dialog__titulo">No encontramos tu mesa</h2>
+  <p class="app-dialog__texto">{{ mensajeMesaDialog }}</p>
 
-  <p class="table-dialog__text">
-    {{ mensajeMesaDialog }}
-  </p>
-
-  <label for="numeroMesa" class="table-dialog__label">
-    Número de mesa
-  </label>
-
+  <label for="numeroMesa" class="app-dialog__label">Número de mesa</label>
   <input id="numeroMesa" type="number" min="1" inputmode="numeric" [(ngModel)]="numeroMesaIngresado"
-    (ngModelChange)="errorNumeroMesa = ''" class="table-dialog__input" placeholder="Ej: 12" />
+    (ngModelChange)="errorNumeroMesa = ''" class="app-dialog__input" placeholder="Ej: 12" />
+  <p *ngIf="errorNumeroMesa" class="app-dialog__error">{{ errorNumeroMesa }}</p>
 
-  <p *ngIf="errorNumeroMesa" class="table-dialog__error">
-    {{ errorNumeroMesa }}
-  </p>
-
-  <div class="table-dialog__actions">
-    <button type="button" class="table-dialog__btn table-dialog__btn--cancel" (click)="cancelarIngresoMesa()">
-      Cancelar
-    </button>
-
-    <button type="button" class="table-dialog__btn table-dialog__btn--save" (click)="confirmarNumeroMesa()">
-      Continuar
-    </button>
+  <div class="app-dialog__acciones">
+    <button type="button" class="btn btn--ghost" (click)="cancelarIngresoMesa()">Cancelar</button>
+    <button type="button" class="btn btn--primary" (click)="confirmarNumeroMesa()">Continuar</button>
   </div>
-
 </dialog>
 
-<dialog method="modal" #errorDialog class="app-dialog table-dialog">
+<dialog #errorDialog class="app-dialog">
+  <div class="app-dialog__icono">⚠️</div>
+  <h2 class="app-dialog__titulo">{{ tituloErrorPedido }}</h2>
+  <p class="app-dialog__texto">{{ mensajeErrorPedido }}</p>
 
-  <p class="table-dialog__title">
-    {{ tituloErrorPedido }}
-  </p>
-
-  <p class="table-dialog__text">
-    {{ mensajeErrorPedido }}
-  </p>
-
-  <div class="table-dialog__actions">
-    <button type="button" class="table-dialog__btn table-dialog__btn--save" (click)="cerrarDialogoError()">
-      Entendido
-    </button>
+  <div class="app-dialog__acciones">
+    <button type="button" class="btn btn--primary" (click)="cerrarDialogoError()">Entendido</button>
   </div>
-
 </dialog>

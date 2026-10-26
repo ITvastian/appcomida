@@ -1,280 +1,117 @@
-@use "./../../../../assets/styles/variables.scss";
-
-#container {
-  min-height: 92px;
-  width: 100%;
-  display: flex;
-  align-items: stretch;
-  background: linear-gradient(180deg,
-      #fff5ed 0%,
-      #ffe9dc 100%);
-  border-radius: variables.$border-radius-mediano;
-  border: 1px solid rgba(202, 126, 96, 0.2);
-  box-shadow: 0 3px 12px rgba(95, 43, 24, 0.10);
-  overflow: hidden;
+:host {
+  display: block;
   cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-  // &:hover {
-  //   box-shadow: 0 6px 18px rgba(95, 43, 24, 0.15);
-  //   transform: translateY(-1px);
-  //   border-color: rgba(202, 126, 96, 0.32);
-  // }
-
-  &:active {
-    transform: translateY(0);
-  }
 }
 
-
-/* =========================
-   FOTO
-   ========================= */
-
-#foto {
-  width: 30%;
-  min-width: 90px;
-  max-width: 125px;
+.producto {
   display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  margin: 6px;
-  overflow: hidden;
-  background: transparent;
+  gap: 14px;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--sh-1);
+  transition: transform 240ms var(--ease-out), box-shadow 240ms ease;
+}
 
-  .product-photo {
-    width: clamp(82px, 24vw, 108px);
-    height: clamp(70px, 20vw, 88px);
-    max-width: 100%;
+:host:active .producto {
+  transform: scale(0.97);
+}
 
-    display: block;
-
-    object-fit: cover;
-
-    border-radius: 10px;
-
-    background-color: #f9e6d8;
-
-    transition: transform 0.3s ease;
+@media (hover: hover) {
+  :host:hover .producto {
+    transform: translateY(-2px);
+    box-shadow: var(--sh-2);
   }
 
-  &:hover .product-photo {
-    transform: scale(1.03);
+  :host:hover img {
+    transform: scale(1.08);
+  }
+
+  :host:hover .producto__mas {
+    transform: rotate(90deg) scale(1.08);
   }
 }
 
-/* =========================
-   DETALLES
-   ========================= */
+.producto__foto {
+  flex: none;
+  width: 104px;
+  height: 104px;
+  overflow: hidden;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
 
-#detalles {
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms var(--ease-out);
+  }
+}
+
+.producto__vacio {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--accent-soft), var(--surface-2));
+}
+
+.producto__info {
   flex: 1;
   min-width: 0;
-
   display: flex;
   flex-direction: column;
-
-  padding: 9px 11px 8px;
-
-  gap: 5px;
+  gap: 4px;
+  padding: 2px 2px 0 0;
 }
 
-
-/* =========================
-   NOMBRE
-   ========================= */
-
-.product-name {
-  margin: 0;
-  padding: 0;
-  font-weight: 600;
-  font-size: 0.92rem;
-  text-transform: uppercase;
-  line-height: 1.15;
-  letter-spacing: 0.5px;
-  color: #ef6242;
-  letter-spacing: 0.5px;
+h4 {
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: capitalize;
 }
 
-
-/* =========================
-   INFORMACIÓN
-   ========================= */
-
-.info-item {
-  display: flex;
-  align-items: flex-start;
-
-  gap: 5px;
-
-  min-width: 0;
-
-  font-size: 0.70rem;
-  line-height: 1.2;
-
-  color: #7a675d;
-
-  word-break: break-word;
-
-  span {
-    min-width: 0;
-
-    display: -webkit-box;
-
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-
-    overflow: hidden;
-  }
-
-  .icon {
-    width: 13px;
-    height: 13px;
-
-    min-width: 13px;
-
-    margin-top: 1px;
-
-    stroke: #a68070;
-    stroke-width: 2.5;
-
-    flex-shrink: 0;
-  }
-
-  &.description {
-    .icon {
-      stroke: #b8906e;
-    }
-  }
+p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 
-
-/* =========================
-   PRECIO
-   ========================= */
-
-.product-footer {
+.producto__pie {
+  margin-top: auto;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-
-  margin-top: auto;
+  justify-content: space-between;
 }
 
-
-#precio {
-  margin: 0;
-
+.producto__precio {
+  font-size: 1.05rem;
   font-weight: 800;
-  font-size: 0.98rem;
-  line-height: 1;
-
-  color: #c9876d;
-
-  white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
+.producto__mas {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-grad);
+  box-shadow: var(--sh-accent);
+  transition: transform 360ms var(--ease-spring);
 
-/* =========================
-   MOBILE
-   ========================= */
-
-@media (max-width: 420px) {
-
-  #container {
-    min-height: 88px;
-  }
-
-  #foto {
-    width: 30%;
-    min-width: 82px;
-    max-width: 105px;
-
-    // padding: 6px;
-
-    .product-photo {
-      width: 100px;
-      height: 85px;
-      border-radius: 9px;
-    }
-  }
-
-  #detalles {
-    padding: 8px 9px 7px;
-    gap: 4px;
-  }
-
-  .product-name {
-    font-size: 0.86rem;
-    line-height: 1.1;
-  }
-
-  .info-item {
-    font-size: 0.67rem;
-    line-height: 1.15;
-
-    gap: 4px;
-
-    .icon {
-      width: 12px;
-      height: 12px;
-      min-width: 12px;
-    }
-  }
-
-  #precio {
-    font-size: 0.90rem;
-  }
-}
-
-
-/* =========================
-   CELULARES MUY ANGOSTOS
-   ========================= */
-
-@media (max-width: 340px) {
-
-  #container {
-    min-height: 84px;
-  }
-
-  #foto {
-    width: 29%;
-    min-width: 76px;
-    // padding: 5px;
-
-    .product-photo {
-      width: 85px;
-      height: 80px;
-      border-radius: 8px;
-    }
-  }
-
-  #detalles {
-    padding: 7px 8px 6px;
-    gap: 3px;
-  }
-
-  .product-name {
-    font-size: 0.82rem;
-  }
-
-  .info-item {
-    font-size: 0.64rem;
-
-    .icon {
-      width: 11px;
-      height: 11px;
-      min-width: 11px;
-    }
-  }
-
-  #precio {
-    font-size: 0.86rem;
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.8;
+    stroke-linecap: round;
   }
 }

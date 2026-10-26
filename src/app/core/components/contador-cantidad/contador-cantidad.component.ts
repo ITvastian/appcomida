@@ -1,3 +1,4 @@
+import { NgFor } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { MAX_CANTIDAD_POR_ITEM } from '../../services/cart.service';
 
@@ -6,6 +7,7 @@ import { MAX_CANTIDAD_POR_ITEM } from '../../services/cart.service';
   templateUrl: './contador-cantidad.component.html',
   styleUrls: ['./contador-cantidad.component.scss'],
   standalone: true,
+  imports: [NgFor],
 })
 export class ContadorCantidadComponent implements OnInit{
 

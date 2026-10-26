@@ -1,40 +1,46 @@
-<!-- <button class="home-back" type="button" (click)="volverAtras()" aria-label="Volver">
-  &larr;
-</button> -->
+<div class="home">
+  <label class="buscador" for="buscar-categoria">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m20 20-4.2-4.2" />
+    </svg>
+    <input id="buscar-categoria" type="text" placeholder="Buscar categoría" autocomplete="off"
+      [ngModel]="textoBusqueda()" (ngModelChange)="textoBusqueda.set($event)" />
+    <button class="buscador__limpiar" type="button" *ngIf="textoBusqueda()" (click)="limpiarBusqueda()"
+      aria-label="Limpiar búsqueda">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 6l12 12M18 6 6 18" />
+      </svg>
+    </button>
+  </label>
 
-<section id="barra-busqueda">
-  <img src="assets/icons/lupa.svg" alt="Buscar" />
-  <input type="text" placeholder="Busca una categoría..." autocomplete="off" [ngModel]="textoBusqueda()"
-    (ngModelChange)="textoBusqueda.set($event)" />
-  <button class="btn-clear" *ngIf="textoBusqueda()" (click)="limpiarBusqueda()">x</button>
-</section>
+  <app-carrusel class="rise-in"></app-carrusel>
 
-<app-carrusel></app-carrusel>
-<section class="home-categorias margenChico">
-  <!-- <h2>Selecciona una categoría</h2> -->
-  <div class="categorias-header">
-    <div>
-      <span class="section-eyebrow">MENÚ</span>
-      <h2>Selecciona una categoría</h2>
+  <section class="categorias">
+    <header class="categorias__head">
+      <span class="eyebrow">Menú</span>
+      <h2>¿Qué tenés ganas de comer?</h2>
+    </header>
+
+    <div class="grid" *ngIf="cargandoCategorias()">
+      <div class="skeleton" *ngFor="let _ of [1, 2, 3, 4]"></div>
     </div>
-  </div>
-  <div class="loading" *ngIf="cargandoCategorias()">
-    <div class="skeleton-card" *ngFor="let _ of [1, 2, 3, 4]"></div>
-  </div>
 
-  <div class="error" *ngIf="!cargandoCategorias() && errorCategorias()">
-    <p>No pudimos cargar las categorias.</p>
-    <button type="button" (click)="reintentarCargaCategorias()">Reintentar</button>
-  </div>
+    <div class="estado" *ngIf="!cargandoCategorias() && errorCategorias()">
+      <p>No pudimos cargar las categorías.</p>
+      <button class="btn btn--primary" type="button" (click)="reintentarCargaCategorias()">Reintentar</button>
+    </div>
 
-  <div id="category-container"
-    *ngIf="!cargandoCategorias() && !errorCategorias() && categoriasFiltradasVacio().length > 0">
-    <app-tarjeta-category *ngFor="let categoria of categoriasFiltradasVacio()" [categoria]="categoria"
-      [routerLink]="['/categoria', categoria.id || categoria.name]" [queryParams]="{ name: categoria.name }"
-      routerLinkActive="router-link-active"></app-tarjeta-category>
-  </div>
+    <div class="grid stagger"
+      *ngIf="!cargandoCategorias() && !errorCategorias() && categoriasFiltradasVacio().length > 0">
+      <app-tarjeta-category *ngFor="let categoria of categoriasFiltradasVacio(); let i = index"
+        [style.--i]="i" [categoria]="categoria" [routerLink]="['/categoria', categoria.id || categoria.name]"
+        [queryParams]="{ name: categoria.name }"></app-tarjeta-category>
+    </div>
 
-  <p class="empty" *ngIf="!cargandoCategorias() && !errorCategorias() && categoriasFiltradasVacio().length === 0">
-    {{ textoBusqueda() ? 'No encontramos esa categoría' : 'No hay categorías disponibles por ahora.' }}
-  </p>
-</section>
+    <p class="estado"
+      *ngIf="!cargandoCategorias() && !errorCategorias() && categoriasFiltradasVacio().length === 0">
+      {{ textoBusqueda() ? 'No encontramos esa categoría' : 'No hay categorías disponibles por ahora.' }}
+    </p>
+  </section>
+</div>

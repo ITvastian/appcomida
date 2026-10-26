@@ -1,8 +1,11 @@
-<div class="carousel-container">
+<div class="carousel-container" [hidden]="fotos.length === 0">
   <div class="slides">
     <div *ngFor="let foto of clonedFotos" class="slide">
-      <img [src]="foto.url" alt="Imagen del carrusel">
+      <img [src]="foto.url" alt="Promoción" />
     </div>
   </div>
-  <!-- <button class="next">›</button> -->
+
+  <div class="dots" *ngIf="fotos.length > 1" aria-hidden="true">
+    <span *ngFor="let foto of fotos; let i = index" class="dot" [class.dot--activo]="i === dotActivo"></span>
+  </div>
 </div>

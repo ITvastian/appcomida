@@ -1,8 +1,10 @@
-$color-principal: #f18b6d;
-$color-principal-claro: #ffe4d6;
-$color-surface: #fff8f2;
-$color-texto: #2d221c;
-$color-muted: #7a675d;
-$border-radius-chico: 8px;
-$border-radius-mediano: 14px;
-$border-radius-grande: 24px;
+// Alias SCSS de los tokens CSS definidos en src/styles.scss (:root).
+// Usar los tokens CSS directamente en código nuevo.
+$color-principal: var(--accent);
+$color-principal-claro: var(--accent-soft);
+$color-surface: var(--surface);
+$color-texto: var(--ink);
+$color-muted: var(--ink-2);
+$border-radius-chico: var(--r-sm);
+$border-radius-mediano: var(--r-md);
+$border-radius-grande: var(--r-lg);

@@ -1,309 +1,215 @@
-@use '../../../assets/styles/variables.scss';
-
-* {
-  font-size: 1rem;
-}
-
-section {
-  display: flex;
+.perfil {
   min-height: 100%;
-}
-
-form {
-  margin-top: 18px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  flex: 1;
-  // min-height: calc(100svh - 170px);
-
-  div {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    label {
-      font-size: 0.92rem;
-      line-height: 1.3;
-      color: #503f35;
-      font-weight: 700;
-    }
-
-    input {
-      font-size: 0.98rem;
-      border: 1px solid rgba(186, 118, 91, 0.24);
-      border-radius: 12px;
-      background: #fff4eb;
-      padding: 11px 12px;
-      min-height: 44px;
-      box-sizing: border-box;
-      color: #2d221c;
-      box-shadow: 0 3px 10px rgba(73, 28, 14, 0.08);
-
-      &:focus {
-        outline: none;
-        border-color: rgba(186, 88, 52, 0.5);
-        box-shadow: 0 0 0 3px rgba(241, 139, 109, 0.16);
-      }
-
-      &.campo-invalido {
-        border-color: #c43f20;
-        background: #fff1ef;
-        box-shadow: 0 0 0 3px rgba(196, 63, 32, 0.16);
-      }
-    }
-  }
-}
-
-button {
-  &:disabled {
-    pointer-events: none;
-    background: #e5d5ca;
-    color: #9b887f;
-    box-shadow: none;
-  }
-}
-
-.pedido-footer {
-  position: sticky;
-  padding-bottom: 8px;
-  z-index: 2;
-  margin: auto 0 12px;
-
-  button {
-    display: block;
-    margin-top: 0;
-    background: linear-gradient(180deg, #f5a082 0%, #f18b6d 100%);
-    color: white;
-    border: unset;
-    cursor: pointer;
-    padding: 13px;
-    border-radius: 14px;
-    font-size: 1.2rem;
-    font-weight: 800;
-    width: 100%;
-    min-height: 50px;
-    box-shadow: 0 6px 14px rgba(83, 33, 16, 0.2);
-  }
-}
-
-.error {
-  color: #c43f20;
-  letter-spacing: 0.2px;
-  font-size: 0.8rem;
-  line-height: 1.2;
+  padding: 18px 16px 8px;
 }
 
 .perfil-form {
   display: grid;
   gap: 14px;
-  padding: 16px 14px;
 }
 
-.perfil-form__intro h2 {
-  margin: 0 0 2px;
-  font-size: 1.25rem;
-  color: #2d221c;
+.perfil-form__intro {
+  h2 {
+    margin-top: 4px;
+    font-size: 1.6rem;
+  }
+
+  p {
+    margin-top: 4px;
+    color: var(--ink-2);
+    font-size: 0.9rem;
+  }
 }
 
-.perfil-form__intro p {
-  margin: 0;
-  color: #7a675d;
-  font-size: 0.88rem;
-}
-
-/* Tarjeta */
 .perfil-card {
   display: grid;
   gap: 18px;
   padding: 18px 16px;
-  background: #ffffff;
-  border: 1px solid rgba(194, 118, 88, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 10px 22px rgba(74, 30, 16, 0.08);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--sh-1);
 }
 
-/* Campos */
+/* ---------- Campos ---------- */
 .field label {
   display: block;
-  margin-bottom: 6px;
-  color: #5d3829;
-  font-size: 0.82rem;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
   font-weight: 700;
 }
 
 .field__optional {
-  color: #a89a91;
+  color: var(--ink-3);
   font-weight: 500;
 }
 
 .field__control {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
-  padding: 0 12px;
-  background: #fffaf6;
-  border: 1.5px solid rgba(194, 118, 88, 0.25);
-  border-radius: 12px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  padding: 0 14px;
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  border: 1.5px solid transparent;
+  transition: border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+
+  &:focus-within {
+    background: var(--surface);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+
+    .field__icon {
+      stroke: var(--accent);
+      transform: scale(1.1);
+    }
+  }
 }
 
 .field__control--top {
   align-items: flex-start;
-  padding-top: 12px;
-}
-
-.field__control:focus-within {
-  background: #ffffff;
-  border-color: #f18b6d;
-  box-shadow: 0 0 0 3px rgba(241, 139, 109, 0.18);
+  padding-top: 14px;
 }
 
 .field__icon {
-  flex: 0 0 auto;
+  flex: none;
   width: 20px;
   height: 20px;
   fill: none;
-  stroke: #c27658;
+  stroke: var(--ink-3);
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+  transition: stroke 200ms ease, transform 300ms var(--ease-spring);
 }
 
-.field .field__control input,
-.field .field__control textarea {
+.field__control input,
+.field__control textarea {
   flex: 1;
   min-width: 0;
-  width: 100%;
-  min-height: 48px;
-  padding: 0;
+  min-height: 50px;
   border: 0;
   outline: 0;
   background: transparent;
-  box-shadow: none;
-  color: #2d221c;
-  font: inherit;
   font-size: 1rem;
+
+  &::placeholder {
+    color: var(--ink-3);
+  }
 }
 
-.field .field__control textarea {
+.field__control textarea {
   min-height: 0;
-  padding: 0 0 12px;
+  padding-bottom: 14px;
   resize: none;
 }
 
-.field__control ::placeholder {
-  color: #b8a99f;
-}
-
-/* Error */
 .field--error .field__control {
-  border-color: #d9534f;
-  background: #fff5f4;
-}
-
-.field--error .field__icon {
-  stroke: #d9534f;
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  animation: sacudir 420ms var(--ease-out);
 }
 
 .field__error {
-  margin: 6px 2px 0;
-  color: #c0392b;
+  margin-top: 6px;
+  color: var(--danger);
   font-size: 0.8rem;
   font-weight: 600;
+  animation: rise-in 300ms var(--ease-out);
 }
 
-/* Interruptor Take Away */
+/* ---------- Switch para llevar ---------- */
 .perfil-switch {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 14px 16px;
-  background: #ffffff;
-  border: 1px solid rgba(194, 118, 88, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 6px 16px rgba(74, 30, 16, 0.06);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--sh-1);
   cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+}
+
+.perfil-switch__emoji {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 1.3rem;
 }
 
 .perfil-switch__text {
+  flex: 1;
   display: grid;
   gap: 2px;
-}
 
-.perfil-switch__text strong {
-  color: #2d221c;
-  font-size: 0.95rem;
-}
-
-.perfil-switch__text small {
-  color: #7a675d;
-  font-size: 0.8rem;
-}
-
-/* Input oculto pero accesible por teclado */
-.perfil-switch input {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
+  small {
+    color: var(--ink-2);
+    font-size: 0.8rem;
+  }
 }
 
 .perfil-switch__track {
   position: relative;
-  flex: 0 0 auto;
-  width: 50px;
-  height: 30px;
-  border-radius: 999px;
-  background: #e6dcd5;
-  transition: background 0.2s ease;
+  flex: none;
+  width: 52px;
+  height: 32px;
+  border-radius: var(--r-pill);
+  background: #e2dcd5;
+  transition: background 260ms ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 420ms var(--ease-bounce);
+  }
 }
 
-.perfil-switch__track::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s ease;
+.perfil-switch input:checked + .perfil-switch__track {
+  background: var(--accent);
+
+  &::after {
+    transform: translateX(20px);
+  }
 }
 
-.perfil-switch input:checked+.perfil-switch__track {
-  background: #f18b6d;
-}
-
-.perfil-switch input:checked+.perfil-switch__track::after {
-  transform: translateX(20px);
-}
-
-.perfil-switch input:focus-visible+.perfil-switch__track {
-  outline: 2px solid #f18b6d;
+.perfil-switch input:focus-visible + .perfil-switch__track {
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
-.resumen-final {
-  margin: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 100%;
+/* ---------- Botón ---------- */
+.pedido-footer {
+  position: sticky;
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 4px);
+  margin-top: auto;
+  padding-top: 20px;
+
+  .btn {
+    width: 100%;
+    min-height: 56px;
+  }
 }
 
-@media (max-width: 420px) {
-  form {
-    margin-top: 14px;
-    gap: 12px;
-    min-height: calc(100svh - 160px);
-  }
-
-  form div input {
-    font-size: 0.95rem;
-    padding: 10px;
-  }
+@keyframes sacudir {
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
 }

@@ -6,7 +6,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { ProductosService } from 'src/app/core/services/productos.service';
 import { Producto, Extra } from 'src/app/core/interface/productos';
-import { CartService } from 'src/app/core/services/cart.service';
+import { CartService, MAX_CANTIDAD_POR_ITEM } from 'src/app/core/services/cart.service';
+import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { ContadorCantidadComponent } from 'src/app/core/components/contador-cantidad/contador-cantidad.component';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,15 @@ export class ArticuloComponent implements OnInit {
   cartService = inject(CartService);
   router = inject(Router);
   route = inject(ActivatedRoute);
+  private location = inject(Location);
+
+  volver(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+    this.router.navigate(['/home']);
+  }
   realtimeService = inject(RealtimeService);
   private destroyRef = inject(DestroyRef);
 
@@ -110,7 +120,7 @@ export class ArticuloComponent implements OnInit {
 
 
   actualizarNum(dif: number) {
-    this.numero.set(Math.max(this.numero() + dif, 1));
+    this.numero.set(Math.min(Math.max(this.numero() + dif, 1), MAX_CANTIDAD_POR_ITEM));
     this.cantidad = this.numero();
     this.cantidadNueva.emit(this.numero());
   }
