@@ -11,7 +11,7 @@
 </div>
 
 <ng-template #entradaContent>
-  <section class="entrada" *ngIf="!transferenciaResumen(); else resumenTransferencia">
+  <section class="entrada" *ngIf="!revisandoCuenta(); else resumenCuenta">
     <figure class="entrada__avatar" [class.entrada__avatar--loading]="avatarCargando()">
       <ng-container *ngIf="avatarUrl() as url; else avatarPlaceholder">
         <img [src]="url" alt="Atencion en mesa" (error)="onAvatarError()" />
@@ -21,6 +21,16 @@
       <h1>Bienvenido</h1>
       <p>¿Cómo querés seguir?</p>
 
+      <p class="entrada__aviso-pago entrada__aviso-pago--ok" *ngIf="pagoRecibido(); else avisoConfirmando">
+        🎉 ¡Pago recibido! Tu cuenta quedó paga.
+      </p>
+      <ng-template #avisoConfirmando>
+        <p class="entrada__aviso-pago" *ngIf="confirmandoPago()">
+          <span class="entrada__spinner" aria-hidden="true"></span>
+          {{ esperandoPago() === 'transferencia' ? 'Esperando que el local confirme tu transferencia…' : 'Confirmando tu pago…' }}
+        </p>
+      </ng-template>
+
       <div class="entrada__actions stagger">
         <a class="btn btn--primary" routerLink="/home" style="--i: 1">Ver menú</a>
         <button class="btn btn--secondary" style="--i: 2" type="button" [class.btn--confirmed]="mozoAvisado()"
@@ -28,29 +38,31 @@
           {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? 'Mozo avisado' : 'Solicitar mozo') }}
         </button>
         <button class="btn btn--tertiary" style="--i: 3" type="button" [class.btn--confirmed]="cuentaSolicitada()"
-          [disabled]="solicitandoCuenta() || iniciandoTransferencia() || cuentaSolicitada()"
+          [disabled]="solicitandoCuenta() || cuentaSolicitada()"
           [attr.aria-expanded]="mediosPagoVisibles()" aria-controls="medios-pago" (click)="alternarMediosPago()">
-          {{ iniciandoTransferencia() ? 'Preparando...' : (solicitandoCuenta() ? 'Enviando...' : (cuentaSolicitada() ?
-          'Cuenta solicitada' : 'Medios de pago')) }}
+          {{ solicitandoCuenta() ? 'Enviando...' : (cuentaSolicitada() ? 'Cuenta solicitada' : 'Medios de pago') }}
         </button>
 
         <div *ngIf="mediosPagoVisibles() && !cuentaSolicitada()" id="medios-pago" class="entrada__payment-methods">
           <p class="payment-tray__title">¿Cómo querés pagar?</p>
           <div class="payment-tray__grid">
-            <button class="pay-chip" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
-              (click)="pedirCuenta('Efectivo')">
+            <button class="pay-chip" type="button" [disabled]="solicitandoCuenta()" (click)="pedirCuenta('Efectivo')">
               <span class="pay-chip__icon" aria-hidden="true">💵</span>
               <span>Efectivo</span>
             </button>
-            <button class="pay-chip" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
-              (click)="pedirCuenta('Tarjeta')">
+            <button class="pay-chip" type="button" [disabled]="solicitandoCuenta()" (click)="pedirCuenta('Tarjeta')">
               <span class="pay-chip__icon" aria-hidden="true">💳</span>
               <span>Tarjeta</span>
             </button>
-            <button class="pay-chip" type="button" [disabled]="solicitandoCuenta() || iniciandoTransferencia()"
+            <button class="pay-chip" type="button" *ngIf="mercadoPagoDisponible()" [disabled]="solicitandoCuenta()"
+              (click)="pedirCuenta('Mercado Pago')">
+              <span class="pay-chip__icon" aria-hidden="true">📱</span>
+              <span>Mercado Pago</span>
+            </button>
+            <button class="pay-chip" type="button" *ngIf="transferenciaDisponible()" [disabled]="solicitandoCuenta()"
               (click)="pedirCuenta('Transferencia')">
               <span class="pay-chip__icon" aria-hidden="true">🏦</span>
-              <span>{{ iniciandoTransferencia() ? 'Preparando...' : 'Transferencia' }}</span>
+              <span>Transferencia</span>
             </button>
           </div>
         </div>
@@ -58,64 +70,143 @@
     </div>
   </section>
 
-  <ng-template #resumenTransferencia>
+  <!-- Cuenta de la mesa: todos los pedidos pendientes, con el total que calcula el servidor. -->
+  <ng-template #resumenCuenta>
     <section class="entrada entrada--payment">
       <button class="home-back" type="button" (click)="volverAtras()" aria-label="Volver">
         &larr;
       </button>
-      <div class="entrada__card entrada__payment-card rise-in" *ngIf="transferenciaResumen() as resumen">
-        <h1>Revisá tu orden</h1>
-        <p>Confirmá los datos antes de continuar con el pago.</p>
+      <div class="entrada__card entrada__payment-card rise-in">
 
-        <div class="entrada__order-head">
-          <span class="entrada__order-id">Orden {{ resumen.orderId }}</span>
-          <span class="entrada__method-chip">
-            <span aria-hidden="true">🏦</span> Transferencia
-          </span>
+        <!-- Pago confirmado (la mesa quedó sin pendientes mientras se esperaba el pago). -->
+        <div class="entrada__pago-ok" *ngIf="pagoRecibido(); else cuentaOTransferencia">
+          <span class="entrada__pago-ok-icono" aria-hidden="true">🎉</span>
+          <h1>¡Pago recibido!</h1>
+          <p>Gracias. Tu cuenta quedó paga.</p>
+          <button class="btn btn--primary" type="button" (click)="volverAtras()">Listo</button>
         </div>
 
-        <dl class="entrada__order-meta entrada__order-meta--three">
-          <div class="entrada__order-meta-main">
-            <dt>Mesa</dt>
-            <dd>{{ resumen.tableNumber }}</dd>
-          </div>
-          <div class="entrada__order-meta-main">
-            <dt>Para llevar</dt>
-            <dd>{{ resumen.order.takeAway ? 'Sí' : 'No' }}</dd>
-          </div>
-          <div class="entrada__order-meta-wide">
-            <dt>Cliente</dt>
-            <dd>{{ resumen.customerName || resumen.order.customerName || 'No disponible' }}</dd>
-          </div>
-        </dl>
-        <ul class="entrada__order-items">
-          <li *ngFor="let item of resumen.order.items">
-            <div class="entrada__order-item-heading">
-              <span>{{ item.name }}</span>
-              <strong>{{ item.price | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</strong>
-            </div>
-            <small class="entrada__order-item-unit-price">
-              Cantidad: {{ item.quantity }}
-            </small>
-            <div class="entrada__order-item-extras" *ngIf="item.extras?.length">
-              <span *ngFor="let extra of item.extras">
-                + {{ extra.name }} ({{ extra.price | currency:'ARS':'symbol':'1.0-0':'es-AR' }})
-              </span>
-            </div>
-          </li>
-        </ul>
+        <ng-template #cuentaOTransferencia>
+          <ng-container *ngIf="datosTransferencia() as datos; else cuentaMesa">
+            <!-- Datos bancarios para transferir -->
+            <h1>Transferí</h1>
+            <p class="entrada__monto">{{ datos.amount | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</p>
 
-        <div class="entrada__order-total">
-          <span>Monto total</span>
-          <strong>{{ resumen.amount | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</strong>
-        </div>
+            <dl class="entrada__banco">
+              <div *ngIf="datos.transfer.alias">
+                <dt>Alias</dt>
+                <dd>
+                  <span>{{ datos.transfer.alias }}</span>
+                  <button type="button" class="entrada__copiar" [class.entrada__copiar--ok]="copiado() === 'alias'"
+                    (click)="copiar(datos.transfer.alias, 'alias')">
+                    {{ copiado() === 'alias' ? '¡Copiado!' : 'Copiar' }}
+                  </button>
+                </dd>
+              </div>
+              <div *ngIf="datos.transfer.cbu">
+                <dt>CBU / CVU</dt>
+                <dd>
+                  <span>{{ datos.transfer.cbu }}</span>
+                  <button type="button" class="entrada__copiar" [class.entrada__copiar--ok]="copiado() === 'cbu'"
+                    (click)="copiar(datos.transfer.cbu, 'cbu')">
+                    {{ copiado() === 'cbu' ? '¡Copiado!' : 'Copiar' }}
+                  </button>
+                </dd>
+              </div>
+              <div *ngIf="datos.transfer.holderName">
+                <dt>Titular</dt>
+                <dd><span>{{ datos.transfer.holderName }}</span></dd>
+              </div>
+              <div *ngIf="datos.transfer.cuit">
+                <dt>CUIT</dt>
+                <dd><span>{{ formatearCuit(datos.transfer.cuit) }}</span></dd>
+              </div>
+              <div *ngIf="datos.transfer.bankName">
+                <dt>Banco</dt>
+                <dd><span>{{ datos.transfer.bankName }}</span></dd>
+              </div>
+            </dl>
 
-        <button class="btn btn--primary" type="button" [disabled]="procesandoPago()" (click)="continuarConPago()">
-          <span>{{ procesandoPago() ? 'Conectando con Mercado Pago...' : 'Continuar con el pago' }}</span>
-        </button>
+            <p class="entrada__instrucciones" *ngIf="datos.transfer.instructions">{{ datos.transfer.instructions }}</p>
+
+            <p class="entrada__aviso-pago">
+              <span class="entrada__spinner" aria-hidden="true"></span>
+              Cuando el local reciba la transferencia, tu cuenta se marca como pagada.
+            </p>
+          </ng-container>
+        </ng-template>
+
+        <ng-template #cuentaMesa>
+          <h1>Tu cuenta</h1>
+
+          <ng-container *ngIf="pedidoActivo() as cuenta; else cargandoCuenta">
+            <ng-container *ngIf="cuenta.hasPendingOrder; else cuentaPaga">
+              <p>Incluye todos los pedidos de la mesa {{ cuenta.tableNumber }}.</p>
+
+              <ul class="entrada__order-items">
+                <ng-container *ngFor="let orden of cuenta.orders">
+                  <li *ngFor="let item of orden.items">
+                    <div class="entrada__order-item-heading">
+                      <span>{{ item.quantity }}× {{ item.name }}</span>
+                      <strong>{{ totalItem(item) | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</strong>
+                    </div>
+                    <div class="entrada__order-item-extras" *ngIf="item.extras?.length">
+                      <span *ngFor="let extra of item.extras">+ {{ extra.name }}</span>
+                    </div>
+                  </li>
+                </ng-container>
+              </ul>
+
+              <div class="entrada__order-total">
+                <span>Total</span>
+                <strong>{{ cuenta.total | currency:'ARS':'symbol':'1.0-0':'es-AR' }}</strong>
+              </div>
+
+              <p class="entrada__aviso-pago" *ngIf="esperandoPago() === 'mercadopago'; else botonesPago">
+                <span class="entrada__spinner" aria-hidden="true"></span>
+                Confirmando tu pago…
+              </p>
+              <ng-template #botonesPago>
+                <p class="entrada__aviso-pago" *ngIf="esperandoPago() === 'transferencia'">
+                  <span class="entrada__spinner" aria-hidden="true"></span>
+                  Esperando que el local confirme tu transferencia…
+                </p>
+                <div class="entrada__actions">
+                  <button class="btn btn--primary" type="button" *ngIf="mercadoPagoDisponible()"
+                    [disabled]="procesandoPago() || iniciandoTransferencia()" (click)="continuarConPago()">
+                    {{ procesandoPago() ? 'Conectando con Mercado Pago…' : 'Pagar con Mercado Pago' }}
+                  </button>
+                  <button class="btn btn--ghost" type="button" *ngIf="transferenciaDisponible()"
+                    [disabled]="procesandoPago() || iniciandoTransferencia()" (click)="pagarPorTransferencia()">
+                    {{ iniciandoTransferencia() ? 'Buscando los datos…' : 'Pagar por transferencia' }}
+                  </button>
+                  <p class="entrada__solo-local" *ngIf="!hayPagoOnline()">
+                    Este local cobra en el salón. Pedí la cuenta al mozo desde "Medios de pago".
+                  </p>
+                </div>
+              </ng-template>
+            </ng-container>
+          </ng-container>
+        </ng-template>
+
+        <ng-template #cuentaPaga>
+          <div class="entrada__cuenta-paga">
+            <span aria-hidden="true">✅</span>
+            <p>No tenés nada pendiente de pago.</p>
+          </div>
+          <button class="btn btn--ghost" type="button" (click)="volverAtras()">Volver</button>
+        </ng-template>
+
+        <ng-template #cargandoCuenta>
+          <p class="entrada__aviso-pago">
+            <span class="entrada__spinner" aria-hidden="true"></span>
+            Buscando tu cuenta…
+          </p>
+        </ng-template>
       </div>
     </section>
   </ng-template>
+
 
   <div class="popup-backdrop" *ngIf="modalAbierto()" (click)="cerrarModal()" aria-hidden="true">
     <div class="popup" role="dialog" aria-modal="true" aria-label="Mensaje" (click)="$event.stopPropagation()">

@@ -238,17 +238,38 @@
   40%, 80% { transform: translateX(8px); background: var(--danger-soft); }
 }
 
-/* ---------- CTA flotante sobre la tabbar ---------- */
+/* ---------- CTA: panel fijo sobre la tabbar con datos, totales y botón ---------- */
+// Fijo desde el borde inferior: la tabbar se dibuja encima. El alto real se mide en el
+// componente (altoCta) y se reserva como padding de .carrito para que la lista no quede tapada.
 .cta {
-  position: sticky;
-  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 4px);
-  z-index: 2;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 10px);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  background: var(--bg);
+  box-shadow: 0 -8px 24px rgba(28, 25, 23, 0.1);
+  animation: barra-in 600ms 200ms var(--ease-spring) both;
 }
 
 #enviar {
   width: 100%;
   justify-content: space-between;
-  min-height: 56px;
+  min-height: 52px;
+}
+
+@keyframes barra-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: none;
+  }
 }
 
 /* ---------- Vacío ---------- */

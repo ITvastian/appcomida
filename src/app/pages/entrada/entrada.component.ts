@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnDestroy, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, OnDestroy, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AvatarService } from 'src/app/core/services/avatar.service';
 import { PerfilService } from 'src/app/core/services/perfil.service';
-import { PaymentsService, TransferInitializationResponse } from 'src/app/core/services/payments.service';
+import { PaymentsService, TransferenciaResponse } from 'src/app/core/services/payments.service';
 import { RealtimeService } from 'src/app/core/services/realtime.service';
+import { PedidoActivoItem, PedidoActivoService } from 'src/app/core/services/pedido-activo.service';
 import { TenantContextService } from 'src/app/core/services/tenant-context.service';
 import { WaiterRequestsService } from 'src/app/core/services/waiter-requests.service';
 
@@ -19,7 +20,8 @@ import { WaiterRequestsService } from 'src/app/core/services/waiter-requests.ser
 })
 export class EntradaComponent implements OnDestroy {
   private static readonly FALLBACK_AVATAR_URL = 'assets/img/dynologo.png';
-  private static readonly PAYMENT_RETURN_URL = 'https://dyno.web.app';
+  // 409 "Ya se está generando el pago": reintentos cada 2,5 s antes de mostrar error.
+  private static readonly MAX_REINTENTOS_PAGO = 4;
 
   private readonly perfilService = inject(PerfilService);
   private readonly waiterRequestsService = inject(WaiterRequestsService);
@@ -28,12 +30,27 @@ export class EntradaComponent implements OnDestroy {
   private readonly tenantContextService = inject(TenantContextService);
   private readonly route = inject(ActivatedRoute);
   private readonly realtimeService = inject(RealtimeService);
+  private readonly pedidoActivoService = inject(PedidoActivoService);
   private readonly destroyRef = inject(DestroyRef);
   solicitandoMozo = signal(false);
   solicitandoCuenta = signal(false);
-  iniciandoTransferencia = signal(false);
   procesandoPago = signal(false);
-  transferenciaResumen = signal<TransferInitializationResponse | null>(null);
+  revisandoCuenta = signal(false);
+  // Medios online del local (GET /payments/methods). También se apagan si create/init
+  // responden 400. Si la consulta falla: Mercado Pago visible y transferencia oculta.
+  mercadoPagoDisponible = signal(true);
+  transferenciaDisponible = signal(false);
+  readonly hayPagoOnline = computed(() => this.mercadoPagoDisponible() || this.transferenciaDisponible());
+
+  iniciandoTransferencia = signal(false);
+  datosTransferencia = signal<TransferenciaResponse | null>(null);
+  copiado = signal<'alias' | 'cbu' | null>(null);
+  private copiadoTimer?: ReturnType<typeof setTimeout>;
+
+  readonly pedidoActivo = this.pedidoActivoService.pedido;
+  readonly confirmandoPago = this.pedidoActivoService.confirmandoPago;
+  readonly esperandoPago = this.pedidoActivoService.esperandoPago;
+  readonly pagoRecibido = this.pedidoActivoService.pagoRecibido;
   mediosPagoVisibles = signal(false);
   mozoAvisado = signal(false);
   cuentaSolicitada = signal(false);
@@ -44,15 +61,21 @@ export class EntradaComponent implements OnDestroy {
   modalAbierto = signal(false);
   modalMensaje = signal('');
   introVisible = signal(true);
-  private paymentIdPendiente: string | null = null;
   private introTimer?: ReturnType<typeof setTimeout>;
 
   ngOnInit(): void {
     this.hidratarContextoDesdeQr();
     // Con el tenant del QR ya guardado, (re)abre el canal en tiempo real del local.
     this.realtimeService.conectar();
+    this.procesarRegresoDeMercadoPago();
     this.actualizarDisponibilidadMesa();
+    // Desde la tarjeta "Pedido en curso": abrir directamente la cuenta.
+    if (this.route.snapshot.queryParamMap.get('pagar') === '1') {
+      this.introVisible.set(false);
+      this.abrirResumenCuenta();
+    }
     this.cargarAvatarActual();
+    this.cargarMetodosDePago();
 
     this.realtimeService
       .on('avatar_updated')
@@ -68,6 +91,7 @@ export class EntradaComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    clearTimeout(this.copiadoTimer);
     if (this.introTimer) {
       clearTimeout(this.introTimer);
     }
@@ -106,8 +130,8 @@ export class EntradaComponent implements OnDestroy {
   }
 
   pedirCuenta(medioPago: string): void {
-    if (medioPago === 'Transferencia') {
-      this.iniciarTransferencia();
+    if (medioPago === 'Mercado Pago' || medioPago === 'Transferencia') {
+      this.abrirResumenCuenta();
       return;
     }
 
@@ -139,97 +163,194 @@ export class EntradaComponent implements OnDestroy {
       });
   }
 
-  iniciarTransferencia(): void {
+  private cargarMetodosDePago(): void {
+    const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      return;
+    }
+    this.paymentsService.getMetodos(tenantId).subscribe({
+      next: (metodos) => {
+        this.mercadoPagoDisponible.set(metodos?.mercadopago === true);
+        this.transferenciaDisponible.set(metodos?.transfer === true);
+      },
+      error: (error) => console.warn('No se pudieron consultar los medios de pago:', error),
+    });
+  }
+
+  /** Muestra la cuenta de la mesa (todos los pedidos pendientes) con los medios online disponibles. */
+  abrirResumenCuenta(): void {
+    if (!this.tenantContextService.getTenantId() || !this.tenantContextService.getTableNumber(undefined)) {
+      this.mostrarModal('No encontramos los datos de la mesa para pagar.');
+      return;
+    }
+    this.pedidoActivoService.refrescar();
+    this.mediosPagoVisibles.set(false);
+    this.revisandoCuenta.set(true);
+  }
+
+  continuarConPago(intento = 0): void {
     const tenantId = this.tenantContextService.getTenantId();
     const tableNumber = this.tenantContextService.getTableNumber(undefined);
     if (!tenantId || !tableNumber) {
-      this.mostrarModal('No encontramos los datos de la mesa para iniciar la transferencia.');
-      return;
-    }
-
-    this.paymentIdPendiente ??= `pago_${crypto.randomUUID()}`;
-    this.iniciandoTransferencia.set(true);
-    this.paymentsService
-      .initializeTransfer({
-        paymentId: this.paymentIdPendiente,
-        tenantId,
-        tableNumber,
-        paymentMethod: 'transfer',
-      })
-      .pipe(finalize(() => this.iniciandoTransferencia.set(false)))
-      .subscribe({
-        next: (response) => {
-          const amount = Number(response.amount ?? response.order?.total);
-          if (!response.success || !response.orderId || !response.order || !Number.isFinite(amount)) {
-            this.mostrarModal('El servidor no devolvió los datos completos de la orden.');
-            return;
-          }
-
-          this.paymentIdPendiente = null;
-          this.transferenciaResumen.set({ ...response, amount });
-          this.mediosPagoVisibles.set(false);
-        },
-        error: (error) => {
-          console.error('Error al iniciar la transferencia:', error);
-          this.mostrarModal('No se pudo cargar la orden para transferir. Intenta de nuevo.');
-        },
-      });
-  }
-
-  continuarConPago(): void {
-    const resumen = this.transferenciaResumen();
-    if (!resumen) {
+      this.mostrarModal('No encontramos los datos de la mesa para pagar.');
       return;
     }
 
     this.procesandoPago.set(true);
+    this.paymentsService.createMercadoPagoCheckout({ tenantId, tableNumber }).subscribe({
+      next: (response) => {
+        try {
+          const checkoutUrl = new URL(response?.checkoutUrl ?? '');
+          if (checkoutUrl.protocol !== 'https:') {
+            throw new Error('La URL de pago debe usar HTTPS.');
+          }
+          // Se queda en "procesando" mientras el navegador navega al checkout.
+          window.location.assign(checkoutUrl.toString());
+        } catch (error) {
+          console.error('URL de pago inválida:', error);
+          this.procesandoPago.set(false);
+          this.mostrarModal('El enlace de pago recibido no es válido.');
+        }
+      },
+      error: (error) => this.manejarErrorDePago(error, intento),
+    });
+  }
+
+  private manejarErrorDePago(error: any, intento: number): void {
+    const mensaje: string = error?.error?.message ?? error?.error?.error ?? '';
+
+    // Otra persona de la mesa está generando el pago: reintentar en unos segundos.
+    if (error?.status === 409 && intento < EntradaComponent.MAX_REINTENTOS_PAGO) {
+      setTimeout(() => this.continuarConPago(intento + 1), 2500);
+      return;
+    }
+
+    this.procesandoPago.set(false);
+
+    if (error?.status === 400 && /mercado ?pago/i.test(mensaje)) {
+      this.mercadoPagoDisponible.set(false);
+      this.revisandoCuenta.set(false);
+      this.mostrarModal('Este local no acepta pagos con Mercado Pago. Pedí la cuenta al mozo.');
+      return;
+    }
+
+    if (error?.status === 404) {
+      this.pedidoActivoService.refrescar();
+      this.revisandoCuenta.set(false);
+      this.mostrarModal('No hay nada pendiente de pago: la cuenta ya está paga.');
+      return;
+    }
+
+    console.error('Error al crear el checkout de Mercado Pago:', error);
+    this.mostrarModal(mensaje || 'No se pudo continuar con el pago. Intenta de nuevo.');
+  }
+
+  /** Pide el monto y los datos bancarios; luego espera a que el staff confirme el pago. */
+  pagarPorTransferencia(): void {
+    const tenantId = this.tenantContextService.getTenantId();
+    const tableNumber = this.tenantContextService.getTableNumber(undefined);
+    if (!tenantId || !tableNumber) {
+      this.mostrarModal('No encontramos los datos de la mesa para pagar.');
+      return;
+    }
+
+    this.iniciandoTransferencia.set(true);
     this.paymentsService
-      .createMercadoPagoCheckout({
-        paymentId: resumen.paymentId,
-        tenantId: resumen.tenantId,
-        orderId: resumen.orderId,
-        tableNumber: Number(resumen.tableNumber),
-        amount: Number(resumen.amount),
-        back_urls: {
-          success: EntradaComponent.PAYMENT_RETURN_URL,
-          failure: EntradaComponent.PAYMENT_RETURN_URL,
-          pending: EntradaComponent.PAYMENT_RETURN_URL,
-        },
-        auto_return: 'approved',
-      })
-      .pipe(finalize(() => this.procesandoPago.set(false)))
+      .initializeTransfer({ tenantId, tableNumber })
+      .pipe(finalize(() => this.iniciandoTransferencia.set(false)))
       .subscribe({
-        next: (response) => {
-          if (!response.success || !response.checkoutUrl) {
-            this.mostrarModal('El servidor no devolvió el enlace de pago.');
+        next: (respuesta) => {
+          if (!respuesta?.success || !respuesta.transfer || !Number.isFinite(Number(respuesta.amount))) {
+            this.mostrarModal('No pudimos obtener los datos para transferir. Intentá de nuevo.');
             return;
           }
-
-          try {
-            const checkoutUrl = new URL(response.checkoutUrl);
-            if (checkoutUrl.protocol !== 'https:') {
-              throw new Error('La URL de pago debe usar HTTPS.');
-            }
-            window.location.assign(checkoutUrl.toString());
-          } catch (error) {
-            console.error('URL de pago inválida:', error);
-            this.mostrarModal('El enlace de pago recibido no es válido.');
-          }
+          this.datosTransferencia.set(respuesta);
+          this.pedidoActivoService.esperarConfirmacionDePago('transferencia');
         },
         error: (error) => {
-          console.error('Error al crear el checkout de Mercado Pago:', error);
-          this.mostrarModal('No se pudo continuar con el pago. Intenta de nuevo.');
+          const mensaje: string = error?.error?.message ?? error?.error?.error ?? '';
+          if (error?.status === 400) {
+            this.transferenciaDisponible.set(false);
+            this.mostrarModal(mensaje || 'Este local no acepta pagos por transferencia.');
+            return;
+          }
+          if (error?.status === 404) {
+            this.pedidoActivoService.refrescar();
+            this.mostrarModal('No hay nada pendiente de pago: la cuenta ya está paga.');
+            return;
+          }
+          console.error('Error al iniciar la transferencia:', error);
+          this.mostrarModal(mensaje || 'No pudimos obtener los datos para transferir. Intentá de nuevo.');
         },
       });
   }
 
+  async copiar(valor: string | undefined, campo: 'alias' | 'cbu'): Promise<void> {
+    if (!valor) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(valor);
+    } catch {
+      // Fallback para navegadores sin Clipboard API (o sin HTTPS).
+      const input = document.createElement('textarea');
+      input.value = valor;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      input.remove();
+    }
+    this.copiado.set(campo);
+    clearTimeout(this.copiadoTimer);
+    this.copiadoTimer = setTimeout(() => this.copiado.set(null), 1800);
+  }
+
+  // El backend manda el CUIT solo con dígitos: 30712345678 → 30-71234567-8.
+  formatearCuit(cuit: string | undefined): string {
+    const digitos = (cuit ?? '').replace(/\D/g, '');
+    return digitos.length === 11 ? `${digitos.slice(0, 2)}-${digitos.slice(2, 10)}-${digitos.slice(10)}` : cuit ?? '';
+  }
+
   volverAtras(): void {
-    this.transferenciaResumen.set(null);
+    // Desde los datos bancarios se vuelve a la cuenta; desde la cuenta, al inicio.
+    if (this.datosTransferencia()) {
+      this.datosTransferencia.set(null);
+      return;
+    }
+    this.revisandoCuenta.set(false);
+    this.pedidoActivoService.descartarPagoRecibido();
+  }
+
+  // Solo para mostrar la línea; el total de la cuenta viene del servidor.
+  totalItem(item: PedidoActivoItem): number {
+    const extras = (item.extras ?? []).reduce((suma, extra) => suma + (Number(extra.price) || 0), 0);
+    return ((Number(item.price) || 0) + extras) * (Number(item.quantity) || 0);
   }
 
   cerrarModal(): void {
     this.modalAbierto.set(false);
     this.modalMensaje.set('');
+  }
+
+  // Mercado Pago agrega estos parámetros al redirigir a la back_url. Volver del checkout no
+  // confirma nada: el pago se da por hecho solo cuando el GET de la mesa deja de mostrar pendientes.
+  private procesarRegresoDeMercadoPago(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const volvio = params.has('payment_id') || params.has('collection_status') || params.has('preference_id');
+    if (!volvio) {
+      this.pedidoActivoService.refrescar();
+      return;
+    }
+
+    const estado = (params.get('collection_status') || params.get('status') || '').toLowerCase();
+    if (estado === 'approved' || estado === 'pending' || estado === 'in_process') {
+      this.pedidoActivoService.esperarConfirmacionDePago();
+      return;
+    }
+
+    // rejected, cancelled, null (el cliente volvió sin pagar)...
+    this.pedidoActivoService.refrescar();
+    this.mostrarModal('El pago no se completó. Podés intentar de nuevo desde "Medios de pago".');
   }
 
   private hidratarContextoDesdeQr(): void {

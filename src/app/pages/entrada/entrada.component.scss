@@ -183,10 +183,59 @@ p {
   font-weight: 700;
 }
 
+// Columnas automáticas: si el local no tiene Mercado Pago quedan 2 chips del mismo ancho.
 .payment-tray__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 8px;
+}
+
+.entrada__aviso-pago {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 12px;
+  border-radius: var(--r-sm);
+  background: #fff6db;
+  color: #8a6100;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.entrada__spinner {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  animation: girar 800ms linear infinite;
+}
+
+.entrada__cuenta-paga {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin: 16px 0;
+  text-align: center;
+
+  span {
+    font-size: 2.4rem;
+    animation: dialog-pop 480ms var(--ease-spring) both;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .pay-chip {
@@ -266,40 +315,6 @@ p {
   font-weight: 800;
 }
 
-.entrada__order-meta {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin: 0 0 16px;
-
-  > div {
-    padding: 12px;
-    border-radius: var(--r-sm);
-    background: var(--bg);
-  }
-
-  dt {
-    margin-bottom: 4px;
-    color: var(--ink-3);
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-
-  dd {
-    margin: 0;
-    font-weight: 800;
-    overflow-wrap: anywhere;
-  }
-}
-
-.entrada__order-meta-main dd {
-  font-size: 1.15rem;
-}
-
-.entrada__order-meta-wide {
-  grid-column: 1 / -1;
-}
-
 .entrada__order-items {
   display: grid;
 
@@ -326,7 +341,7 @@ p {
   }
 }
 
-.entrada__order-item-unit-price,
+
 .entrada__order-item-extras {
   display: block;
   margin-top: 4px;
@@ -402,4 +417,90 @@ p {
 
 @keyframes confirmado {
   40% { transform: scale(1.04); }
+}
+
+/* ---------- Transferencia ---------- */
+.entrada__aviso-pago--ok {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.entrada__monto {
+  margin: 4px 0 16px !important;
+  text-align: center;
+  color: var(--ink) !important;
+  font-size: 2.4rem !important;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.entrada__banco {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+
+  > div {
+    padding: 10px 12px;
+    border-radius: var(--r-sm);
+    background: var(--bg);
+  }
+
+  dt {
+    color: var(--ink-3);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  dd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 2px 0 0;
+    font-weight: 700;
+
+    span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      user-select: all;
+    }
+  }
+}
+
+.entrada__copiar {
+  flex: none;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  box-shadow: var(--sh-1);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.entrada__copiar--ok {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.entrada__instrucciones,
+.entrada__solo-local {
+  margin: 0 0 14px !important;
+  font-size: 0.88rem !important;
+  text-align: center;
+}
+
+.entrada__pago-ok {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+
+  .btn {
+    width: 100%;
+  }
+}
+
+.entrada__pago-ok-icono {
+  font-size: 3rem;
+  animation: dialog-pop 520ms var(--ease-spring) both;
 }

@@ -12,7 +12,9 @@ export type RealtimeEvent =
   | { type: 'banner_updated'; banners: unknown; slot?: number; tenantId: string; timestamp?: string }
   | { type: 'title_background_updated'; imageUrl: string; tenantId: string; timestamp?: string }
   | { type: 'header_title_updated'; title: string; isActive: boolean; tenantId: string; timestamp?: string }
-  | { type: 'avatar_updated'; imageUrl: string; tenantId: string; timestamp?: string };
+  | { type: 'avatar_updated'; imageUrl: string; tenantId: string; timestamp?: string }
+  // Solo llega a la mesa afectada; no trae datos: hay que volver a pedir el pedido por HTTP.
+  | { type: 'table_order_updated'; tableNumber: number; tenantId: string; timestamp?: string };
 
 const TIPOS_CONOCIDOS = new Set<RealtimeEvent['type']>([
   'connection_established',
@@ -21,6 +23,7 @@ const TIPOS_CONOCIDOS = new Set<RealtimeEvent['type']>([
   'title_background_updated',
   'header_title_updated',
   'avatar_updated',
+  'table_order_updated',
 ]);
 
 // Espera entre reintentos de conexión (ms). El último valor se repite.
@@ -42,6 +45,7 @@ export class RealtimeService implements OnDestroy {
   private readonly zone = inject(NgZone);
 
   private socket?: WebSocket;
+  // "tenant" o "tenant#mesa": identifica a qué canal está conectado el socket.
   private tenantConectado = '';
   private intentos = 0;
   private huboCorte = false;
@@ -85,7 +89,7 @@ export class RealtimeService implements OnDestroy {
     ).pipe(map(() => undefined));
   }
 
-  /** Abre la conexión si no existe, o la reabre si cambió el local activo. */
+  /** Abre la conexión si no existe, o la reabre si cambió el local o la mesa activa. */
   conectar(): void {
     this.detenido = false;
     const tenantId = this.tenantContext.getTenantId();
@@ -93,10 +97,14 @@ export class RealtimeService implements OnDestroy {
       return;
     }
 
+    // Con la mesa, el backend además envía table_order_updated de esa mesa.
+    const mesa = this.tenantContext.getTableNumber(undefined);
+    const destino = mesa > 0 ? `${tenantId}#${mesa}` : tenantId;
+
     const activo =
       this.socket &&
       (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING);
-    if (activo && this.tenantConectado === tenantId) {
+    if (activo && this.tenantConectado === destino) {
       return;
     }
 
@@ -109,8 +117,10 @@ export class RealtimeService implements OnDestroy {
       this.reconnectTimer = undefined;
     }
 
-    this.tenantConectado = tenantId;
-    const url = `${this.apiConfig.ws()}/ws/public?tenantId=${encodeURIComponent(tenantId)}`;
+    this.tenantConectado = destino;
+    const url =
+      `${this.apiConfig.ws()}/ws/public?tenantId=${encodeURIComponent(tenantId)}` +
+      (mesa > 0 ? `&table=${mesa}` : '');
 
     // Fuera de la zona para no disparar change detection por cada frame del socket.
     this.zone.runOutsideAngular(() => {

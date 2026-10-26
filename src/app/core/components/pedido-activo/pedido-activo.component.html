@@ -1,0 +1,46 @@
+<div class="pago-ok" *ngIf="servicio.pagoRecibido()" role="status">
+  <span aria-hidden="true">🎉</span>
+  <strong>¡Pago recibido! Tu cuenta quedó paga.</strong>
+  <button type="button" (click)="servicio.descartarPagoRecibido()" aria-label="Cerrar">✕</button>
+</div>
+
+<section class="pedido" *ngIf="servicio.pedido() as pedido" [hidden]="!pedido.hasPendingOrder">
+  <button type="button" class="pedido__head" (click)="abierto.set(!abierto())" [attr.aria-expanded]="abierto()">
+    <span class="pedido__pulso" [class.pedido__pulso--pago]="servicio.confirmandoPago()" aria-hidden="true"></span>
+    <span class="pedido__titulo">
+      <strong>Pedido en curso</strong>
+      <small *ngIf="!servicio.confirmandoPago(); else confirmando">
+        Mesa {{ pedido.tableNumber }} · {{ cantidadItems() }} {{ cantidadItems() === 1 ? 'producto' : 'productos' }}
+      </small>
+      <ng-template #confirmando><small class="pedido__confirmando">{{ servicio.esperandoPago() === 'transferencia' ? 'Esperando confirmación de la transferencia…' : 'Confirmando pago…' }}</small></ng-template>
+    </span>
+    <span class="pedido__total">${{ pedido.total | number:'1.0-0':'es-AR' }}</span>
+    <svg class="pedido__chevron" [class.pedido__chevron--abierto]="abierto()" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
+
+  <div class="pedido__cuerpo" [class.pedido__cuerpo--abierto]="abierto()">
+    <div class="pedido__interior">
+      <div class="orden" *ngFor="let orden of pedido.orders">
+        <div class="orden__head">
+          <span>#{{ orden.orderId }}</span>
+          <span>{{ orden.createdAt | date:'HH:mm' }} hs</span>
+        </div>
+        <ul>
+          <li *ngFor="let item of orden.items">
+            <div class="orden__fila">
+              <span>{{ item.quantity }}× {{ item.name }}</span>
+              <span>${{ totalItem(item) | number:'1.0-0':'es-AR' }}</span>
+            </div>
+            <small *ngFor="let extra of item.extras">+ {{ extra.name }}</small>
+          </li>
+        </ul>
+      </div>
+
+      <a class="btn btn--primary pedido__pagar" routerLink="/entrada" [queryParams]="{ pagar: 1 }" *ngIf="!servicio.confirmandoPago()">
+        Ver la cuenta y pagar
+      </a>
+    </div>
+  </div>
+</section>

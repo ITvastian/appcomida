@@ -56,7 +56,8 @@
   z-index: 1;
   flex: 1;
   margin-top: -28px;
-  padding: 24px 18px 20px;
+  // Espacio para la barra fija (≈72px): el final del contenido queda visible sobre ella.
+  padding: 24px 18px 88px;
   border-radius: var(--r-lg) var(--r-lg) 0 0;
   background: var(--bg);
   animation: hoja-in 640ms var(--ease-spring) both;
@@ -238,20 +239,32 @@ textarea {
 }
 
 /* ---------- Barra de acción (sobre la tabbar) ---------- */
+// Panel opaco fijo desde el borde inferior: la tabbar se dibuja encima y el contenido
+// nunca queda visible detrás de la barra.
 .barra {
-  position: sticky;
-  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 4px);
-  z-index: 2;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 0 12px;
-  padding: 10px;
-  border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  box-shadow: var(--sh-2);
-  animation: rise-in 600ms 250ms var(--ease-spring) both;
+  padding: 12px 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 10px);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  background: var(--surface);
+  box-shadow: 0 -8px 24px rgba(28, 25, 23, 0.08);
+  animation: barra-in 600ms 200ms var(--ease-spring) both;
+}
+
+@keyframes barra-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: none;
+  }
 }
 
 .stepper {

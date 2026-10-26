@@ -2,7 +2,8 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 18px 16px 8px;
+  // Espacio para el botón fijo (≈76px) para que el final del formulario quede visible.
+  padding: 18px 16px 92px;
 }
 
 .perfil-form {
@@ -197,15 +198,33 @@
 }
 
 /* ---------- Botón ---------- */
+// Panel opaco fijo desde el borde inferior (igual que en el artículo): la tabbar se dibuja
+// encima y el formulario nunca queda visible detrás del botón.
 .pedido-footer {
-  position: sticky;
-  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 4px);
-  margin-top: auto;
-  padding-top: 20px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 12px 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 10px);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  background: var(--surface);
+  box-shadow: 0 -8px 24px rgba(28, 25, 23, 0.08);
+  animation: barra-in 600ms 200ms var(--ease-spring) both;
 
   .btn {
     width: 100%;
-    min-height: 56px;
+    min-height: 52px;
+  }
+}
+
+@keyframes barra-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: none;
   }
 }
 

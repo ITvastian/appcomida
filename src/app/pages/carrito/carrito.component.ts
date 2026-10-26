@@ -22,13 +22,15 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ApiConfigService } from 'src/app/core/services/api-config.service';
 import { RealtimeService } from 'src/app/core/services/realtime.service';
+import { PedidoActivoService } from 'src/app/core/services/pedido-activo.service';
+import { PedidoActivoComponent } from 'src/app/core/components/pedido-activo/pedido-activo.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-carrito',
   templateUrl: './carrito.component.html',
   styleUrls: ['./carrito.component.scss'],
-  imports: [CommonModule, ContadorCantidadComponent, RouterModule, FormsModule],
+  imports: [CommonModule, ContadorCantidadComponent, RouterModule, FormsModule, PedidoActivoComponent],
   standalone: true,
 })
 export class CarritoComponent implements OnDestroy {
@@ -40,6 +42,7 @@ export class CarritoComponent implements OnDestroy {
   apiConfigService = inject(ApiConfigService);
   router = inject(Router);
   realtimeService = inject(RealtimeService);
+  pedidoActivoService = inject(PedidoActivoService);
   private destroyRef = inject(DestroyRef);
 
   productosCarrito: WritableSignal<
@@ -61,6 +64,23 @@ export class CarritoComponent implements OnDestroy {
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>;
   @ViewChild('tableDialog') tableDialog!: ElementRef<HTMLDialogElement>;
   @ViewChild('errorDialog') errorDialog!: ElementRef<HTMLDialogElement>;
+
+  // Alto del panel fijo (.cta). Cambia con los datos/extras, por eso se observa.
+  altoCta = signal(0);
+  private ctaObserver?: ResizeObserver;
+
+  @ViewChild('cta') set cta(ref: ElementRef<HTMLElement> | undefined) {
+    this.ctaObserver?.disconnect();
+    if (!ref) {
+      this.altoCta.set(0);
+      return;
+    }
+    this.ctaObserver = new ResizeObserver(([entry]) =>
+      this.altoCta.set(Math.ceil(entry.borderBoxSize?.[0]?.blockSize ?? entry.target.getBoundingClientRect().height))
+    );
+    this.ctaObserver.observe(ref.nativeElement);
+  }
+
   tituloErrorPedido = '';
   mensajeErrorPedido = '';
   private readonly apiUrl = this.apiConfigService.api('/salon/order');
@@ -70,6 +90,7 @@ export class CarritoComponent implements OnDestroy {
 
   ngOnInit(): void {
     this.headerService.titulo.set('Carrito');
+    this.pedidoActivoService.refrescar();
     this.cargandoCarrito.set(true);
     this.buscarInfo().finally(() => {
       this.calcularinfo();
@@ -125,6 +146,7 @@ export class CarritoComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.ctaObserver?.disconnect();
     if (this.perfilAlertTimer) {
       clearTimeout(this.perfilAlertTimer);
     }
@@ -365,6 +387,7 @@ export class CarritoComponent implements OnDestroy {
         })
       );
       console.log('Orden enviada exitosamente al servidor:', response);
+      this.pedidoActivoService.refrescar();
       return true;
     } catch (err) {
       console.error('Error al enviar la orden:', err);
@@ -504,6 +527,9 @@ export class CarritoComponent implements OnDestroy {
     }
 
     localStorage.setItem('tableNumber', String(mesa));
+    // Nueva mesa: reabrir el canal con table= y traer su pedido abierto.
+    this.realtimeService.conectar();
+    this.pedidoActivoService.refrescar();
     this.errorNumeroMesa = '';
     this.tableDialog.nativeElement.close();
     this.abrirConfirmacionPedido();

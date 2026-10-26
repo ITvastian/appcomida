@@ -5,11 +5,14 @@
 </ng-container>
 
 <ng-template #carritoListo>
-  <div class="carrito" *ngIf="productosCarrito().length > 0; else sinCarrito">
+  <div class="carrito" *ngIf="productosCarrito().length > 0; else sinCarrito"
+    [style.padding-bottom]="'calc(' + altoCta() + 'px - var(--tabbar-h) - env(safe-area-inset-bottom, 0px) + 8px)'">
     <header class="carrito__head rise-in">
       <span class="eyebrow">Tu pedido</span>
       <h2>{{ productosCarrito().length }} {{ productosCarrito().length === 1 ? 'producto' : 'productos' }}</h2>
     </header>
+
+    <app-pedido-activo></app-pedido-activo>
 
     <div class="items stagger">
       <article *ngFor="let item of productosCarrito(); let i = index" class="item" [style.--i]="i">
@@ -47,43 +50,43 @@
       Agregar más productos
     </a>
 
-    <section class="panel rise-in" id="informacion">
-      <div class="cliente" [class.perfil-incompleto-alerta]="perfilIncompletoAlert()">
-        <ng-container *ngIf="perfilService.perfil() as perfil; else sinDatosEnvio">
-          <div class="cliente__avatar" aria-hidden="true">{{ (perfil.nombre || '?').charAt(0) }}</div>
-          <div class="cliente__body">
-            <strong>{{ perfil.nombre }}</strong>
-            <span>{{ perfil.takeAway ? '🥡 Para llevar' : '🍽️ En mesa' }}</span>
-            <small *ngIf="perfil.detalleEntrega">📝 {{ perfil.detalleEntrega }}</small>
+    <div class="cta" #cta>
+      <section class="panel" id="informacion">
+        <div class="cliente" [class.perfil-incompleto-alerta]="perfilIncompletoAlert()">
+          <ng-container *ngIf="perfilService.perfil() as perfil; else sinDatosEnvio">
+            <div class="cliente__avatar" aria-hidden="true">{{ (perfil.nombre || '?').charAt(0) }}</div>
+            <div class="cliente__body">
+              <strong>{{ perfil.nombre }}</strong>
+              <span>{{ perfil.takeAway ? '🥡 Para llevar' : '🍽️ En mesa' }}</span>
+              <small *ngIf="perfil.detalleEntrega">📝 {{ perfil.detalleEntrega }}</small>
+            </div>
+          </ng-container>
+          <ng-template #sinDatosEnvio>
+            <div class="cliente__body">
+              <strong>Faltan tus datos</strong>
+              <span>Los necesitamos para tu pedido</span>
+            </div>
+          </ng-template>
+
+          <a class="cliente__editar" [routerLink]="['/perfil']">Editar</a>
+        </div>
+
+        <div class="totales">
+          <div class="totales__fila">
+            <span>Subtotal</span>
+            <span>${{ formatPrice(subtotal) }}</span>
           </div>
-        </ng-container>
-        <ng-template #sinDatosEnvio>
-          <div class="cliente__body">
-            <strong>Faltan tus datos</strong>
-            <span>Los necesitamos para tu pedido</span>
+          <div class="totales__fila" *ngIf="extraTotal > 0">
+            <span>Extras</span>
+            <span>${{ formatPrice(extraTotal) }}</span>
           </div>
-        </ng-template>
-
-        <a class="cliente__editar" [routerLink]="['/perfil']">Editar</a>
-      </div>
-
-      <div class="totales">
-        <div class="totales__fila">
-          <span>Subtotal</span>
-          <span>${{ formatPrice(subtotal) }}</span>
+          <div class="totales__fila totales__fila--total">
+            <span>Total</span>
+            <strong>${{ formatPrice(total) }}</strong>
+          </div>
         </div>
-        <div class="totales__fila" *ngIf="extraTotal > 0">
-          <span>Extras</span>
-          <span>${{ formatPrice(extraTotal) }}</span>
-        </div>
-        <div class="totales__fila totales__fila--total">
-          <span>Total</span>
-          <strong>${{ formatPrice(total) }}</strong>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <div class="cta">
       <button id="enviar" class="btn btn--primary" type="button" (click)="abrirConfirmacionPedido()">
         <span>Realizar pedido</span>
         <strong>${{ formatPrice(total) }}</strong>
@@ -93,11 +96,21 @@
 </ng-template>
 
 <ng-template #sinCarrito>
-  <div class="vacio rise-in">
-    <div class="vacio__icono" aria-hidden="true">🛍️</div>
-    <h2>Tu pedido está vacío</h2>
-    <p>Elegí algo rico del menú para empezar.</p>
-    <a class="btn btn--primary" [routerLink]="['/home']">Ver el menú</a>
+  <div class="carrito">
+    <app-pedido-activo></app-pedido-activo>
+
+    <div class="vacio rise-in">
+      <div class="vacio__icono" aria-hidden="true">🛍️</div>
+      <ng-container *ngIf="pedidoActivoService.hayPedido(); else sinPedido">
+        <h2>¿Algo más?</h2>
+        <p>Tu pedido ya está en la cocina. Podés sumar más productos cuando quieras.</p>
+      </ng-container>
+      <ng-template #sinPedido>
+        <h2>Tu pedido está vacío</h2>
+        <p>Elegí algo rico del menú para empezar.</p>
+      </ng-template>
+      <a class="btn btn--primary" [routerLink]="['/home']">Ver el menú</a>
+    </div>
   </div>
 </ng-template>
 
