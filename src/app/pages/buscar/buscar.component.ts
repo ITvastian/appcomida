@@ -1,13 +1,13 @@
 import { Producto } from 'src/app/core/interface/productos';
 import { ProductosService } from './../../core/services/productos.service';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Busqueda } from 'src/app/core/interface/busqueda';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { RealtimeService } from 'src/app/core/services/realtime.service';
 import { TarjetaProductoComponent } from 'src/app/core/components/tarjeta-producto/tarjeta-producto.component';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -18,10 +18,20 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   imports: [CommonModule, FormsModule, TarjetaProductoComponent, RouterModule],
   standalone: true,
 })
-export class BuscarComponent implements OnInit, OnDestroy {
+export class BuscarComponent implements OnInit, AfterViewInit, OnDestroy {
   headerService = inject(HeaderService);
   productosService = inject(ProductosService);
   realtimeService = inject(RealtimeService);
+  private route = inject(ActivatedRoute);
+
+  @ViewChild('campo') private campo?: ElementRef<HTMLInputElement>;
+
+  // Desde el buscador de la home (?foco=1): abrir con el cursor en el campo.
+  ngAfterViewInit(): void {
+    if (this.route.snapshot.queryParamMap.get('foco') === '1') {
+      setTimeout(() => this.campo?.nativeElement.focus(), 350);
+    }
+  }
 
   productos: Producto[] = [];
   productosCompletos: Producto[] = []; // Todos los productos cargados

@@ -504,3 +504,28 @@ p {
   font-size: 3rem;
   animation: dialog-pop 520ms var(--ease-spring) both;
 }
+
+/* Confirmación de "Solicitar mozo" */
+.entrada__confirmar {
+  padding: 14px 12px 12px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  animation: desplegar 360ms var(--ease-spring) both;
+  transform-origin: top;
+
+  p {
+    margin: 0 0 12px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+}
+
+.entrada__confirmar-acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  .btn {
+    min-height: 46px;
+  }
+}

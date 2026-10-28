@@ -4,7 +4,9 @@ import { TitleHeaderService } from 'src/app/core/services/title-header.service';
 import { UiConfigService } from 'src/app/core/services/ui-config.service';
 import { Component, effect, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { TenantContextService } from 'src/app/core/services/tenant-context.service';
+import { PedidoActivoService } from 'src/app/core/services/pedido-activo.service';
 import { Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { takeUntil } from 'rxjs/operators';
@@ -14,7 +16,7 @@ import { takeUntil } from 'rxjs/operators';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   headerService = inject(HeaderService);
@@ -23,6 +25,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   uiConfigService = inject(UiConfigService);
   router = inject(Router);
   location = inject(Location);
+  private tenantContext = inject(TenantContextService);
+  pedidoActivo = inject(PedidoActivoService);
+
+  // Mesa del QR (0 si no hay); se muestra en la placa del header extendido.
+  get mesa(): number {
+    return this.tenantContext.getTableNumber(undefined);
+  }
 
   claseAplicada = signal('');
   tituloMostrado = signal('');
@@ -43,6 +52,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   );
 
   ngOnInit() {
+    // Para la placa de la mesa (si se entra directo a /home sin pasar por la entrada).
+    this.pedidoActivo.refrescar();
     this.actualizarEstadoRuta(this.router.url);
 
     this.router.events

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { CategoriasService } from './../../core/services/categorias.service';
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, WritableSignal, computed } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RealtimeService } from 'src/app/core/services/realtime.service';
 import { TarjetaCategoryComponent } from 'src/app/core/components/tarjeta-category/tarjeta-category.component';
@@ -8,7 +8,6 @@ import { Categoria } from 'src/app/core/interface/categorias';
 import { HeaderService } from 'src/app/core/services/header.service';
 import { RouterModule } from '@angular/router';
 import { CarruselComponent } from "../../core/components/carousel/carousel.component";
-import { FormsModule } from '@angular/forms';
 import { saveAs } from 'file-saver';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
@@ -18,7 +17,7 @@ import { Router } from '@angular/router';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   standalone:true,
-  imports: [TarjetaCategoryComponent, CommonModule, RouterModule, CarruselComponent, FormsModule]
+  imports: [TarjetaCategoryComponent, CommonModule, RouterModule, CarruselComponent]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   headerService = inject(HeaderService);
@@ -28,19 +27,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   realtimeService = inject(RealtimeService);
   private destroyRef = inject(DestroyRef);
   categorias: WritableSignal<Categoria[]> = signal([]);
-  textoBusqueda = signal('');
   cargandoCategorias = signal(true);
   errorCategorias = signal(false);
-
-  categoriasFiltradasVacio = computed(() => {
-    const texto = this.textoBusqueda().toLowerCase().trim();
-    if (!texto) {
-      return this.categorias();
-    }
-    return this.categorias().filter(cat =>
-      cat.name.toLowerCase().includes(texto)
-    );
-  });
 
   ngOnInit(): void {
     this.headerService.titulo.set('');
@@ -78,10 +66,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.cargandoCategorias.set(false);
       },
     });
-  }
-
-  limpiarBusqueda() {
-    this.textoBusqueda.set('');
   }
 
   reintentarCargaCategorias() {

@@ -4,8 +4,9 @@
       <img [src]="foto.url" alt="Promoción" />
     </div>
   </div>
+</div>
 
-  <div class="dots" *ngIf="fotos.length > 1" aria-hidden="true">
-    <span *ngFor="let foto of fotos; let i = index" class="dot" [class.dot--activo]="i === dotActivo"></span>
-  </div>
+<!-- Fuera de la imagen para no tapar el contenido de los banners. -->
+<div class="dots" *ngIf="fotos.length > 1" aria-hidden="true">
+  <span *ngFor="let foto of fotos; let i = index" class="dot" [class.dot--activo]="i === dotActivo"></span>
 </div>

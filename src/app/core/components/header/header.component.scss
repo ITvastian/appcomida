@@ -32,7 +32,7 @@
 }
 
 .header.extendido {
-  height: 168px;
+  height: 132px;
   border-radius: 0 0 var(--r-lg) var(--r-lg);
 
   .header__fondo {
@@ -44,10 +44,51 @@
     }
   }
 
-  h1 {
-    align-self: flex-end;
-    margin-bottom: 18px;
-    font-size: clamp(1.4rem, 6.5vw, 2rem);
+  // Título del local (opcional, lo envía el back): placa de vidrio esmerilado abajo a la
+  // izquierda, legible sobre cualquier imagen de fondo.
+  // :not(.fade-out) para no pisar la animación titulo-out, que el componente espera para cambiar el texto.
+  h1:not(.sin-titulo):not(.fade-out) {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    flex: none;
+    // Deja lugar a la placa de la mesa (derecha).
+    max-width: calc(100% - 140px);
+    padding: 8px 18px 9px 14px;
+    border-radius: var(--r-pill);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(20, 16, 14, 0.42);
+    backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    font-size: clamp(1.15rem, 5.4vw, 1.6rem);
+    letter-spacing: -0.02em;
+    text-shadow: none;
+    animation: placa-in 700ms 150ms var(--ease-spring) both;
+
+    // Detalle de acento a la izquierda del texto.
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin: 0 10px 0.18em 0;
+      border-radius: 50%;
+      background: var(--accent-grad);
+      box-shadow: 0 0 0 4px rgba(255, 91, 53, 0.25);
+      vertical-align: middle;
+    }
+  }
+}
+
+@keyframes placa-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -61,10 +102,12 @@
   height: 40px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  // Vidrio oscuro (como la placa del título): contrasta tanto en fondos claros como oscuros.
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(10px);
+  background: rgba(20, 16, 14, 0.45);
+  backdrop-filter: blur(12px) saturate(1.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   color: #fff;
 
   svg {
@@ -122,5 +165,61 @@ h1.sin-titulo {
   to {
     opacity: 0;
     transform: translateX(-12px);
+  }
+}
+
+/* Placa de la mesa (header extendido, abajo a la derecha). */
+.header__mesa {
+  position: absolute;
+  z-index: 2;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(20, 16, 14, 0.42);
+  backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+  animation: placa-in 700ms 250ms var(--ease-spring) both;
+  transition: transform 200ms var(--ease-out);
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.header__mesa--pedido {
+  background: rgba(255, 91, 53, 0.85);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.header__mesa-punto {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #fff;
+    animation: mesa-pulso 1.6s ease-out infinite;
+  }
+}
+
+@keyframes mesa-pulso {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
   }
 }

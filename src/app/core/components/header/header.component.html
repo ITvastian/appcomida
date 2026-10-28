@@ -11,4 +11,12 @@
   <h1 [ngClass]="[claseAplicada(), !tituloVisible() ? 'sin-titulo' : '']" (animationend)="mostrarTituloNuevo($event)">
     {{ tituloVisible() }}
   </h1>
+
+  <!-- Mesa actual; con pedido en curso lleva a "Tu pedido". -->
+  <a class="header__mesa" *ngIf="headerService.extendido() && mesa > 0" routerLink="/carrito"
+    [class.header__mesa--pedido]="pedidoActivo.hayPedido()"
+    [attr.aria-label]="pedidoActivo.hayPedido() ? 'Mesa ' + mesa + ', pedido en curso' : 'Mesa ' + mesa">
+    <span class="header__mesa-punto" *ngIf="pedidoActivo.hayPedido()" aria-hidden="true"></span>
+    Mesa {{ mesa }}
+  </a>
 </header>

@@ -53,6 +53,12 @@ export class EntradaComponent implements OnDestroy {
   readonly pagoRecibido = this.pedidoActivoService.pagoRecibido;
   mediosPagoVisibles = signal(false);
   mozoAvisado = signal(false);
+  // Paso intermedio: "Solicitar mozo" pide confirmación antes de enviar el llamado.
+  confirmandoMozo = signal(false);
+
+  mesaActual(): number {
+    return this.tenantContextService.getTableNumber(undefined);
+  }
   cuentaSolicitada = signal(false);
   avatarCargando = signal(true);
   avatarUrl = signal<string | null>(null);
@@ -106,6 +112,7 @@ export class EntradaComponent implements OnDestroy {
       return;
     }
 
+    this.confirmandoMozo.set(false);
     this.solicitandoMozo.set(true);
     this.waiterRequestsService
       .create({

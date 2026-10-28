@@ -31,27 +31,21 @@ img {
 }
 
 .dots {
-  position: absolute;
-  left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%);
   display: flex;
-  gap: 6px;
-  padding: 5px 8px;
-  border-radius: var(--r-pill);
-  background: rgba(20, 16, 14, 0.35);
-  backdrop-filter: blur(6px);
+  justify-content: center;
+  gap: 5px;
+  margin-top: 10px;
 }
 
 .dot {
   width: 6px;
-  height: 6px;
+  height: 4px;
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(28, 25, 23, 0.15);
   transition: width 420ms var(--ease-spring), background 300ms ease;
 }
 
 .dot--activo {
-  width: 18px;
-  background: #fff;
+  width: 20px;
+  background: var(--accent);
 }

@@ -20,11 +20,13 @@
   box-shadow: var(--sh-1);
   border: 1px solid var(--line);
   transition: box-shadow 240ms ease, transform 240ms var(--ease-out);
-  cursor: text;
 
-  &:focus-within {
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
     box-shadow: 0 0 0 4px var(--accent-soft), var(--sh-2);
-    transform: translateY(-1px);
   }
 
   > svg {
@@ -37,39 +39,10 @@
     stroke-linecap: round;
   }
 
-  input {
+  .buscador__placeholder {
     flex: 1;
-    min-width: 0;
-    height: 100%;
-    border: 0;
-    outline: 0;
-    background: transparent;
+    color: var(--ink-3);
     font-size: 1rem;
-
-    &::placeholder {
-      color: var(--ink-3);
-    }
-  }
-}
-
-.buscador__limpiar {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: 50%;
-  background: var(--surface-2);
-  animation: pop-in 320ms var(--ease-spring) both;
-
-  svg {
-    width: 16px;
-    height: 16px;
-    fill: none;
-    stroke: var(--ink-2);
-    stroke-width: 2.4;
-    stroke-linecap: round;
   }
 }
 
@@ -89,7 +62,7 @@
 }
 
 .skeleton {
-  aspect-ratio: 1 / 1.05;
+  aspect-ratio: 4 / 3;
   border-radius: var(--r-md);
   background: linear-gradient(90deg, var(--surface-2) 25%, #fbf8f4 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
@@ -108,15 +81,6 @@
   box-shadow: var(--sh-1);
 }
 
-@keyframes pop-in {
-  from {
-    transform: scale(0);
-  }
-
-  to {
-    transform: scale(1);
-  }
-}
 
 @media (min-width: 560px) {
   .grid {

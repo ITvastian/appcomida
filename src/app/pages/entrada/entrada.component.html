@@ -33,10 +33,21 @@
 
       <div class="entrada__actions stagger">
         <a class="btn btn--primary" routerLink="/home" style="--i: 1">Ver menú</a>
-        <button class="btn btn--secondary" style="--i: 2" type="button" [class.btn--confirmed]="mozoAvisado()"
-          [disabled]="solicitandoMozo() || mozoAvisado()" (click)="solicitarMozo()">
-          {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? 'Mozo avisado' : 'Solicitar mozo') }}
-        </button>
+        <!-- Confirmación antes de llamar al mozo, para evitar llamados por un toque sin querer. -->
+        <div class="entrada__confirmar" style="--i: 2" *ngIf="confirmandoMozo(); else botonMozo" role="group"
+          aria-label="Confirmar llamado al mozo">
+          <p>{{ mesaActual() ? '¿Llamamos al mozo a la mesa ' + mesaActual() + '?' : '¿Llamamos al mozo?' }}</p>
+          <div class="entrada__confirmar-acciones">
+            <button class="btn btn--ghost" type="button" (click)="confirmandoMozo.set(false)">Cancelar</button>
+            <button class="btn btn--primary" type="button" (click)="solicitarMozo()">Sí, llamar</button>
+          </div>
+        </div>
+        <ng-template #botonMozo>
+          <button class="btn btn--secondary" style="--i: 2" type="button" [class.btn--confirmed]="mozoAvisado()"
+            [disabled]="solicitandoMozo() || mozoAvisado()" (click)="confirmandoMozo.set(true)">
+            {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? 'Mozo avisado' : 'Solicitar mozo') }}
+          </button>
+        </ng-template>
         <button class="btn btn--tertiary" style="--i: 3" type="button" [class.btn--confirmed]="cuentaSolicitada()"
           [disabled]="solicitandoCuenta() || cuentaSolicitada()"
           [attr.aria-expanded]="mediosPagoVisibles()" aria-controls="medios-pago" (click)="alternarMediosPago()">

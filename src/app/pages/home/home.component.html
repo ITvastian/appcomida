@@ -1,18 +1,12 @@
 <div class="home">
-  <label class="buscador" for="buscar-categoria">
+  <!-- Acceso a la búsqueda de productos (tab Buscar), que abre con el teclado listo. -->
+  <a class="buscador" routerLink="/buscar" [queryParams]="{ foco: 1 }">
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="11" cy="11" r="6.5" />
       <path d="m20 20-4.2-4.2" />
     </svg>
-    <input id="buscar-categoria" type="text" placeholder="Buscar categoría" autocomplete="off"
-      [ngModel]="textoBusqueda()" (ngModelChange)="textoBusqueda.set($event)" />
-    <button class="buscador__limpiar" type="button" *ngIf="textoBusqueda()" (click)="limpiarBusqueda()"
-      aria-label="Limpiar búsqueda">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 6l12 12M18 6 6 18" />
-      </svg>
-    </button>
-  </label>
+    <span class="buscador__placeholder">Buscar en el menú</span>
+  </a>
 
   <app-carrusel class="rise-in"></app-carrusel>
 
@@ -32,15 +26,15 @@
     </div>
 
     <div class="grid stagger"
-      *ngIf="!cargandoCategorias() && !errorCategorias() && categoriasFiltradasVacio().length > 0">
-      <app-tarjeta-category *ngFor="let categoria of categoriasFiltradasVacio(); let i = index"
+      *ngIf="!cargandoCategorias() && !errorCategorias() && categorias().length > 0">
+      <app-tarjeta-category *ngFor="let categoria of categorias(); let i = index"
         [style.--i]="i" [categoria]="categoria" [routerLink]="['/categoria', categoria.id || categoria.name]"
         [queryParams]="{ name: categoria.name }"></app-tarjeta-category>
     </div>
 
     <p class="estado"
-      *ngIf="!cargandoCategorias() && !errorCategorias() && categoriasFiltradasVacio().length === 0">
-      {{ textoBusqueda() ? 'No encontramos esa categoría' : 'No hay categorías disponibles por ahora.' }}
+      *ngIf="!cargandoCategorias() && !errorCategorias() && categorias().length === 0">
+      No hay categorías disponibles por ahora.
     </p>
   </section>
 </div>
