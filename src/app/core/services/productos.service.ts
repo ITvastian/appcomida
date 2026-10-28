@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { Producto } from '../interface/productos';
 import { Busqueda } from '../interface/busqueda';
 import { map } from 'rxjs/operators';
-import { switchMap } from 'rxjs/operators';
+import { TenantContextService } from './tenant-context.service';
 import { ApiConfigService } from './api-config.service';
 
 @Injectable({
@@ -13,21 +13,13 @@ import { ApiConfigService } from './api-config.service';
 })
 export class ProductosService {
   private readonly apiUrl: string;
-  private readonly defaultTenantId = 'big-pizza';
 
-  constructor(private http: HttpClient, private apiConfigService: ApiConfigService) {
+  constructor(
+    private http: HttpClient,
+    private apiConfigService: ApiConfigService,
+    private tenantContextService: TenantContextService
+  ) {
     this.apiUrl = this.apiConfigService.api('');
-  }
-
-  private obtenerTenantId(): string | null {
-    const keys = ['activeTenantId', 'tenantId', 'activeRestaurantTenantId'];
-    for (const key of keys) {
-      const value = localStorage.getItem(key)?.trim();
-      if (value) {
-        return value;
-      }
-    }
-    return this.defaultTenantId;
   }
 
   private normalizarProducto(producto: any): Producto {
@@ -40,6 +32,7 @@ export class ProductosService {
       price: this.parsePrice(producto?.price),
       esVegano: Boolean(producto?.esVegano),
       esCeliaco: Boolean(producto?.esCeliaco),
+      sinTacc: producto?.sinTacc === true,
       photoUrl: this.parsePhotoUrl(producto?.photoUrl || producto?.photo || producto?.imageUrl),
       ingredients: String(producto?.ingredients || ''),
       extras: producto?.extras || [],
@@ -70,11 +63,9 @@ export class ProductosService {
     return [];
   }
 
-  private consultarTodos(tenantId?: string): Observable<Producto[]> {
-    let params = new HttpParams();
-    if (tenantId) {
-      params = params.set('tenantId', tenantId);
-    }
+  // Siempre con tenantId: nunca se consulta el catálogo sin local (traería productos de otros).
+  private consultarTodos(tenantId: string): Observable<Producto[]> {
+    const params = new HttpParams().set('tenantId', tenantId);
 
     return this.http
       .get<any>(`${this.apiUrl}/productos`, { params })
@@ -129,15 +120,13 @@ export class ProductosService {
     return isNaN(parsed) ? 0 : parsed;
   }
 
+  // Solo los productos del local activo; sin local (no se entró desde el QR) no hay menú.
   getAllProducts(): Observable<Producto[]> {
-    const tenantId = this.obtenerTenantId();
+    const tenantId = this.tenantContextService.getTenantId();
     if (!tenantId) {
-      return this.consultarTodos();
+      return of([]);
     }
-
-    return this.consultarTodos(tenantId).pipe(
-      switchMap((productos) => (productos.length > 0 ? of(productos) : this.consultarTodos()))
-    );
+    return this.consultarTodos(tenantId);
   }
 
   private crearProductoVacio(): Producto {

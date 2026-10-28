@@ -7,6 +7,8 @@ export interface Producto {
   price: number;
   esVegano: boolean;
   esCeliaco: boolean;
+  // Apto celíacos; lo envía el back en GET /productos.
+  sinTacc?: boolean;
   ingredients: string;
   description?: string;
   photoUrl: string;

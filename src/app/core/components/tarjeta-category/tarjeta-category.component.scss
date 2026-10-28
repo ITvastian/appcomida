@@ -95,3 +95,30 @@ h3 {
     stroke-linejoin: round;
   }
 }
+
+/* Ícono "sin TACC" (arriba a la derecha): la categoría tiene al menos un producto apto. */
+.card__sin-tacc {
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: var(--success);
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}

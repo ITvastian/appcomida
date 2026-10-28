@@ -355,3 +355,33 @@ textarea {
     opacity: 1;
   }
 }
+
+/* Insignia "Sin TACC" sobre la foto, abajo a la izquierda. bottom = 28px que la hoja
+   se superpone a la imagen + 12px de aire. */
+.sin-tacc {
+  position: absolute;
+  left: 16px;
+  bottom: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 7px 8px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 69%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  color: var(--success);
+  font-size: 0.8rem;
+  font-weight: 800;
+  animation: rise-in 500ms 250ms var(--ease-spring) both;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}

@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environmets/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TenantContextService {
-  private readonly devTenantId = 'big-pizza';
 
   getTenantId(): string {
     const keys = ['activeTenantId', 'tenantId', 'activeRestaurantTenantId'];
@@ -37,11 +35,6 @@ export class TenantContextService {
       } catch (error) {
         console.warn(`No se pudo parsear ${key} para obtener tenantId`, error);
       }
-    }
-
-    if (!environment.production) {
-      localStorage.setItem('activeTenantId', this.devTenantId);
-      return this.devTenantId;
     }
 
     return '';

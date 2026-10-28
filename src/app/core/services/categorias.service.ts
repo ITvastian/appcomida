@@ -1,30 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Categoria } from '../interface/categorias';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiConfigService } from './api-config.service';
+import { TenantContextService } from './tenant-context.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoriasService {
   private readonly apiUrl: string;
-  private readonly defaultTenantId = 'big-pizza';
 
-  constructor(private http: HttpClient, private apiConfigService: ApiConfigService) {
+  constructor(
+    private http: HttpClient,
+    private apiConfigService: ApiConfigService,
+    private tenantContextService: TenantContextService
+  ) {
     this.apiUrl = this.apiConfigService.api('');
-  }
-
-  private obtenerTenantId(): string {
-    const keys = ['activeTenantId', 'tenantId', 'activeRestaurantTenantId'];
-    for (const key of keys) {
-      const value = localStorage.getItem(key)?.trim();
-      if (value) {
-        return value;
-      }
-    }
-    return this.defaultTenantId;
   }
 
   private normalizarCategoria(data: any): Categoria {
@@ -57,9 +50,12 @@ export class CategoriasService {
     return [];
   }
 
-  // Obtener todas las categorías desde API con tenantId
+  // Solo las categorías del local activo; sin local (no se entró desde el QR) no hay menú.
   getAll(): Observable<Categoria[]> {
-    const tenantId = this.obtenerTenantId();
+    const tenantId = this.tenantContextService.getTenantId();
+    if (!tenantId) {
+      return of([]);
+    }
     const params = new HttpParams().set('tenantId', tenantId);
 
     return this.http.get<any>(`${this.apiUrl}/categorias`, { params }).pipe(

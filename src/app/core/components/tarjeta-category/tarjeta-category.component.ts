@@ -1,5 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { CategoriasService } from '../../services/categorias.service';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Categoria } from 'src/app/core/interface/categorias';
 
@@ -11,16 +10,8 @@ import { Categoria } from 'src/app/core/interface/categorias';
   imports: [CommonModule]
 
 })
-export class TarjetaCategoryComponent implements OnInit {
+export class TarjetaCategoryComponent {
   @Input() categoria!: Categoria;
-  categorias: Categoria[] = [];  // Arreglo para almacenar las categorías
-
-  constructor(private categoriasService: CategoriasService) { }
-
-  ngOnInit(): void {
-    // Llamamos al servicio para obtener las categorías
-    this.categoriasService.getAll().subscribe((data: Categoria[]) => {
-      this.categorias = data;
-    });
-  }
+  // La categoría tiene al menos un producto sin TACC: se muestra solo el ícono.
+  @Input() sinTacc = false;
 }

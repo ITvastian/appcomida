@@ -28,13 +28,19 @@
     <div class="grid stagger"
       *ngIf="!cargandoCategorias() && !errorCategorias() && categorias().length > 0">
       <app-tarjeta-category *ngFor="let categoria of categorias(); let i = index"
-        [style.--i]="i" [categoria]="categoria" [routerLink]="['/categoria', categoria.id || categoria.name]"
+        [style.--i]="i" [categoria]="categoria" [sinTacc]="tieneSinTacc(categoria)" [routerLink]="['/categoria', categoria.id || categoria.name]"
         [queryParams]="{ name: categoria.name }"></app-tarjeta-category>
     </div>
 
-    <p class="estado"
+    <div class="estado"
       *ngIf="!cargandoCategorias() && !errorCategorias() && categorias().length === 0">
-      No hay categorías disponibles por ahora.
-    </p>
+      <!-- Sin local cargado (no se entró desde el QR) no hay menú que mostrar. -->
+      <ng-container *ngIf="sinLocal; else sinCategorias">
+        <span class="estado__icono" aria-hidden="true">📱</span>
+        <strong>Escaneá el código QR de tu mesa</strong>
+        <p>Así te mostramos el menú del local.</p>
+      </ng-container>
+      <ng-template #sinCategorias>No hay categorías disponibles por ahora.</ng-template>
+    </div>
   </section>
 </div>

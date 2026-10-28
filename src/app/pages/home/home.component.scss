@@ -87,3 +87,23 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+.estado__icono {
+  font-size: 2.2rem;
+  animation: flotar 2.6s ease-in-out infinite;
+}
+
+.estado strong {
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+.estado p {
+  margin: -6px 0 0;
+}
+
+@keyframes flotar {
+  50% {
+    transform: translateY(-6px) rotate(-6deg);
+  }
+}
