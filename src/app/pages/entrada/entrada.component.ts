@@ -52,14 +52,21 @@ export class EntradaComponent implements OnDestroy {
   readonly esperandoPago = this.pedidoActivoService.esperandoPago;
   readonly pagoRecibido = this.pedidoActivoService.pagoRecibido;
   mediosPagoVisibles = signal(false);
-  mozoAvisado = signal(false);
   // Paso intermedio: "Solicitar mozo" pide confirmación antes de enviar el llamado.
   confirmandoMozo = signal(false);
+
+  // Estado de los llamados (lo guarda el back; se actualiza con table_request_updated).
+  // Mientras haya uno pending el botón queda deshabilitado; dismissed/expired lo rehabilitan.
+  readonly mozo = this.waiterRequestsService.mozo;
+  readonly cuenta = this.waiterRequestsService.cuenta;
+  readonly mozoAvisado = computed(() => this.mozo()?.status === 'pending');
+  readonly mozoEnCamino = computed(() => this.mozo()?.status === 'attended');
+  readonly cuentaSolicitada = computed(() => this.cuenta()?.status === 'pending');
+  readonly cuentaEnCamino = computed(() => this.cuenta()?.status === 'attended');
 
   mesaActual(): number {
     return this.tenantContextService.getTableNumber(undefined);
   }
-  cuentaSolicitada = signal(false);
   avatarCargando = signal(true);
   avatarUrl = signal<string | null>(null);
   introAvatarLoaded = signal(false);
@@ -82,6 +89,7 @@ export class EntradaComponent implements OnDestroy {
     }
     this.cargarAvatarActual();
     this.cargarMetodosDePago();
+    this.waiterRequestsService.refrescar();
 
     this.realtimeService
       .on('avatar_updated')
@@ -122,12 +130,10 @@ export class EntradaComponent implements OnDestroy {
       })
       .pipe(finalize(() => this.solicitandoMozo.set(false)))
       .subscribe({
-        next: () => {
-          this.mozoAvisado.set(true);
-        },
+        // El estado del botón lo actualiza WaiterRequestsService (respuesta y eventos).
         error: (error) => {
           console.error('Error al solicitar mozo:', error);
-          this.mostrarModal('No se pudo enviar la solicitud. Intenta de nuevo.');
+          this.mostrarModal(this.mensajeErrorLlamado(error, 'No se pudo avisar al mozo. Intentá de nuevo.'));
         },
       });
   }
@@ -159,15 +165,23 @@ export class EntradaComponent implements OnDestroy {
       })
       .pipe(finalize(() => this.solicitandoCuenta.set(false)))
       .subscribe({
-        next: () => {
-          this.cuentaSolicitada.set(true);
-          this.mediosPagoVisibles.set(false);
-        },
+        next: () => this.mediosPagoVisibles.set(false),
         error: (error) => {
           console.error('Error al pedir cuenta:', error);
-          this.mostrarModal('No se pudo enviar el pedido de cuenta. Intenta de nuevo.');
+          this.mostrarModal(this.mensajeErrorLlamado(error, 'No se pudo pedir la cuenta. Intentá de nuevo.'));
         },
       });
+  }
+
+  // 400 = mesa inválida (debe ser un entero > 0); sin conexión, se sugiere avisar a mano.
+  private mensajeErrorLlamado(error: any, porDefecto: string): string {
+    if (error?.status === 400) {
+      return 'El número de mesa no es válido. Volvé a escanear el código QR de tu mesa.';
+    }
+    if (error?.status === 0) {
+      return 'No pudimos conectarnos con el local. Si es urgente, llamá al mozo levantando la mano 🙋';
+    }
+    return error?.error?.message || porDefecto;
   }
 
   private cargarMetodosDePago(): void {

@@ -14,7 +14,19 @@ export type RealtimeEvent =
   | { type: 'header_title_updated'; title: string; isActive: boolean; tenantId: string; timestamp?: string }
   | { type: 'avatar_updated'; imageUrl: string; tenantId: string; timestamp?: string }
   // Solo llega a la mesa afectada; no trae datos: hay que volver a pedir el pedido por HTTP.
-  | { type: 'table_order_updated'; tableNumber: number; tenantId: string; timestamp?: string };
+  | { type: 'table_order_updated'; tableNumber: number; tenantId: string; timestamp?: string }
+  // Cambio de estado de un llamado al mozo o pedido de cuenta de esta mesa.
+  | {
+      type: 'table_request_updated';
+      tableNumber: number;
+      tenantId: string;
+      requestId: string;
+      requestType: 'waiter' | 'bill';
+      status: EstadoLlamado;
+      timestamp?: string;
+    };
+
+export type EstadoLlamado = 'pending' | 'attended' | 'dismissed' | 'expired';
 
 const TIPOS_CONOCIDOS = new Set<RealtimeEvent['type']>([
   'connection_established',
@@ -24,6 +36,7 @@ const TIPOS_CONOCIDOS = new Set<RealtimeEvent['type']>([
   'header_title_updated',
   'avatar_updated',
   'table_order_updated',
+  'table_request_updated',
 ]);
 
 // Espera entre reintentos de conexión (ms). El último valor se repite.

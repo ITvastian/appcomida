@@ -43,15 +43,17 @@
           </div>
         </div>
         <ng-template #botonMozo>
+          <p class="entrada__estado-llamado" *ngIf="mozoEnCamino()" role="status">🏃 El mozo está en camino</p>
           <button class="btn btn--secondary" style="--i: 2" type="button" [class.btn--confirmed]="mozoAvisado()"
             [disabled]="solicitandoMozo() || mozoAvisado()" (click)="confirmandoMozo.set(true)">
-            {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? 'Mozo avisado' : 'Solicitar mozo') }}
+            {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? (mozo()?.duplicado ? 'Ya avisamos al mozo' : 'Mozo avisado') : 'Solicitar mozo') }}
           </button>
         </ng-template>
+        <p class="entrada__estado-llamado" *ngIf="cuentaEnCamino()" role="status">🧾 Te llevamos la cuenta</p>
         <button class="btn btn--tertiary" style="--i: 3" type="button" [class.btn--confirmed]="cuentaSolicitada()"
           [disabled]="solicitandoCuenta() || cuentaSolicitada()"
           [attr.aria-expanded]="mediosPagoVisibles()" aria-controls="medios-pago" (click)="alternarMediosPago()">
-          {{ solicitandoCuenta() ? 'Enviando...' : (cuentaSolicitada() ? 'Cuenta solicitada' : 'Medios de pago') }}
+          {{ solicitandoCuenta() ? 'Enviando...' : (cuentaSolicitada() ? (cuenta()?.duplicado ? 'Ya pedimos la cuenta' : 'Cuenta solicitada') : 'Medios de pago') }}
         </button>
 
         <div *ngIf="mediosPagoVisibles() && !cuentaSolicitada()" id="medios-pago" class="entrada__payment-methods">

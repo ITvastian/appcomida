@@ -529,3 +529,15 @@ p {
     min-height: 46px;
   }
 }
+
+/* Estado de un llamado atendido por el staff */
+.entrada__estado-llamado {
+  margin: 0 !important;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  background: var(--success-soft);
+  color: var(--success) !important;
+  font-weight: 800;
+  font-size: 0.9rem !important;
+  animation: dialog-pop 420ms var(--ease-spring) both;
+}
