@@ -61,8 +61,13 @@ export class EntradaComponent implements OnDestroy {
   readonly cuenta = this.waiterRequestsService.cuenta;
   readonly mozoAvisado = computed(() => this.mozo()?.status === 'pending');
   readonly mozoEnCamino = computed(() => this.mozo()?.status === 'attended');
-  readonly cuentaSolicitada = computed(() => this.cuenta()?.status === 'pending');
-  readonly cuentaEnCamino = computed(() => this.cuenta()?.status === 'attended');
+  // Con la cuenta ya paga (o la mesa sin pendientes) el pedido de cuenta queda viejo: no se muestra.
+  private readonly cuentaPaga = computed(() => {
+    const pedido = this.pedidoActivoService.pedido();
+    return this.pagoRecibido() || (!!pedido && !pedido.hasPendingOrder);
+  });
+  readonly cuentaSolicitada = computed(() => !this.cuentaPaga() && this.cuenta()?.status === 'pending');
+  readonly cuentaEnCamino = computed(() => !this.cuentaPaga() && this.cuenta()?.status === 'attended');
 
   mesaActual(): number {
     return this.tenantContextService.getTableNumber(undefined);
