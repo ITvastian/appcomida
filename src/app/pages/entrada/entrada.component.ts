@@ -375,7 +375,7 @@ export class EntradaComponent implements OnDestroy {
       queryParams.get('numeroMesa')?.trim();
     const tableNumber = Number(tableParam);
     if (tableParam && Number.isFinite(tableNumber) && tableNumber > 0) {
-      localStorage.setItem('tableNumber', String(tableNumber));
+      this.tenantContextService.setTableNumber(tableNumber);
     }
   }
 

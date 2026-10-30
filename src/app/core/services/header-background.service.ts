@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
-import { map, catchError, tap, switchMap } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TenantContextService } from './tenant-context.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ApiConfigService } from './api-config.service';
 import { RealtimeService } from './realtime.service';
 
@@ -20,6 +19,10 @@ export interface TitleBackground {
   updatedAt?: string;
 }
 
+// Fondo genérico para locales sin imagen de título configurada.
+const FONDO_HEADER_POR_DEFECTO =
+  'https://res.cloudinary.com/dgs0ckmux/image/upload/v1791580173/promotions-title-background/dynodemo/dynodemo-title-bg.webp';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -30,7 +33,6 @@ export class HeaderBackgroundService {
   constructor(
     private http: HttpClient,
     private tenantContextService: TenantContextService,
-    private firestore: AngularFirestore,
     private apiConfigService: ApiConfigService,
     private realtimeService: RealtimeService
   ) {
@@ -94,36 +96,9 @@ export class HeaderBackgroundService {
     }
   }
 
-  private cargarBackgroundDesdeFirestore(tenantId: string): Observable<TitleBackground | null> {
-    return this.firestore
-      .doc(`configuracion/${tenantId}__title-background`)
-      .valueChanges()
-      .pipe(
-        tap((doc: any) => {
-          console.log(`Fallback Firestore configuracion/${tenantId}__title-background:`, doc);
-        }),
-        map((doc: any) => this.normalizeBackground(doc)),
-        switchMap((background) => {
-          if (background?.imageUrl) {
-            return of(background);
-          }
-
-          return this.firestore.doc('configuracion/title-background').valueChanges().pipe(
-            map((legacyDoc: any) => {
-              const legacyBackground = this.normalizeBackground(legacyDoc);
-              if (legacyBackground?.imageUrl) {
-                return legacyBackground;
-              }
-              return this.leerCache(tenantId);
-            }),
-            catchError(() => of(this.leerCache(tenantId)))
-          );
-        }),
-        catchError((error) => {
-          console.error('Error cargando fondo desde Firestore fallback:', error);
-          return of(this.leerCache(tenantId));
-        })
-      );
+  // Sin fondo propio (o sin API y sin caché del local): imagen genérica, nunca la de otro local.
+  private fondoPorDefecto(): TitleBackground {
+    return { imageUrl: FONDO_HEADER_POR_DEFECTO };
   }
 
   private loadBackground(): void {
@@ -139,29 +114,21 @@ export class HeaderBackgroundService {
     this.http
       .get<any>(this.apiUrl, { params, headers })
       .pipe(
-        tap((response: any) => {
-          console.log('Response title-background/current:', response);
-        }),
-        map((response: any) => this.normalizeBackground(response)),
-        switchMap((background) => {
+        map((response: any) => {
+          const background = this.normalizeBackground(response);
           if (background?.imageUrl) {
-            return of(background);
+            this.guardarCache(tenantId, background);
+            return background;
           }
-          console.warn('No hay fondo de header en title-background/current');
-          return this.cargarBackgroundDesdeFirestore(tenantId);
+          return this.fondoPorDefecto();
         }),
         catchError((error) => {
-          console.error('Error cargando fondo del header desde API, aplicando fallback Firestore:', error);
-          return this.cargarBackgroundDesdeFirestore(tenantId);
+          // API caída: último fondo conocido de este mismo local, o el genérico.
+          console.error('Error cargando fondo del header:', error);
+          return of(this.leerCache(tenantId) ?? this.fondoPorDefecto());
         })
       )
-      .subscribe((background) => {
-        this.currentBackground$.next(background);
-        if (background?.imageUrl) {
-          this.guardarCache(tenantId, background);
-          console.log('Fondo del header cargado desde API:', background.imageUrl);
-        }
-      });
+      .subscribe((background) => this.currentBackground$.next(background));
   }
 
   getCurrentBackground(): Observable<TitleBackground | null> {

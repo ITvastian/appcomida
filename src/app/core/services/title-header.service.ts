@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
-import { map, catchError, tap, switchMap } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TenantContextService } from './tenant-context.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ApiConfigService } from './api-config.service';
 import { RealtimeService } from './realtime.service';
 
@@ -24,7 +23,6 @@ export class TitleHeaderService {
   constructor(
     private http: HttpClient,
     private tenantContextService: TenantContextService,
-    private firestore: AngularFirestore,
     private apiConfigService: ApiConfigService,
     private realtimeService: RealtimeService
   ) {
@@ -91,38 +89,6 @@ export class TitleHeaderService {
     }
   }
 
-  private cargarTituloDesdeFirestore(tenantId: string): Observable<TitleHeader | null> {
-    return this.firestore
-      .doc(`configuracion/${tenantId}__title-header`)
-      .valueChanges()
-      .pipe(
-        tap((doc: any) => {
-          console.log(`Fallback Firestore configuracion/${tenantId}__title-header:`, doc);
-        }),
-        map((doc: any) => this.normalizeTitle(doc)),
-        switchMap((title) => {
-          if (title?.title) {
-            return of(title);
-          }
-
-          return this.firestore.doc('configuracion/title-header').valueChanges().pipe(
-            map((legacyDoc: any) => {
-              const legacyTitle = this.normalizeTitle(legacyDoc);
-              if (legacyTitle?.title) {
-                return legacyTitle;
-              }
-              return this.leerCache(tenantId);
-            }),
-            catchError(() => of(this.leerCache(tenantId)))
-          );
-        }),
-        catchError((error) => {
-          console.error('Error cargando titulo desde Firestore fallback:', error);
-          return of(this.leerCache(tenantId));
-        })
-      );
-  }
-
   private loadTitle(): void {
     const tenantId = this.tenantContextService.getTenantId();
     if (!tenantId) {
@@ -136,29 +102,21 @@ export class TitleHeaderService {
     this.http
       .get<any>(this.apiUrl, { params, headers })
       .pipe(
-        tap((response: any) => {
-          console.log('Response title-header/current:', response);
-        }),
-        map((response: any) => this.normalizeTitle(response)),
-        switchMap((title) => {
+        // Sin título: no se muestra. Nunca se usa el de otro local.
+        map((response: any) => {
+          const title = this.normalizeTitle(response);
           if (title?.title) {
-            return of(title);
+            this.guardarCache(tenantId, title);
           }
-          console.warn('No hay titulo de header en title-header/current');
-          return this.cargarTituloDesdeFirestore(tenantId);
+          return title;
         }),
         catchError((error) => {
-          console.error('Error cargando titulo del header desde API, aplicando fallback Firestore:', error);
-          return this.cargarTituloDesdeFirestore(tenantId);
+          // API caída: último título conocido de este mismo local.
+          console.error('Error cargando titulo del header:', error);
+          return of(this.leerCache(tenantId));
         })
       )
-      .subscribe((title) => {
-        this.currentTitle$.next(title);
-        if (title?.title) {
-          this.guardarCache(tenantId, title);
-          console.log('Titulo del header cargado desde API:', title.title, '- isActive:', title.isActive);
-        }
-      });
+      .subscribe((title) => this.currentTitle$.next(title));
   }
 
   getCurrentTitle(): Observable<TitleHeader | null> {

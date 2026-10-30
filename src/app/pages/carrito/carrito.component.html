@@ -114,7 +114,7 @@
   </div>
 </ng-template>
 
-<dialog #dialog class="app-dialog">
+<dialog #dialog class="app-dialog" (cancel)="bloquearCierreSiEnvia($event)" (close)="alCerrarDialogo()">
   <!-- PASO 1 -->
   <section *ngIf="paso === 1">
     <div class="app-dialog__icono">🛍️</div>
@@ -122,15 +122,18 @@
     <p class="app-dialog__texto">Lo enviamos a la cocina.</p>
 
     <div class="app-dialog__acciones">
-      <button type="button" class="btn btn--ghost" (click)="editarPedido()">No, editar</button>
-      <button type="button" class="btn btn--primary" (click)="paso = 2">Sí, listo</button>
+      <button type="button" class="btn btn--ghost" [disabled]="enviandoPedido()" (click)="editarPedido()">No, editar</button>
+      <button type="button" class="btn btn--primary" [disabled]="enviandoPedido()" (click)="confirmarPedido()">
+        {{ enviandoPedido() ? 'Enviando…' : 'Sí, enviar' }}
+      </button>
     </div>
   </section>
 
   <!-- PASO 2 -->
   <section *ngIf="paso === 2">
     <div class="app-dialog__icono">🎉</div>
-    <h2 class="app-dialog__titulo">¿Nos ayudás a mejorar?</h2>
+    <h2 class="app-dialog__titulo">¡Pedido enviado!</h2>
+    <p class="app-dialog__texto">¿Nos ayudás a mejorar? Es opcional.</p>
 
     <div class="stars" role="radiogroup" aria-label="Calificación">
       <button type="button" class="star" *ngFor="let star of stars; let i = index"
@@ -144,8 +147,8 @@
       placeholder="¿Algo que podamos mejorar?"></textarea>
 
     <div class="app-dialog__acciones">
-      <button type="button" class="btn btn--ghost" (click)="finalizarPedido(false)">Omitir</button>
-      <button type="button" class="btn btn--primary" (click)="finalizarPedido(true)">Enviar</button>
+      <button type="button" class="btn btn--ghost" (click)="terminarTrasPedido(false)">Omitir</button>
+      <button type="button" class="btn btn--primary" [disabled]="rating === 0" (click)="terminarTrasPedido(true)">Enviar</button>
     </div>
   </section>
 </dialog>

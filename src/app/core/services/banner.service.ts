@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
-import { map, catchError, tap, switchMap } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TenantContextService } from './tenant-context.service';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ApiConfigService } from './api-config.service';
 import { RealtimeService } from './realtime.service';
 
@@ -25,7 +24,6 @@ export class BannerService {
   constructor(
     private http: HttpClient,
     private tenantContextService: TenantContextService,
-    private firestore: AngularFirestore,
     private apiConfigService: ApiConfigService,
     private realtimeService: RealtimeService
   ) {
@@ -99,42 +97,6 @@ export class BannerService {
     }
   }
 
-  private cargarBannersDesdeFirestore(tenantId: string): Observable<Banner[]> {
-    return this.firestore
-      .doc(`configuracion/${tenantId}__banner`)
-      .valueChanges()
-      .pipe(
-        tap((doc: any) => {
-          console.log(`Fallback Firestore configuracion/${tenantId}__banner:`, doc);
-        }),
-        map((doc: any) => {
-          const bannersFromDoc = Array.isArray(doc) ? doc : doc?.banners;
-          return this.normalizeBanners(bannersFromDoc);
-        }),
-        switchMap((banners) => {
-          if (banners.length > 0) {
-            return of(banners);
-          }
-
-          return this.firestore.doc('configuracion/banner').valueChanges().pipe(
-            map((legacyDoc: any) => {
-              const legacyBanners = Array.isArray(legacyDoc) ? legacyDoc : legacyDoc?.banners;
-              const normalized = this.normalizeBanners(legacyBanners);
-              if (normalized.length > 0) {
-                return normalized;
-              }
-              return this.leerCache(tenantId);
-            }),
-            catchError(() => of(this.leerCache(tenantId)))
-          );
-        }),
-        catchError((error) => {
-          console.error('Error cargando banners desde Firestore fallback:', error);
-          return of(this.leerCache(tenantId));
-        })
-      );
-  }
-
   private loadBanners(): void {
     const tenantId = this.tenantContextService.getTenantId();
     if (!tenantId) {
@@ -148,30 +110,17 @@ export class BannerService {
     this.http
       .get<any>(this.apiUrl, { params, headers })
       .pipe(
-        tap((response: any) => {
-          console.log('Response banner/current:', response);
-        }),
-        map((response: any) => {
-          return this.extractBannersFromResponse(response);
-        }),
-        switchMap((banners) => {
-          if (banners.length > 0) {
-            return of(banners);
-          }
-          console.warn('No se encontro array banners en banner/current');
-          return this.cargarBannersDesdeFirestore(tenantId);
-        }),
+        // Sin banners: carrusel vacío (se oculta). Nunca se usan banners de otro local.
+        map((response: any) => this.extractBannersFromResponse(response)),
         catchError((error) => {
-          console.error('Error cargando banners desde API, aplicando fallback Firestore:', error);
-          return this.cargarBannersDesdeFirestore(tenantId);
+          // API caída: últimos banners conocidos de este mismo local.
+          console.error('Error cargando banners:', error);
+          return of(this.leerCache(tenantId));
         })
       )
       .subscribe((banners) => {
         this.banners$.next(banners);
-        if (banners.length > 0) {
-          this.guardarCache(tenantId, banners);
-        }
-        console.log('Banners cargados desde API:', banners.length);
+        this.guardarCache(tenantId, banners);
       });
   }
 

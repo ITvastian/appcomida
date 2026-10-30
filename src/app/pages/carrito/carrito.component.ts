@@ -49,6 +49,7 @@ export class CarritoComponent implements OnDestroy {
     (Producto & { cantidad: number; extras: any[]; notas?: string })[]
   > = signal([]);
   cargandoCarrito = signal(true);
+  enviandoPedido = signal(false);
   perfilIncompletoAlert = signal(false);
   private perfilAlertTimer?: ReturnType<typeof setTimeout>;
   private perfilAlertRestartTimer?: ReturnType<typeof setTimeout>;
@@ -339,35 +340,49 @@ export class CarritoComponent implements OnDestroy {
       return false;
     }
 
+    // Catálogo una sola vez (no un request por producto).
+    let catalogo: Producto[];
+    try {
+      catalogo = await firstValueFrom(this.ProductosService.getAllProducts());
+    } catch (error) {
+      console.error('No se pudo verificar el catálogo antes de enviar:', error);
+      this.abrirDialogoError('No pudimos verificar los productos. Revisá tu conexión e intentá de nuevo.');
+      return false;
+    }
+
+    // Todo o nada: si falta un producto no se manda un pedido incompleto.
     const items: any[] = [];
-
-    for (let i = 0; i < this.CartService.carrito.length; i++) {
-      const itemCarrito = this.CartService.carrito[i];
-      try {
-        const producto = await firstValueFrom(this.ProductosService.getById(itemCarrito.idProd.toString()));
-
-        if (producto) {
-          const productId = String(producto._id ?? '').trim();
-          if (!productId) {
-            console.warn('Producto sin _id valido. Se omite en la orden.', producto);
-            continue;
-          }
-
-          items.push({
-            productId,
-            name: producto.name,
-            quantity: itemCarrito.cantidad,
-            price: producto.price,
-            extras: this.resolverExtrasDesdeProducto(itemCarrito.extras, producto).map((extra) => ({
-              name: extra.name,
-              price: extra.price,
-              quantity: 1,
-            })),
-          });
-        }
-      } catch (error) {
-        console.error(`Error al obtener el producto con id ${itemCarrito.idProd}:`, error);
+    let faltanProductos = false;
+    for (const itemCarrito of this.CartService.carrito) {
+      const id = String(itemCarrito.idProd).trim();
+      const producto = catalogo.find((p) => String(p._id).trim() === id || String(p.category).trim() === id);
+      const productId = String(producto?._id ?? '').trim();
+      if (!producto || !productId) {
+        faltanProductos = true;
+        continue;
       }
+
+      items.push({
+        productId,
+        name: producto.name,
+        quantity: itemCarrito.cantidad,
+        price: producto.price,
+        extras: this.resolverExtrasDesdeProducto(itemCarrito.extras, producto).map((extra) => ({
+          name: extra.name,
+          price: extra.price,
+          quantity: 1,
+        })),
+      });
+    }
+
+    if (faltanProductos) {
+      // Saca del carrito lo que ya no existe, recalcula y le avisa al cliente.
+      await this.sincronizarConMenu();
+      return false;
+    }
+    if (items.length === 0) {
+      this.abrirDialogoError('Tu pedido está vacío.');
+      return false;
     }
 
     const orden = {
@@ -526,7 +541,7 @@ export class CarritoComponent implements OnDestroy {
       return;
     }
 
-    localStorage.setItem('tableNumber', String(mesa));
+    this.tenantContextService.setTableNumber(mesa);
     // Nueva mesa: reabrir el canal con table= y traer su pedido abierto.
     this.realtimeService.conectar();
     this.pedidoActivoService.refrescar();
@@ -535,28 +550,49 @@ export class CarritoComponent implements OnDestroy {
     this.abrirConfirmacionPedido();
   }
 
-  async finalizarPedido(enviarCalificacion: boolean) {
-    const ordenEnviada = await this.enviarMensaje();
-    if (!ordenEnviada) {
+  /** Paso 1: envía el pedido. Si sale bien, vacía el carrito y ofrece calificar (paso 2). */
+  async confirmarPedido() {
+    // Evita pedidos duplicados por varios toques mientras el POST está en curso.
+    if (this.enviandoPedido()) {
       return;
     }
+    this.enviandoPedido.set(true);
 
-    if (enviarCalificacion) {
+    try {
+      const ordenEnviada = await this.enviarMensaje();
+      if (!ordenEnviada) {
+        return;
+      }
+      this.CartService.vaciar();
+      this.suggestionText = '';
+      this.rating = 0;
+      this.paso = 2;
+    } finally {
+      this.enviandoPedido.set(false);
+    }
+  }
+
+  /** Paso 2 (opcional): el pedido ya salió; solo se manda la calificación si la hay. */
+  async terminarTrasPedido(enviarCalificacion: boolean) {
+    if (enviarCalificacion && this.rating > 0) {
       await this.enviarCalificacion();
     }
-
-    const venta = {
-      productos: this.CartService.carrito,
-      subtotal: this.subtotal,
-      extras: this.extraTotal,
-      total: this.total,
-      fecha: new Date()
-    };
-    this.CartService.vaciar();
     this.dialog.nativeElement.close();
-    this.router.navigate(['/home']);
-    this.suggestionText = '';
-    this.rating = 0;
+  }
+
+  // Mientras se envía, Esc (o el "atrás" del celular) no cierra el diálogo.
+  bloquearCierreSiEnvia(event: Event) {
+    if (this.enviandoPedido()) {
+      event.preventDefault();
+    }
+  }
+
+  // Al cerrar el diálogo después de pedir, el carrito quedó vacío: se muestra el pedido en curso.
+  alCerrarDialogo() {
+    if (this.paso === 2) {
+      this.paso = 1;
+      this.actualizarCarrito();
+    }
   }
 
   editarPedido() {
