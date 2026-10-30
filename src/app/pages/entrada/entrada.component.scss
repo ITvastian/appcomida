@@ -222,9 +222,10 @@ p {
   margin: 16px 0;
   text-align: center;
 
-  span {
-    font-size: 2.4rem;
-    animation: dialog-pop 480ms var(--ease-spring) both;
+  strong {
+    font-size: 1.15rem;
+    margin-top: 6px;
+    animation: rise-in-pago 420ms 250ms var(--ease-spring) both;
   }
 
   p {
@@ -540,4 +541,110 @@ p {
   font-weight: 800;
   font-size: 0.9rem !important;
   animation: dialog-pop 420ms var(--ease-spring) both;
+}
+
+.entrada__estado-llamado--cuenta-regresiva {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.entrada__mozo-corriendo {
+  display: inline-block;
+  animation: mozo-corre 600ms ease-in-out infinite alternate;
+}
+
+.entrada__contador {
+  margin-left: auto;
+  min-width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  animation: contador-latido 1s ease-in-out infinite;
+}
+
+.entrada__contador-barra {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--success);
+  transform-origin: left;
+  animation: contador-vaciar 10s linear forwards;
+}
+
+@keyframes mozo-corre {
+  from { transform: translateX(-2px) rotate(-6deg); }
+  to { transform: translateX(3px) rotate(6deg); }
+}
+
+@keyframes contador-latido {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.18); }
+}
+
+@keyframes contador-vaciar {
+  to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entrada__mozo-corriendo,
+  .entrada__contador,
+  .entrada__contador-barra { animation: none; }
+}
+
+.entrada__check {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--success-soft);
+  animation: dialog-pop 480ms var(--ease-spring) both, check-halo 1.6s 600ms ease-out;
+
+  circle,
+  path {
+    fill: none;
+    stroke: var(--success);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  circle {
+    stroke-dasharray: 151;
+    stroke-dashoffset: 151;
+    animation: check-trazo 600ms ease-out forwards;
+  }
+
+  path {
+    stroke-dasharray: 36;
+    stroke-dashoffset: 36;
+    animation: check-trazo 350ms 500ms ease-out forwards;
+  }
+}
+
+@keyframes check-trazo {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes check-halo {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 35%, transparent); }
+  to { box-shadow: 0 0 0 18px transparent; }
+}
+
+@keyframes rise-in-pago {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entrada__check,
+  .entrada__check circle,
+  .entrada__check path,
+  .entrada__cuenta-paga strong { animation: none; stroke-dashoffset: 0; }
 }

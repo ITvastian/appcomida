@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, OnDestroy, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, OnDestroy, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -10,6 +10,8 @@ import { RealtimeService } from 'src/app/core/services/realtime.service';
 import { PedidoActivoItem, PedidoActivoService } from 'src/app/core/services/pedido-activo.service';
 import { TenantContextService } from 'src/app/core/services/tenant-context.service';
 import { WaiterRequestsService } from 'src/app/core/services/waiter-requests.service';
+
+const SEGUNDOS_AVISO = 10;
 
 @Component({
   selector: 'app-entrada',
@@ -51,6 +53,7 @@ export class EntradaComponent implements OnDestroy {
   readonly confirmandoPago = this.pedidoActivoService.confirmandoPago;
   readonly esperandoPago = this.pedidoActivoService.esperandoPago;
   readonly pagoRecibido = this.pedidoActivoService.pagoRecibido;
+  readonly segundosPagoRecibido = this.cuentaRegresiva(this.pagoRecibido);
   mediosPagoVisibles = signal(false);
   // Paso intermedio: "Solicitar mozo" pide confirmación antes de enviar el llamado.
   confirmandoMozo = signal(false);
@@ -61,13 +64,15 @@ export class EntradaComponent implements OnDestroy {
   readonly cuenta = this.waiterRequestsService.cuenta;
   readonly mozoAvisado = computed(() => this.mozo()?.status === 'pending');
   readonly mozoEnCamino = computed(() => this.mozo()?.status === 'attended');
+  // Cuenta regresiva sobre el cartel "El mozo está en camino"; al llegar a 0 el cartel se oculta.
+  readonly segundosMozo = this.cuentaRegresiva(this.mozoEnCamino);
   // Con la cuenta ya paga (o la mesa sin pendientes) el pedido de cuenta queda viejo: no se muestra.
   private readonly cuentaPaga = computed(() => {
     const pedido = this.pedidoActivoService.pedido();
     return this.pagoRecibido() || (!!pedido && !pedido.hasPendingOrder);
   });
   readonly cuentaSolicitada = computed(() => !this.cuentaPaga() && this.cuenta()?.status === 'pending');
-  readonly cuentaEnCamino = computed(() => !this.cuentaPaga() && this.cuenta()?.status === 'attended');
+  readonly cuentaEnCamino = computed(() => !this.cuentaPaga() && !this.confirmandoPago() && this.cuenta()?.status === 'attended');
 
   mesaActual(): number {
     return this.tenantContextService.getTableNumber(undefined);
@@ -107,6 +112,27 @@ export class EntradaComponent implements OnDestroy {
     this.realtimeService.resync$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.cargarAvatarActual());
+  }
+
+  /** Cuenta regresiva de SEGUNDOS_AVISO que arranca cada vez que `activo` pasa a true; al llegar a 0 el aviso se oculta. */
+  private cuentaRegresiva(activo: () => boolean) {
+    const segundos = signal(0);
+    let timer: ReturnType<typeof setInterval> | undefined;
+    effect(() => {
+      const encendido = activo();
+      untracked(() => {
+        clearInterval(timer);
+        segundos.set(encendido ? SEGUNDOS_AVISO : 0);
+        if (encendido) {
+          timer = setInterval(() => {
+            segundos.update((s) => s - 1);
+            if (segundos() <= 0) clearInterval(timer);
+          }, 1000);
+        }
+      });
+    });
+    this.destroyRef.onDestroy(() => clearInterval(timer));
+    return segundos.asReadonly();
   }
 
   ngOnDestroy(): void {

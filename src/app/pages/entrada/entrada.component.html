@@ -21,8 +21,10 @@
       <h1>Bienvenido</h1>
       <p>¿Cómo querés seguir?</p>
 
-      <p class="entrada__aviso-pago entrada__aviso-pago--ok" *ngIf="pagoRecibido(); else avisoConfirmando">
+      <p class="entrada__aviso-pago entrada__aviso-pago--ok entrada__estado-llamado--cuenta-regresiva" *ngIf="segundosPagoRecibido() > 0; else avisoConfirmando">
         🎉 ¡Pago recibido! Tu cuenta quedó paga.
+        <span class="entrada__contador" aria-hidden="true">{{ segundosPagoRecibido() }}</span>
+        <span class="entrada__contador-barra" aria-hidden="true"></span>
       </p>
       <ng-template #avisoConfirmando>
         <p class="entrada__aviso-pago" *ngIf="confirmandoPago()">
@@ -43,7 +45,11 @@
           </div>
         </div>
         <ng-template #botonMozo>
-          <p class="entrada__estado-llamado" *ngIf="mozoEnCamino()" role="status">🏃 El mozo está en camino</p>
+          <p class="entrada__estado-llamado entrada__estado-llamado--cuenta-regresiva" *ngIf="segundosMozo() > 0" role="status">
+            <span class="entrada__mozo-corriendo" aria-hidden="true">🏃</span> El mozo está en camino
+            <span class="entrada__contador" aria-hidden="true">{{ segundosMozo() }}</span>
+            <span class="entrada__contador-barra" aria-hidden="true"></span>
+          </p>
           <button class="btn btn--secondary" style="--i: 2" type="button" [class.btn--confirmed]="mozoAvisado()"
             [disabled]="solicitandoMozo() || mozoAvisado()" (click)="confirmandoMozo.set(true)">
             {{ solicitandoMozo() ? 'Enviando...' : (mozoAvisado() ? (mozo()?.duplicado ? 'Ya avisamos al mozo' : 'Mozo avisado') : 'Solicitar mozo') }}
@@ -203,10 +209,15 @@
         </ng-template>
 
         <ng-template #cuentaPaga>
-          <div class="entrada__cuenta-paga">
-            <span aria-hidden="true">✅</span>
-            <p>No tenés nada pendiente de pago.</p>
+          <div class="entrada__cuenta-paga" role="status">
+            <svg class="entrada__check" viewBox="0 0 52 52" aria-hidden="true">
+              <circle cx="26" cy="26" r="24" />
+              <path d="M15 27l7 7 15-15" />
+            </svg>
+            <strong>¡Estás al día!</strong>
+            <p>No tenés nada pendiente de pago.<br />Si querés algo más, pedilo desde el menú.</p>
           </div>
+          <a class="btn btn--primary" routerLink="/home">Ver menú</a>
           <button class="btn btn--ghost" type="button" (click)="volverAtras()">Volver</button>
         </ng-template>
 
